@@ -1,0 +1,261 @@
+
+const express = require('express');
+const router = express.Router();
+const User = require('../models/User');
+const { protect } = require('../middleware/authMiddleware');
+const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
+
+// Configure Multer Storage
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadPath = path.join(__dirname, '../public/uploads');
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        cb(null, uploadPath)
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname)
+    }
+});
+
+const upload = multer({ storage: storage });
+
+// Backwards-compatible verifyToken alias using standard protect
+const verifyToken = protect;
+
+// @route   GET /api/users/profile
+// @desc    Get current logged in user profile
+router.get('/profile', protect, async (req, res) => {
+    try {
+        const userId = req.user._id || req.user.id;
+        const user = await User.findById(userId).select('-password').populate('profile');
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+// @route   PUT /api/users/profile
+// @desc    Update current logged in user profile
+router.put('/profile', verifyToken, async (req, res) => {
+    try {
+        const {
+            firstName, lastName, profilePicture, // User fields
+            headline, bio, skills, experience, projects, education, resume, // Candidate & Freelancer fields
+            hourlyRate, yearsOfExperience, availability, // Interviewer Profile fields
+            website, description // Org fields
+        } = req.body;
+
+        // 1. Update User Fields
+        const userUpdate = {};
+        if (firstName) userUpdate.firstName = firstName;
+        if (lastName) userUpdate.lastName = lastName;
+        if (firstName || lastName) userUpdate.name = `${firstName || ''} ${lastName || ''}`.trim();
+        if (profilePicture) userUpdate.profilePicture = profilePicture;
+        
+        // Trust & Verification layer array updates directly on User model
+        if (experience !== undefined) userUpdate.experience = experience;
+        if (projects !== undefined) userUpdate.projects = projects;
+        
+        // Ensure bio and skills sync to User model too for cross-compatibility
+        if (bio !== undefined) userUpdate.bio = bio;
+        if (skills !== undefined) userUpdate.skills = skills;
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { $set: userUpdate },
+            { new: true, runValidators: false }
+        ).select('-password').populate('profile');
+
+        // 2. Update Profile Fields (auto-create if missing)
+        const Profile = require('../models/Profile'); // Lazy load
+        let profileId = user.profile ? user.profile._id : null;
+
+        if (!profileId) {
+            // Auto-create missing profile to prevent silent drops
+            const newProfile = new Profile({ user: user._id });
+            await newProfile.save();
+            profileId = newProfile._id;
+            
+            // Link it back to the User object
+            await User.findByIdAndUpdate(user._id, { $set: { profile: profileId } }, { runValidators: false });
+        }
+
+        const profileUpdate = {};
+        if (headline !== undefined) profileUpdate.headline = headline;
+        if (bio !== undefined) profileUpdate.bio = bio;
+        if (skills !== undefined) profileUpdate.skills = skills;
+        if (experience !== undefined) profileUpdate.experience = experience; // Sync experience to Profile model
+        if (education !== undefined) profileUpdate.education = education;
+        if (resume !== undefined) profileUpdate.resume = resume;
+
+        if (hourlyRate !== undefined) profileUpdate.hourlyRate = hourlyRate;
+        if (yearsOfExperience !== undefined) profileUpdate.yearsOfExperience = yearsOfExperience;
+        if (availability !== undefined) profileUpdate.availability = availability;
+
+        const updatedProfile = await Profile.findByIdAndUpdate(
+            profileId,
+            { $set: profileUpdate },
+            { new: true, runValidators: false } // Added runValidators: false here just in case
+        );
+
+        // Re-assign updated profile to user object for response
+        user.profile = updatedProfile;
+
+        // 3. Update Organization Fields (if user is Admin)
+        if (user.role === 'ADMIN' && user.organization) {
+            const orgUpdate = {};
+            if (website) orgUpdate.website = website;
+            if (description) orgUpdate.description = description;
+
+            const Organization = require('../models/Organization');
+            await Organization.findByIdAndUpdate(user.organization, { $set: orgUpdate });
+        }
+
+        res.json(user);
+    } catch (error) {
+        console.error('Profile update error:', error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+// @route   POST /api/users/profile-picture
+// @desc    Upload profile picture
+router.post('/profile-picture', verifyToken, upload.single('profilePicture'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        // URL to access the file
+        const profilePictureUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+
+        // Update User model with profilePictureUrl
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { profilePicture: profilePictureUrl },
+            { new: true }
+        ).select('-password');
+
+        res.json({ profilePicture: profilePictureUrl, user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+// @route   GET /api/users/interviewers
+// @desc    Get list of freelance interviewers (Approved Only) with optional filters
+router.get('/interviewers', verifyToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'RECRUITER' && req.user.role !== 'ADMIN') return res.status(403).json({ message: 'Unauthorized' });
+
+        const { skill, maxRate } = req.query;
+
+        // 1. Find Approved (or Pending for now) Interviewers
+        let query = { role: 'INTERVIEWER' }; // Removed approvalStatus: 'APPROVED' to allow viewing
+        let interviewers = await User.find(query).select('-password -email').populate('profile');
+
+        // 2. Apply Filters (Skill & MaxRate)
+        if (skill || maxRate) {
+            interviewers = interviewers.filter(user => {
+                let match = true;
+                if (!user.profile) return false; // If no profile, they can't match these filters
+
+                if (skill) {
+                    // Check if skills array includes the requested skill (case-insensitive)
+                    const hasSkill = user.profile.skills && user.profile.skills.some(s => s.toLowerCase().includes(skill.toLowerCase()));
+                    if (!hasSkill) match = false;
+                }
+
+                if (maxRate && match) {
+                    // Check if hourlyRate is less than or equal to maxRate
+                    if (!user.profile.hourlyRate || user.profile.hourlyRate > Number(maxRate)) {
+                        match = false;
+                    }
+                }
+
+                return match;
+            });
+        }
+
+        res.json(interviewers);
+    } catch (error) {
+        console.error("Error fetching interviewers:", error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+// @route   GET /api/users/candidates
+// @desc    Get list of candidates (for Recruiters)
+router.get('/candidates', verifyToken, async (req, res) => {
+    try {
+        // Allow Recruiter and Admin
+        if (req.user.role !== 'RECRUITER' && req.user.role !== 'ADMIN') {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        const candidates = await User.find({ role: 'CANDIDATE' }).select('name email profilePicture');
+        res.json(candidates);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+// @route   GET /api/users/by-id/:id
+// @desc    Get public user info by ID (for messaging deep-link)
+router.get('/by-id/:id', verifyToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).select('name role profilePicture');
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+// @route   GET /api/users/:email
+// @desc    Get public profile by email (Optional per requirement)
+router.get('/:email', async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.params.email }).select('-password -email');
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+// @route   POST /api/users/resume
+// @desc    Upload resume
+router.post('/resume', verifyToken, upload.single('resume'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        // URL to access the file
+        const resumeUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+
+        // Update User model with resumeUrl
+        const user = await User.findByIdAndUpdate(req.user.id, { resumeUrl: resumeUrl }, { new: true });
+
+        // Also update Profile if it exists (for backward compatibility or redundancy)
+        if (user.profile) {
+            const Profile = require('../models/Profile');
+            await Profile.findByIdAndUpdate(user.profile, { resume: resumeUrl });
+        }
+
+        res.json({ resumeUrl });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+module.exports = router;

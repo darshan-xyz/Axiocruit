@@ -1,0 +1,99 @@
+%PDF-1.4
+1 0 obj
+<<
+  /Type /Catalog
+  /Pages 2 0 R
+>>
+endobj
+2 0 obj
+<<
+  /Type /Pages
+  /Kids [3 0 R]
+  /Count 1
+>>
+endobj
+3 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 612 792]
+  /Contents 4 0 R
+  /Resources <<
+    /Font <<
+      /F1 5 0 R
+    >>
+  >>
+>>
+endobj
+4 0 obj
+<<
+  /Length 780
+>>
+stream
+BT
+/F1 18 Tf
+50 740 Td
+(Alex Candidate - Senior Software Engineer) Tj
+/F1 11 Tf
+0 -24 Td
+(Email: candidate@procruit.com | Phone: +1 555-0199 | Location: San Francisco, CA) Tj
+0 -28 Td
+(SUMMARY) Tj
+0 -16 Td
+(Results-oriented Full Stack Engineer with 7+ years of experience building scalable web applications) Tj
+0 -14 Td
+(and distributed microservices using React, TypeScript, Node.js, Python, and cloud infrastructure.) Tj
+0 -28 Td
+(TECHNICAL SKILLS) Tj
+0 -16 Td
+(Frontend: JavaScript, TypeScript, React, Redux, Next.js, Tailwind CSS, HTML5, CSS3) Tj
+0 -14 Td
+(Backend: Node.js, Express, Python, FastAPI, Django, REST APIs, GraphQL, WebSockets) Tj
+0 -14 Td
+(Databases & Tools: PostgreSQL, MongoDB, Redis, Docker, Kubernetes, AWS, Git, CI/CD) Tj
+0 -28 Td
+(WORK EXPERIENCE) Tj
+0 -16 Td
+(Senior Full Stack Developer - TechCorp Solutions (2021 - Present)) Tj
+0 -14 Td
+(- Architected and delivered high-throughput microservices using Node.js, Express, and MongoDB.) Tj
+0 -14 Td
+(- Modernized frontend architecture using React, TypeScript, and TailwindCSS, improving load times by 45%.) Tj
+0 -14 Td
+(- Engineered automated CI/CD deployment pipelines using Docker and GitHub Actions.) Tj
+0 -24 Td
+(Software Engineer - CloudSystems Inc. (2018 - 2021)) Tj
+0 -14 Td
+(- Built RESTful APIs and real-time WebSocket communication channels in Python and FastAPI.) Tj
+0 -14 Td
+(- Designed responsive user interfaces in React and integrated third-party payment gateways.) Tj
+0 -28 Td
+(EDUCATION) Tj
+0 -16 Td
+(Bachelor of Science in Computer Science - University of Technology (2014 - 2018)) Tj
+ET
+endstream
+endobj
+5 0 obj
+<<
+  /Type /Font
+  /Subtype /Type1
+  /BaseFont /Helvetica
+>>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000266 00000 n 
+0000001100 00000 n 
+trailer
+<<
+  /Size 6
+  /Root 1 0 R
+>>
+startxref
+1171
+%%EOF

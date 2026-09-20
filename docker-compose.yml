@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  # --- MongoDB Database ---
+  mongodb:
+    image: mongo:7.0
+    container_name: axiocruit-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: axiocruit
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - axiocruit-network
+
+  # --- AI Microservice (NLP & CV Matching) ---
+  ai-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.ai
+    container_name: axiocruit-ai
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    environment:
+      - PORT=8002
+      - OLLAMA_URL=http://host.docker.internal:11434
+    networks:
+      - axiocruit-network
+
+  # --- Proctoring Microservice (MediaPipe & Gaze Detection) ---
+  proctoring-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.proctor
+    container_name: axiocruit-proctor
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      - PORT=8001
+    networks:
+      - axiocruit-network
+
+  # --- Core Express Backend & Socket.IO Gateway ---
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    container_name: axiocruit-backend
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    environment:
+      - NODE_ENV=production
+      - PORT=5001
+      - MONGO_URI=mongodb://mongodb:27017/axiocruit
+      - JWT_SECRET=${JWT_SECRET:-axiocruit_enterprise_jwt_secret_change_in_prod}
+      - CLIENT_URL=http://localhost:3000
+      - AI_SERVICE_URL=http://ai-service:8002
+      - PROCTORING_SERVICE_URL=http://proctoring-service:8001
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+      proctoring-service:
+        condition: service_started
+    volumes:
+      - uploads-data:/app/public/uploads
+    networks:
+      - axiocruit-network
+
+  # --- Frontend Client (Nginx SPA + Reverse Proxy) ---
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: axiocruit-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+      - proctoring-service
+    networks:
+      - axiocruit-network
+
+volumes:
+  mongo-data:
+    driver: local
+  uploads-data:
+    driver: local
+
+networks:
+  axiocruit-network:
+    driver: bridge

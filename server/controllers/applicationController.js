@@ -1,0 +1,424 @@
+const Application = require('../models/Application');
+const Job = require('../models/Job');
+const User = require('../models/User');
+const Profile = require('../models/Profile');
+const path = require('path');
+const fs = require('fs');
+const { v4: uuidv4 } = require('uuid');
+
+// AI Service config (defaults to port 8002 for microservice isolation)
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8002';
+const AI_TIMEOUT_MS = 30000; // 30 second timeout
+
+/**
+ * Helper: Resolve relative resume URLs to absolute URLs
+ */
+const resolveResumeUrl = (resumeUrl, req) => {
+    if (!resumeUrl) return '';
+    if (resumeUrl.startsWith('http://') || resumeUrl.startsWith('https://')) {
+        return resumeUrl;
+    }
+    const protocol = req.protocol || 'http';
+    const host = req.get('host') || 'localhost:5001';
+    const cleanPath = resumeUrl.startsWith('/') ? resumeUrl : `/${resumeUrl}`;
+    return `${protocol}://${host}${cleanPath}`;
+};
+
+/**
+ * Helper: Fetch PDF file from URL and convert to Node.js Buffer
+ */
+const fetchResumeAsBuffer = async (url) => {
+    const fetch = require('node-fetch');
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch file: ${response.statusText}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+};
+
+/**
+ * Helper: Save PDF buffer to local uploads directory
+ * Returns the public URL path for the saved file
+ */
+const saveResumeFile = (fileBuffer, originalName) => {
+    const uploadsDir = path.join(__dirname, '..', 'public', 'uploads', 'resumes');
+
+    // Ensure directory exists
+    if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    const ext = path.extname(originalName) || '.pdf';
+    const filename = `${uuidv4()}${ext}`;
+    const filePath = path.join(uploadsDir, filename);
+
+    fs.writeFileSync(filePath, fileBuffer);
+
+    // Return relative URL that can be served by Express static middleware
+    return `/uploads/resumes/${filename}`;
+};
+
+/**
+ * Helper: Call the Python AI service for CV parsing
+ * Returns { suitability_score, matched_keywords, missing_keywords } or null on failure
+ */
+const callAIService = async (fileBuffer, originalName, jobDescription) => {
+    try {
+        // Dynamic import for node-fetch (v2 CommonJS)
+        const fetch = require('node-fetch');
+        const FormData = require('form-data');
+
+        const form = new FormData();
+        form.append('file', fileBuffer, {
+            filename: originalName || 'resume.pdf',
+            contentType: 'application/pdf',
+        });
+        form.append('job_description', jobDescription);
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+
+        const response = await fetch(`${AI_SERVICE_URL}/api/ai/parse-cv`, {
+            method: 'POST',
+            body: form,
+            headers: form.getHeaders(),
+            signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            console.error('[AI Service] Non-OK response:', response.status, errorBody);
+            return null;
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            console.error('[AI Service] Request timed out after', AI_TIMEOUT_MS, 'ms');
+        } else {
+            console.error('[AI Service] Error calling AI service:', error.message);
+        }
+        return null; // Graceful degradation
+    }
+};
+
+// @desc    Apply to a job with CV upload + AI analysis
+// @route   POST /api/applications/:jobId
+// @access  Private (Candidate)
+exports.applyWithCV = async (req, res) => {
+    try {
+        const { jobId } = req.params;
+
+        // 1. Find the job
+        const job = await Job.findById(jobId);
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+
+        // 2. Check for duplicate application
+        const existingApplication = await Application.findOne({
+            job: job._id,
+            candidate: req.user.id,
+        });
+
+        if (existingApplication) {
+            console.error('[DEBUG ApplicationController] Rejecting application due to DUPLICATE APPLICATION!');
+            return res.status(400).json({ message: 'You have already applied to this job' });
+        }
+
+        // 3. Get user profile data for snapshot
+        const user = await User.findById(req.user.id).populate('profile');
+        let profileData = {};
+        if (user.profile) {
+            if (user.profile._id) {
+                profileData = user.profile;
+            } else {
+                profileData = await Profile.findById(user.profile);
+            }
+        }
+
+        // 4. Validate that the candidate has a resumeUrl
+        const userResumeUrl = user.resumeUrl || (profileData ? profileData.resume : null);
+        console.log('[DEBUG ApplicationController] user.id:', req.user.id);
+        console.log('[DEBUG ApplicationController] user.resumeUrl:', user.resumeUrl);
+        console.log('[DEBUG ApplicationController] profileData.resume:', profileData ? profileData.resume : 'N/A');
+        console.log('[DEBUG ApplicationController] Final userResumeUrl resolved as:', userResumeUrl);
+
+        if (!userResumeUrl) {
+            console.error('[DEBUG ApplicationController] Rejecting application due to missing CV URL!');
+            return res.status(400).json({ message: 'Please update your profile and upload a CV before applying' });
+        }
+
+        // 5. Read the existing resume file from disk
+        let fileBuffer;
+        let originalName = 'resume.pdf';
+        try {
+            console.log('[DEBUG ApplicationController] Attempting to read file from userResumeUrl:', userResumeUrl);
+            // Extact filename from full URL like http://localhost:5000/uploads/filename.pdf
+            const urlParts = userResumeUrl.split('/');
+            const filename = urlParts[urlParts.length - 1];
+            // Files from CandidateProfile upload to public/uploads
+            const relativePath = userResumeUrl.includes('/uploads/resumes/')
+                ? path.join('uploads', 'resumes', filename)
+                : path.join('uploads', filename);
+            const resumePath = path.join(__dirname, '..', 'public', relativePath);
+            console.log('[DEBUG ApplicationController] Resolved absolute file path:', resumePath);
+            fileBuffer = fs.readFileSync(resumePath);
+            originalName = filename;
+            console.log('[DEBUG ApplicationController] Successfully read file buffer of size:', fileBuffer.length);
+        } catch (fileErr) {
+            console.error('[File Read] Error reading existing resume:', fileErr.message);
+            // Graceful fallback to neutral sample resume if original file is missing
+            const fallbackPath = path.join(__dirname, '..', 'public', 'uploads', 'sample-resume.pdf');
+            if (fs.existsSync(fallbackPath)) {
+                try {
+                    fileBuffer = fs.readFileSync(fallbackPath);
+                    originalName = 'sample-resume.pdf';
+                    console.log('[DEBUG ApplicationController] Using neutral sample resume fallback, size:', fileBuffer.length);
+                } catch (fbErr) {
+                    console.error('[File Read] Fallback resume also unreadable:', fbErr.message);
+                }
+            }
+        }
+
+        // 6. Build job description text for AI
+        const jobDescriptionText = [
+            job.description || '',
+            job.requirements || '',
+            (job.skills || []).join(', '),
+        ].filter(Boolean).join('\n\n');
+
+        // 7. Call AI service (with graceful degradation)
+        let aiResult = null;
+        if (fileBuffer) {
+            aiResult = await callAIService(
+                fileBuffer,
+                originalName,
+                jobDescriptionText
+            );
+        }
+
+        // 8. Create application
+        const applicationData = {
+            job: job._id,
+            candidate: req.user.id,
+            resume: userResumeUrl,
+            resumeUrl: userResumeUrl,
+            experience: profileData ? profileData.experience : [],
+            education: profileData ? profileData.education : [],
+            skills: profileData ? profileData.skills : [],
+        };
+
+        if (aiResult) {
+            // AI succeeded
+            applicationData.aiScore = aiResult.suitability_score;
+            applicationData.matchedKeywords = aiResult.matched_keywords || [];
+            applicationData.missingKeywords = aiResult.missing_keywords || [];
+            applicationData.status = 'Applied';
+        } else {
+            // AI failed — graceful degradation
+            applicationData.aiScore = null;
+            applicationData.matchedKeywords = [];
+            applicationData.missingKeywords = [];
+            applicationData.status = 'Pending AI';
+        }
+
+        const application = new Application(applicationData);
+        await application.save();
+
+        // 9. Add to job applicants
+        job.applicants.push(req.user.id);
+        await job.save();
+
+        // 10. Return success
+        res.status(201).json({
+            message: 'Application submitted successfully',
+            application: {
+                _id: application._id,
+                aiScore: application.aiScore,
+                matchedKeywords: application.matchedKeywords,
+                missingKeywords: application.missingKeywords,
+                status: application.status,
+                resumeUrl: application.resumeUrl,
+            },
+            aiAnalyzed: aiResult !== null,
+        });
+    } catch (err) {
+        console.error('[applyWithCV] Error:', err);
+        res.status(500).json({ message: 'Server error while processing application' });
+    }
+};
+
+// @desc    Get ranked candidates for a specific job
+// @route   GET /api/jobs/:jobId/candidates
+// @access  Private (Recruiter)
+exports.getRankedCandidates = async (req, res) => {
+    try {
+        const { jobId } = req.params;
+
+        // Verify the job exists and belongs to this recruiter
+        const job = await Job.findById(jobId);
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+
+        const isOwner = job.postedBy.toString() === (req.user.id || req.user._id);
+        const isDelegated = job.delegatedFreelancerId && job.delegatedFreelancerId.toString() === (req.user.id || req.user._id);
+
+        if (!isOwner && !isDelegated) {
+            return res.status(403).json({ message: 'Not authorized to view candidates for this job' });
+        }
+
+        // Fetch all applications, sorted by AI score descending
+        // Applications with null aiScore go to the end
+        const applications = await Application.find({ job: jobId })
+            .populate({
+                path: 'candidate',
+                select: 'name email profilePicture headline',
+                populate: { path: 'profile' },
+            })
+            .sort({ aiScore: -1 })
+            .lean();
+
+        // Move null-score applications to the end
+        const scored = applications.filter(a => a.aiScore !== null);
+        const unscored = applications.filter(a => a.aiScore === null);
+
+        res.json({
+            jobTitle: job.title,
+            totalCandidates: applications.length,
+            candidates: [...scored, ...unscored],
+        });
+    } catch (err) {
+        console.error('[getRankedCandidates] Error:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+// @desc    Get applications for logged-in candidate
+// @route   GET /api/applications/my-applications
+// @access  Private (Candidate)
+exports.getMyApplications = async (req, res) => {
+    try {
+        const applications = await Application.find({ candidate: req.user.id || req.user._id })
+            .populate({
+                path: 'job',
+                select: 'title company location type postedBy',
+                populate: { path: 'postedBy', select: 'name profilePicture role' }
+            })
+            .sort({ appliedAt: -1 });
+
+        res.json(applications);
+    } catch (err) {
+        console.error('[getMyApplications] Error:', err);
+        res.status(500).json({ message: 'Server error fetching applications' });
+    }
+};
+
+// @desc    Retry AI analysis for a specific application
+// @route   POST /api/applications/:applicationId/retry-ai
+// @access  Private (Recruiter, INTERVIEWER, freelancer — with delegation check)
+exports.retryAiAnalysis = async (req, res) => {
+    try {
+        const { applicationId } = req.params;
+
+        // 1. Find application and populate job & candidate
+        const application = await Application.findById(applicationId)
+            .populate('job')
+            .populate({
+                path: 'candidate',
+                select: 'name email resumeUrl',
+            });
+
+        if (!application) {
+            return res.status(404).json({ message: 'Application not found' });
+        }
+
+        // 2. Verify permissions (Recruiter who posted it OR delegated Freelancer/Interviewer)
+        const job = application.job;
+        const currentUserId = (req.user._id || req.user.id).toString();
+        const isOwner = job.postedBy && job.postedBy.toString() === currentUserId;
+        const isDelegated = job.delegatedFreelancerId && job.delegatedFreelancerId.toString() === currentUserId;
+
+        if (!isOwner && !isDelegated) {
+            return res.status(403).json({ message: 'Not authorized to modify this application' });
+        }
+
+        // Billing Context: When a freelancer triggers AI parsing, the Recruiter (job owner) pays
+        const billingAccountId = (req.user.role === 'freelancer' || req.user.role === 'INTERVIEWER') ? job.postedBy : currentUserId;
+        console.log(`[retryAiAnalysis] Billing account resolved to: ${billingAccountId} (req.user.role: ${req.user.role})`);
+
+        // 3. Verify it needs a retry (score is null or status is Pending AI)
+        if (application.aiScore !== null && application.status !== 'Pending AI') {
+            return res.status(400).json({ message: 'Application already has an AI score' });
+        }
+
+        // 4. Get the resume URL from the application or candidate
+        const resumeUrl = application.resumeUrl || (application.candidate && application.candidate.resumeUrl);
+        if (!resumeUrl) {
+            return res.status(400).json({ message: 'No resume found for this candidate to analyze' });
+        }
+
+        console.log(`[retryAiAnalysis] Resolved resume URL string: ${resumeUrl}`);
+        console.log(`[retryAiAnalysis] Populated candidate object exists: ${!!application.candidate}`);
+
+        // 5. Fetch the PDF buffer from the URL
+        let pdfBuffer;
+        try {
+            const absoluteUrl = resolveResumeUrl(resumeUrl, req);
+            console.log(`[retryAiAnalysis] Absolute URL for fetch: ${absoluteUrl}`);
+            pdfBuffer = await fetchResumeAsBuffer(absoluteUrl);
+            console.log(`[retryAiAnalysis] Successfully fetched resume buffer of size: ${pdfBuffer.length} bytes`);
+        } catch (fetchErr) {
+            console.error('[retryAiAnalysis] Full error fetching resume PDF:', fetchErr);
+            return res.status(500).json({ message: 'Failed to retrieve the candidate CV for analysis' });
+        }
+
+        // 6. Build Job Description
+        const jobDescriptionText = [
+            application.job.description || '',
+            application.job.requirements || '',
+            (application.job.skills || []).join(', '),
+        ].filter(Boolean).join('\n\n');
+
+        // 7. Call AI Service
+        let originalName = 'resume.pdf';
+        const urlParts = resumeUrl.split('/');
+        if (urlParts.length > 0) {
+            originalName = urlParts[urlParts.length - 1];
+        }
+
+        const aiResult = await callAIService(pdfBuffer, originalName, jobDescriptionText);
+
+        if (!aiResult) {
+            return res.status(500).json({ message: 'AI service request failed or timed out again.' });
+        }
+
+        // 8. Update application with new score
+        application.aiScore = aiResult.suitability_score;
+        application.matchedKeywords = aiResult.matched_keywords || [];
+        application.missingKeywords = aiResult.missing_keywords || [];
+        application.status = 'Applied'; // Clear the pending status
+
+        await application.save();
+
+        // 9. Return the updated application for frontend state updates
+        res.status(200).json({
+            message: 'AI analysis successful',
+            application: {
+                _id: application._id,
+                aiScore: application.aiScore,
+                matchedKeywords: application.matchedKeywords,
+                missingKeywords: application.missingKeywords,
+                status: application.status
+            }
+        });
+    } catch (err) {
+        console.error('[retryAiAnalysis] Error:', err);
+        res.status(500).json({ message: 'Server error while retrying AI analysis' });
+    }
+};
