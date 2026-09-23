@@ -1,7 +1,7 @@
 @echo off
-title Axiocruit Recruitment Platform
+title Procruit Recruitment Platform
 echo ===================================================
-echo Starting Axiocruit Full Stack (Client, Server, AI, Proctor)
+echo Starting Procruit Full Stack (Client, Server, AI, Proctor)
 echo ===================================================
 npm run dev
 pause

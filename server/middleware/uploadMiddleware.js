@@ -31,7 +31,7 @@ function checkFileType(file, cb) {
     if (mimetype && extname) {
         return cb(null, true);
     } else {
-        cb('Error: Images, PDFs, and Docs only!');
+        cb(new Error('Images, PDFs, and Docs only!'));
     }
 }
 

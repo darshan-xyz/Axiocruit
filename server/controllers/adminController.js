@@ -3,13 +3,14 @@ const Job = require('../models/Job');
 const Organization = require('../models/Organization');
 const Profile = require('../models/Profile');
 const Application = require('../models/Application');
+const Interview = require('../models/Interview');
 
 // @desc    Get dashboard stats
 // @route   GET /api/admin/stats
 exports.getDashboardStats = async (req, res) => {
     try {
         const totalCandidates = await User.countDocuments({ role: 'CANDIDATE' });
-        const totalRecruiters = await User.countDocuments({ role: { $in: ['RECRUITER', 'organization'] } });
+        const totalRecruiters = await User.countDocuments({ role: { $in: ['RECRUITER', 'ORGANIZATION', 'organization'] } });
         const activeJobs = await Job.countDocuments({ status: 'Active' });
         const totalApplications = await Application.countDocuments();
 
@@ -38,7 +39,14 @@ exports.getAllUsers = async (req, res) => {
         const { role } = req.query;
         let query = {};
         if (role) {
-            query.role = role;
+            const normalized = String(role).trim().toUpperCase();
+            if (normalized === 'ORGANIZATION') {
+                query.role = { $in: ['ORGANIZATION', 'organization'] };
+            } else if (normalized === 'FREELANCER' || normalized === 'INTERVIEWER') {
+                query.role = { $in: ['INTERVIEWER', 'freelancer'] };
+            } else {
+                query.role = normalized;
+            }
         }
 
         const users = await User.find(query)
@@ -73,8 +81,10 @@ exports.deleteUser = async (req, res) => {
             await Profile.findByIdAndDelete(user.profile);
         }
 
+        const roleUpper = (user.role || '').toUpperCase();
+
         // 2. If organization: Delete Organization and its Recruiters
-        if (user.role === 'organization') {
+        if (roleUpper === 'ORGANIZATION') {
             const org = await Organization.findOne({ admin: user._id });
             if (org) {
                 // Find all recruiters in this org
@@ -91,7 +101,7 @@ exports.deleteUser = async (req, res) => {
         }
 
         // 3. If RECRUITER: Remove from Org list and delete their jobs
-        if (user.role === 'RECRUITER') {
+        if (roleUpper === 'RECRUITER') {
             await Job.deleteMany({ postedBy: user._id });
             if (user.organization) {
                 await Organization.findByIdAndUpdate(user.organization, {
@@ -101,9 +111,14 @@ exports.deleteUser = async (req, res) => {
         }
 
         // 4. Delete Applications (if Candidate)
-        if (user.role === 'CANDIDATE') {
+        if (roleUpper === 'CANDIDATE') {
             await Application.deleteMany({ candidate: user._id });
         }
+
+        // 5. Clean up associated interviews
+        await Interview.deleteMany({
+            $or: [{ candidateId: user._id }, { recruiterId: user._id }, { interviewerId: user._id }]
+        });
 
         // Finally, delete the user
         await User.findByIdAndDelete(req.params.id);

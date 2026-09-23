@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Sparkles,
@@ -54,8 +54,39 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
   onProposeHire
 }) => {
   const [activeTab, setActiveTab] = useState<'Overview' | 'Profile' | 'Activity' | 'Notes' | 'Files'>('Overview');
-  const [notesList, setNotesList] = useState<SakromeNote[]>([]);
   const [newNoteText, setNewNoteText] = useState('');
+
+  const candidateId = candidate?._id || (candidate as any)?.candidate?._id || (candidate as any)?.candidate || (candidate as any)?.id || '';
+
+  // Dictionary map for notes keyed by candidate ID, persisted in localStorage
+  const [notesByCandidate, setNotesByCandidate] = useState<Record<string, SakromeNote[]>>(() => {
+    try {
+      const saved = localStorage.getItem('candidate_inspector_notes');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const updateCandidateNotes = (candId: string, notes: SakromeNote[]) => {
+    if (!candId) return;
+    setNotesByCandidate(prev => {
+      const next = { ...prev, [candId]: notes };
+      try {
+        localStorage.setItem('candidate_inspector_notes', JSON.stringify(next));
+      } catch (err) {
+        console.error('Failed to persist candidate notes:', err);
+      }
+      return next;
+    });
+  };
+
+  const [notesList, setNotesList] = useState<SakromeNote[]>([]);
+
+  useEffect(() => {
+    setNewNoteText('');
+    setNotesList([]);
+  }, [candidate?._id, candidate?.candidate?._id]);
 
   if (!candidate) return null;
 
@@ -71,26 +102,28 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
   const gaugeCircumference = 2 * Math.PI * gaugeRadius; // ~113.1
   const gaugeOffset = gaugeCircumference - (Math.min(100, Math.max(0, score)) / 100) * gaugeCircumference;
 
-  // Active notes for candidate
-  const currentNotes = notesList.length > 0 ? notesList : (cand.candidate?.notes || [
+  // Active notes for candidate isolated by candidateId
+  const defaultNotes: SakromeNote[] = cand.candidate?.notes || [
     {
       id: 'note-1',
       author: 'Kevin Nunez',
       date: cand.appliedDateFormatted || '14 Sep 2026',
       content: 'Excellent communication and systematic thinking during screening. Recommended for technical round.'
     }
-  ]);
+  ];
+  const currentNotes = (candidateId && notesByCandidate[candidateId]) ? notesByCandidate[candidateId] : defaultNotes;
 
   const handleAddNote = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newNoteText.trim()) return;
+    if (!newNoteText.trim() || !candidateId) return;
     const newNote: SakromeNote = {
       id: `note-${Date.now()}`,
       author: role === 'INTERVIEWER' ? 'Interviewer' : 'Kevin Nunez',
       date: 'Just now',
       content: newNoteText.trim()
     };
-    setNotesList([newNote, ...currentNotes]);
+    const updated = [newNote, ...currentNotes];
+    updateCandidateNotes(candidateId, updated);
     setNewNoteText('');
   };
 

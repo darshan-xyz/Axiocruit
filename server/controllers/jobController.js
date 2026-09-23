@@ -69,12 +69,20 @@ exports.getMyJobs = async (req, res) => {
             .sort({ createdAt: -1 })
             .lean();
 
-        const jobsWithCounts = await Promise.all(jobs.map(async (job) => {
-            const count = await Application.countDocuments({ job: job._id });
-            return {
-                ...job,
-                applicantCount: count
-            };
+        if (!jobs || jobs.length === 0) {
+            return res.json([]);
+        }
+
+        const jobIds = jobs.map(j => j._id);
+        const counts = await Application.aggregate([
+            { $match: { job: { $in: jobIds } } },
+            { $group: { _id: '$job', count: { $sum: 1 } } }
+        ]);
+
+        const countMap = new Map(counts.map(c => [c._id.toString(), c.count]));
+        const jobsWithCounts = jobs.map(job => ({
+            ...job,
+            applicantCount: countMap.get(job._id.toString()) || 0
         }));
 
         res.json(jobsWithCounts);
@@ -234,41 +242,66 @@ exports.getMyReceivedApplications = async (req, res) => {
             .sort({ appliedAt: -1 })
             .lean();
 
-        // Attach external AI test and interview results so the Freelancer can package them
+        // Attach external AI test and interview results efficiently via batch $in queries
         const Interview = require('../models/Interview');
         const TestSession = require('../models/TestSession');
 
-        for (let app of applications) {
-            if (!app.candidate) continue;
+        const candidateIds = applications
+            .filter(a => a.candidate && a.candidate._id)
+            .map(a => a.candidate._id);
 
-            const interview = await Interview.findOne({
-                jobId: app.job._id,
-                candidateId: app.candidate._id,
-                status: 'Completed'
-            }).sort({ createdAt: -1 }).lean();
+        if (jobIds.length > 0 && candidateIds.length > 0) {
+            const [interviews, testSessions] = await Promise.all([
+                Interview.find({
+                    jobId: { $in: jobIds },
+                    candidateId: { $in: candidateIds },
+                    status: 'Completed',
+                }).sort({ createdAt: -1 }).lean(),
+                TestSession.find({
+                    jobId: { $in: jobIds },
+                    candidateId: { $in: candidateIds },
+                    status: 'completed',
+                }).populate('responses.questionId', 'title category').sort({ completedAt: -1 }).lean(),
+            ]);
 
-            if (interview) {
-                app.aiInterviewReport = interview.aiEvaluation || null;
-                app.aiAnalysis = interview.feedback ? interview.feedback.detailedFeedback : null;
+            const interviewMap = new Map();
+            for (const item of interviews) {
+                const key = `${item.jobId?.toString()}_${item.candidateId?.toString()}`;
+                if (!interviewMap.has(key)) {
+                    interviewMap.set(key, item);
+                }
             }
 
-            const testSession = await TestSession.findOne({
-                jobId: app.job._id,
-                candidateId: app.candidate._id,
-                status: 'completed'
-            }).populate('responses.questionId', 'title category').sort({ completedAt: -1 }).lean();
+            const testSessionMap = new Map();
+            for (const item of testSessions) {
+                const key = `${item.jobId?.toString()}_${item.candidateId?.toString()}`;
+                if (!testSessionMap.has(key)) {
+                    testSessionMap.set(key, item);
+                }
+            }
 
-            if (testSession) {
-                app.codingTestResults = {
-                    finalScore: testSession.finalScore,
-                    difficultyReached: testSession.currentDifficulty,
-                    responses: testSession.responses.map(r => ({
-                        question: r.questionId?.title || 'Unknown',
-                        category: r.questionId?.category || 'Unknown',
-                        passed: r.passed,
-                        score: r.score
-                    }))
-                };
+            for (const app of applications) {
+                if (!app.candidate || !app.job) continue;
+                const key = `${app.job._id.toString()}_${app.candidate._id.toString()}`;
+                const interview = interviewMap.get(key);
+                if (interview) {
+                    app.aiInterviewReport = interview.aiEvaluation || null;
+                    app.aiAnalysis = interview.feedback ? interview.feedback.detailedFeedback : null;
+                }
+
+                const testSession = testSessionMap.get(key);
+                if (testSession) {
+                    app.codingTestResults = {
+                        finalScore: testSession.finalScore,
+                        difficultyReached: testSession.currentDifficulty,
+                        responses: testSession.responses.map(r => ({
+                            question: r.questionId?.title || 'Unknown',
+                            category: r.questionId?.category || 'Unknown',
+                            passed: r.passed,
+                            score: r.score,
+                        })),
+                    };
+                }
             }
         }
 

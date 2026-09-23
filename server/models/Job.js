@@ -41,4 +41,7 @@ const jobSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 }, { timestamps: true });
 
+jobSchema.index({ postedBy: 1, status: 1 });
+jobSchema.index({ delegatedFreelancerId: 1, delegationStatus: 1 });
+
 module.exports = mongoose.model('Job', jobSchema);

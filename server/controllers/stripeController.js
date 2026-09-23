@@ -79,6 +79,10 @@ const createCheckoutSession = async (req, res) => {
 // @route   POST /api/payments/webhook
 // @access  Public (Called by Stripe)
 const stripeWebhook = async (req, res) => {
+    if (!stripe || !process.env.STRIPE_WEBHOOK_SECRET) {
+        return res.status(503).json({ message: 'Stripe webhook handler is unconfigured' });
+    }
+
     const payload = req.body;
     const sig = req.headers['stripe-signature'];
 

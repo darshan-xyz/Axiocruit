@@ -1,5 +1,5 @@
 """
-Axiocruit AI Microservice — CV Parsing & NLP Matching
+Procruit AI Microservice — CV Parsing & NLP Matching
 =====================================================
 FastAPI server that extracts text from PDF resumes, computes semantic
 similarity with a job description using SentenceTransformers, and
@@ -16,8 +16,10 @@ import os
 import re
 import string
 import time
+from contextlib import asynccontextmanager
 from typing import List
 
+import httpx
 import pdfplumber
 import spacy
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
@@ -33,15 +35,11 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("ai-service")
 
 # ---------------------------------------------------------------------------
-# Global Model Loading (at import / startup time)
+# Model Handles (loaded in async lifespan)
 # ---------------------------------------------------------------------------
-logger.info("Loading SentenceTransformer model (all-MiniLM-L6-v2) ...")
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-logger.info("SentenceTransformer model loaded.")
-
-logger.info("Loading spaCy model (en_core_web_sm) ...")
-nlp = spacy.load("en_core_web_sm")
-logger.info("spaCy model loaded.")
+embedding_model: SentenceTransformer | None = None
+nlp = None
+http_client: httpx.AsyncClient | None = None
 
 # Common NER labels that are never useful keywords
 STOP_LABELS = {"DATE", "TIME", "PERCENT", "MONEY", "QUANTITY", "ORDINAL", "CARDINAL"}
@@ -109,9 +107,34 @@ TECH_KEYWORDS = {
 }
 
 # ---------------------------------------------------------------------------
-# FastAPI App
+# FastAPI App & Async Lifespan
 # ---------------------------------------------------------------------------
-app = FastAPI(title="Axiocruit AI Service", version="1.0.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global embedding_model, nlp, http_client
+    logger.info("Initializing models and HTTP client in lifespan...")
+    try:
+        embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+        logger.info("SentenceTransformer model loaded.")
+    except Exception as e:
+        logger.warning("SentenceTransformer could not be loaded: %s", e)
+
+    try:
+        nlp = spacy.load("en_core_web_sm")
+        logger.info("spaCy model loaded.")
+    except Exception as e:
+        logger.warning("spaCy model could not be loaded: %s", e)
+
+    http_client = httpx.AsyncClient(
+        timeout=httpx.Timeout(connect=10.0, read=60.0, write=10.0, pool=10.0)
+    )
+    yield
+    if http_client:
+        await http_client.aclose()
+    logger.info("AI service shut down.")
+
+
+app = FastAPI(title="Procruit AI Service", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -125,20 +148,30 @@ app.add_middleware(
 # Response Schema
 # ---------------------------------------------------------------------------
 class ParseCVResponse(BaseModel):
-    suitability_score: float
-    matched_keywords: List[str]
-    missing_keywords: List[str]
+    suitability_score: float = 0.0
+    matched_keywords: List[str] = []
+    missing_keywords: List[str] = []
+    parsed_text: str = ""
+    skills: List[str] = []
+    experience_years: float = 0.0
+    domain: str = ""
+    candidate_name: str = ""
+    ai_summary: str = ""
 
 
 # ---------------------------------------------------------------------------
 # Helper Functions
 # ---------------------------------------------------------------------------
 def extract_text_from_pdf(file_bytes: bytes) -> str:
-    """Extract all text from a PDF using pdfplumber — strictly in-memory."""
+    """Extract all text from a PDF using pdfplumber — strictly in-memory with MAX_PAGES ceiling."""
+    MAX_PAGES = 30
     text_parts: list[str] = []
     try:
         with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
-            for page in pdf.pages:
+            for i, page in enumerate(pdf.pages):
+                if i >= MAX_PAGES:
+                    logger.info("Reached MAX_PAGES ceiling (%d) - stopping extraction", MAX_PAGES)
+                    break
                 page_text = page.extract_text()
                 if page_text:
                     text_parts.append(page_text)
@@ -265,7 +298,6 @@ def _remove_subset_phrases(
 
 
 def compute_keyword_score(
-    cv_keywords: set[str],
     jd_keywords: set[str],
     matched_count: int,
 ) -> float:
@@ -299,13 +331,57 @@ def compute_keyword_score(
     return min(curved_score, 100.0)
 
 
+def extract_candidate_metadata(cv_text: str, cv_keywords: set[str]) -> tuple[str, float, str, str]:
+    """Extract candidate name, experience years, domain, and summary from CV text."""
+    lines = [line.strip() for line in cv_text.splitlines() if line.strip()]
+    candidate_name = ""
+    for line in lines[:5]:
+        if "@" in line or "http" in line or any(c.isdigit() for c in line):
+            continue
+        cleaned = re.sub(r'[^a-zA-Z\s]', '', line).strip()
+        words = cleaned.split()
+        if 1 <= len(words) <= 4 and len(cleaned) < 50:
+            candidate_name = cleaned.title()
+            break
+    if not candidate_name and lines:
+        candidate_name = lines[0][:40].strip()
+
+    experience_years = 0.0
+    exp_matches = re.findall(r'(\d+(?:\.\d+)?)\+?\s*(?:years?|yrs?)(?:\s+of)?\s+(?:experience|exp)?', cv_text, re.IGNORECASE)
+    if exp_matches:
+        try:
+            candidates_exp = [float(m) for m in exp_matches if float(m) <= 40]
+            if candidates_exp:
+                experience_years = max(candidates_exp)
+        except Exception:
+            experience_years = 0.0
+
+    skills_list = sorted(list(cv_keywords))
+    domain = "Software Engineering"
+    cv_lower = cv_text.lower()
+    if any(k in cv_lower for k in ["ui/ux", "figma", "designer", "design system"]):
+        domain = "Product Design"
+    elif any(k in cv_lower for k in ["data science", "machine learning", "deep learning", "pandas", "pytorch"]):
+        domain = "Data Science & AI"
+    elif any(k in cv_lower for k in ["devops", "kubernetes", "docker", "terraform", "aws", "cloud"]):
+        domain = "DevOps & Cloud"
+    elif any(k in cv_lower for k in ["product manager", "scrum", "agile", "roadmaps"]):
+        domain = "Product Management"
+
+    name_display = candidate_name or "Candidate"
+    skills_preview = ", ".join(skills_list[:5]) if skills_list else "core technical skills"
+    ai_summary = f"{name_display} demonstrates domain expertise in {domain} with proficiency in {skills_preview}."
+
+    return candidate_name, experience_years, domain, ai_summary
+
+
 # ---------------------------------------------------------------------------
 # Endpoint
 # ---------------------------------------------------------------------------
 @app.post("/api/ai/parse-cv", response_model=ParseCVResponse)
 async def parse_cv(
     file: UploadFile = File(...),
-    job_description: str = Form(...),
+    job_description: str = Form(default=""),
 ):
     """
     Parse a candidate's CV (PDF) and score it against a job description.
@@ -313,70 +389,100 @@ async def parse_cv(
     - Extracts text from the uploaded PDF (in-memory only)
     - Computes semantic similarity via SentenceTransformers
     - Extracts and compares keywords via spaCy
-    - Returns a combined suitability score (0-100)
+    - Returns a combined suitability score (0-100) and structured candidate metadata
     """
-    # Validate file type
-    if not file.filename or not file.filename.lower().endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
+    MAX_FILE_SIZE = 15 * 1024 * 1024  # 15MB limit
 
-    # Read file into memory (no temp files)
-    file_bytes = await file.read()
-    if len(file_bytes) == 0:
-        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+    try:
+        # Validate file type
+        if not file.filename or not file.filename.lower().endswith(".pdf"):
+            raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
 
-    logger.info("Processing CV: %s (%d bytes)", file.filename, len(file_bytes))
+        # Read file into memory (enforce 15MB limit)
+        file_bytes = await file.read()
+        if len(file_bytes) == 0:
+            raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+        if len(file_bytes) > MAX_FILE_SIZE:
+            raise HTTPException(status_code=413, detail="File too large. Maximum size is 15MB.")
 
-    # 1. Extract text from PDF
-    cv_text = extract_text_from_pdf(file_bytes)
-    logger.info("Extracted %d characters from CV.", len(cv_text))
+        logger.info("Processing CV: %s (%d bytes)", file.filename, len(file_bytes))
 
-    # 2. Semantic similarity
-    semantic_score = compute_semantic_score(cv_text, job_description)
-    logger.info("Semantic score: %.2f", semantic_score)
+        # 1. Extract text from PDF
+        cv_text = extract_text_from_pdf(file_bytes)
+        logger.info("Extracted %d characters from CV.", len(cv_text))
 
-    # 3. Keyword extraction & matching
-    cv_keywords = extract_keywords(cv_text)
-    jd_keywords = extract_keywords(job_description)
+        # 2. Extract CV keywords & candidate profile metadata
+        cv_keywords = extract_keywords(cv_text)
+        candidate_name, experience_years, domain, ai_summary = extract_candidate_metadata(cv_text, cv_keywords)
 
-    matched = cv_keywords & jd_keywords
-    missing = jd_keywords - cv_keywords
+        clean_jd = (job_description or "").strip()
+        if not clean_jd:
+            logger.info("Empty job description provided — returning extracted CV metadata without scoring.")
+            return ParseCVResponse(
+                suitability_score=0.0,
+                matched_keywords=[],
+                missing_keywords=[],
+                parsed_text=cv_text,
+                skills=sorted(list(cv_keywords)),
+                experience_years=experience_years,
+                domain=domain,
+                candidate_name=candidate_name,
+                ai_summary=ai_summary,
+            )
 
-    # 3b. Subset-matching — remove n-gram phrases whose individual
-    #     words are already present in matched_keywords
-    missing = _remove_subset_phrases(matched, missing)
-    # Re-derive matched count after subset cleaning
-    effective_matched = len(jd_keywords) - len(missing)
+        # 3. Semantic similarity
+        semantic_score = compute_semantic_score(cv_text, clean_jd)
+        logger.info("Semantic score: %.2f", semantic_score)
 
-    keyword_score = compute_keyword_score(jd_keywords, jd_keywords, effective_matched)
-    logger.info(
-        "Keyword score: %.2f  (matched=%d, missing=%d, jd_total=%d)",
-        keyword_score, effective_matched, len(missing), len(jd_keywords),
-    )
+        # 4. Keyword extraction & matching
+        jd_keywords = extract_keywords(clean_jd)
+        matched = cv_keywords & jd_keywords
+        missing = jd_keywords - cv_keywords
 
-    # 4. Combined score — dynamically adjust weights
-    #    Default: 60% semantic + 40% keyword
-    #    If the JD yields fewer than 5 filterable keywords the keyword
-    #    score becomes unreliable, so we shift weight toward semantic.
-    if len(jd_keywords) < 5:
-        semantic_weight = 0.85
-        keyword_weight = 0.15
+        # 4b. Subset-matching — remove n-gram phrases whose individual
+        #     words are already present in matched_keywords
+        missing = _remove_subset_phrases(matched, missing)
+        # Re-derive matched count after subset cleaning
+        effective_matched = len(jd_keywords) - len(missing)
+
+        keyword_score = compute_keyword_score(jd_keywords, effective_matched)
         logger.info(
-            "JD keyword count (%d) < 5 — using semantic-heavy weights (%.0f/%.0f)",
-            len(jd_keywords), semantic_weight * 100, keyword_weight * 100,
+            "Keyword score: %.2f  (matched=%d, missing=%d, jd_total=%d)",
+            keyword_score, effective_matched, len(missing), len(jd_keywords),
         )
-    else:
-        semantic_weight = 0.60
-        keyword_weight = 0.40
 
-    suitability_score = round(
-        (semantic_score * semantic_weight) + (keyword_score * keyword_weight), 1,
-    )
+        # 5. Combined score — dynamically adjust weights
+        #    Default: 60% semantic + 40% keyword
+        #    If the JD yields fewer than 5 filterable keywords the keyword
+        #    score becomes unreliable, so we shift weight toward semantic.
+        if len(jd_keywords) < 5:
+            semantic_weight = 0.85
+            keyword_weight = 0.15
+            logger.info(
+                "JD keyword count (%d) < 5 — using semantic-heavy weights (%.0f/%.0f)",
+                len(jd_keywords), semantic_weight * 100, keyword_weight * 100,
+            )
+        else:
+            semantic_weight = 0.60
+            keyword_weight = 0.40
 
-    return ParseCVResponse(
-        suitability_score=suitability_score,
-        matched_keywords=sorted(matched),
-        missing_keywords=sorted(missing),
-    )
+        suitability_score = round(
+            (semantic_score * semantic_weight) + (keyword_score * keyword_weight), 1,
+        )
+
+        return ParseCVResponse(
+            suitability_score=suitability_score,
+            matched_keywords=sorted(matched),
+            missing_keywords=sorted(missing),
+            parsed_text=cv_text,
+            skills=sorted(list(cv_keywords)),
+            experience_years=experience_years,
+            domain=domain,
+            candidate_name=candidate_name,
+            ai_summary=ai_summary,
+        )
+    finally:
+        await file.close()
 
 
 # ---------------------------------------------------------------------------
@@ -429,7 +535,8 @@ async def _resolve_ollama_model() -> str:
 
     try:
         import httpx
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        client = http_client if http_client and not http_client.is_closed else httpx.AsyncClient(timeout=5.0)
+        try:
             resp = await client.get(f"{OLLAMA_URL}/api/tags")
             resp.raise_for_status()
             data = resp.json()
@@ -450,6 +557,9 @@ async def _resolve_ollama_model() -> str:
                     OLLAMA_MODEL, _resolved_model
                 )
                 return _resolved_model
+        finally:
+            if client is not http_client:
+                await client.aclose()
     except Exception as e:
         logger.warning("[AI-Eval] ⚠️  Could not query Ollama model list: %s", e)
 
@@ -610,9 +720,10 @@ Rules:
 
         logger.info("[AI-Eval]   Prompt length: %d chars", len(prompt))
 
-        async with httpx.AsyncClient(
-            timeout=httpx.Timeout(connect=30.0, read=300.0, write=30.0, pool=30.0)
-        ) as client:
+        client = http_client if http_client and not http_client.is_closed else httpx.AsyncClient(
+            timeout=httpx.Timeout(connect=15.0, read=60.0, write=15.0, pool=15.0)
+        )
+        try:
             ollama_response = await client.post(
                 f"{OLLAMA_URL}/api/generate",
                 json={
@@ -624,8 +735,12 @@ Rules:
                         "num_predict": 1024,
                     },
                 },
+                timeout=60.0,
             )
             ollama_response.raise_for_status()
+        finally:
+            if client is not http_client:
+                await client.aclose()
 
         elapsed = time.time() - start_time
         logger.info("[AI-Eval]   ⏱️ Ollama responded in %.2f seconds", elapsed)
@@ -686,7 +801,12 @@ Rules:
 # ---------------------------------------------------------------------------
 @app.get("/health")
 async def health():
-    return {"status": "ok", "models_loaded": True}
+    models_ready = embedding_model is not None and nlp is not None
+    return {
+        "status": "ok" if models_ready else "degraded",
+        "service": "ai-service",
+        "models_loaded": models_ready,
+    }
 
 
 # ---------------------------------------------------------------------------

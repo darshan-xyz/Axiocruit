@@ -15,7 +15,7 @@ interface SubmitFeedbackModalProps {
 export const SubmitFeedbackModal: React.FC<SubmitFeedbackModalProps> = ({ isOpen, onClose, interviewId, candidateName, onSuccess }) => {
     const [technicalScore, setTechnicalScore] = useState(50);
     const [communicationScore, setCommunicationScore] = useState(50);
-    const [recommendation, setRecommendation] = useState('Hire');
+    const [recommendation, setRecommendation] = useState<'Strong Hire' | 'Hire' | 'No Hire'>('Hire');
     const [detailedFeedback, setDetailedFeedback] = useState('');
     const [submitting, setSubmitting] = useState(false);
     
@@ -129,7 +129,7 @@ export const SubmitFeedbackModal: React.FC<SubmitFeedbackModalProps> = ({ isOpen
                         <ThumbsUp className="w-4 h-4 text-green-500" /> Final Recommendation
                     </label>
                     <div className="flex flex-wrap gap-3">
-                        {['Strong Hire', 'Hire', 'No Hire'].map((rec) => (
+                        {(['Strong Hire', 'Hire', 'No Hire'] as const).map((rec) => (
                             <label 
                                 key={rec}
                                 className={`flex-1 flex items-center justify-center p-3 border rounded-xl cursor-pointer transition-all ${
@@ -143,7 +143,7 @@ export const SubmitFeedbackModal: React.FC<SubmitFeedbackModalProps> = ({ isOpen
                                     name="recommendation" 
                                     value={rec} 
                                     checked={recommendation === rec} 
-                                    onChange={(e) => setRecommendation(e.target.value)}
+                                    onChange={() => setRecommendation(rec)}
                                     className="hidden"
                                 />
                                 <span className={`font-medium ${

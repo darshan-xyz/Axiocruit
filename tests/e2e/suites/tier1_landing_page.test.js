@@ -253,7 +253,7 @@ describe('Tier 1: Herb Agency Landing Page Fidelity (F1 - F6)', () => {
   }, () => {
     const content = defaultInspector.readFile(layoutsPath);
     expect(content).toContain('BrandLogo');
-    expect(content.includes('AXIOCRUIT') || content.includes('PROCRUIT')).toBe(true);
+    expect(content.includes('PROCRUIT')).toBe(true);
     expect(content).toMatch(/navigate\(['"`]\/['"`]\)/);
   });
 

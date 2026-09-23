@@ -10,6 +10,9 @@ const bcrypt = require('bcryptjs');
 exports.getRecruiters = async (req, res) => {
     try {
         const orgUser = await User.findById(req.user.id);
+        if (!orgUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
         if (!orgUser.organization) {
             return res.status(400).json({ message: 'You do not belong to an organization' });
         }
@@ -43,6 +46,9 @@ exports.inviteRecruiter = async (req, res) => {
         }
 
         const orgUser = await User.findById(req.user.id);
+        if (!orgUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
         if (!orgUser.organization) {
             return res.status(400).json({ message: 'You do not belong to an organization' });
         }
@@ -89,6 +95,9 @@ exports.inviteRecruiter = async (req, res) => {
 exports.removeRecruiter = async (req, res) => {
     try {
         const orgUser = await User.findById(req.user.id);
+        if (!orgUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
         if (!orgUser.organization) {
             return res.status(400).json({ message: 'You do not belong to an organization' });
         }
@@ -124,6 +133,9 @@ exports.removeRecruiter = async (req, res) => {
 exports.getOrgJobs = async (req, res) => {
     try {
         const orgUser = await User.findById(req.user.id);
+        if (!orgUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
         if (!orgUser.organization) {
             return res.status(400).json({ message: 'You do not belong to an organization' });
         }
@@ -140,13 +152,22 @@ exports.getOrgJobs = async (req, res) => {
             .sort({ createdAt: -1 })
             .lean();
 
-        // Calculate applicantCount for each job
-        const jobsWithStats = await Promise.all(
-            jobs.map(async (job) => {
-                const applicantCount = await Application.countDocuments({ job: job._id });
-                return { ...job, applicantCount };
-            })
-        );
+        // Calculate applicantCount for each job using a single aggregation
+        if (!jobs || jobs.length === 0) {
+            return res.json([]);
+        }
+
+        const jobIds = jobs.map(j => j._id);
+        const counts = await Application.aggregate([
+            { $match: { job: { $in: jobIds } } },
+            { $group: { _id: '$job', count: { $sum: 1 } } }
+        ]);
+
+        const countMap = new Map(counts.map(c => [c._id.toString(), c.count]));
+        const jobsWithStats = jobs.map(job => ({
+            ...job,
+            applicantCount: countMap.get(job._id.toString()) || 0
+        }));
 
         res.json(jobsWithStats);
     } catch (err) {

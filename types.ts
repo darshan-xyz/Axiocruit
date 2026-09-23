@@ -1,5 +1,5 @@
 
-export type UserRole = 'ADMIN' | 'RECRUITER' | 'CANDIDATE' | 'INTERVIEWER' | 'organization' | 'freelancer';
+export type UserRole = 'ADMIN' | 'ORGANIZATION' | 'RECRUITER' | 'CANDIDATE' | 'INTERVIEWER' | 'organization' | 'freelancer';
 
 export interface Experience {
   company: string;

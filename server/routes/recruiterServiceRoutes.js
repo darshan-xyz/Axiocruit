@@ -11,7 +11,7 @@ const Interview = require('../models/Interview');
 const { v4: uuidv4 } = require('uuid');
 const { getFreelancerPublicProfile } = require('../controllers/recruiterController');
 
-const RECRUITER_ROLES = ['RECRUITER', 'organization', 'ORG_ADMIN', 'ADMIN'];
+const RECRUITER_ROLES = ['RECRUITER', 'ORGANIZATION', 'ADMIN'];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/recruiter/services

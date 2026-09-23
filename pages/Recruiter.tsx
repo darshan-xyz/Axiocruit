@@ -662,11 +662,10 @@ const MiniCalendarWidget: React.FC = () => {
 
 const MyTaskScheduleList: React.FC = () => {
   const [tasks, setTasks] = useState([
-    { id: 1, title: 'Interview with condidates from product designer application', time: '09.00 – 10.00 AM', color: 'border-l-purple-500', done: true },
-    { id: 2, title: 'UI Design candidate screening', time: '10.30 – 12.00 AM', color: 'border-l-blue-500', done: true },
-    { id: 3, title: 'Submit freelance recruitment result', time: '13.30 – 14.00 PM', color: 'border-l-amber-500', done: true },
-    { id: 4, title: 'Make new career vacancy', time: '14.00 – 16.00 PM', color: 'border-l-rose-500', done: true },
-    { id: 5, title: 'Conduct test for UX Researcher candidates', time: '16.30 – 18.00 PM', color: 'border-l-cyan-500', done: true },
+    { id: '101', interviewTitle: 'System Architecture Assessment', candidate: { name: 'Sarah Miller' }, scheduledTime: '09.00 – 10.00 AM', time: '09.00 – 10.00 AM', color: 'border-l-4 border-l-blue-600', done: true },
+    { id: '102', interviewTitle: 'Distributed Systems & Coding Round', candidate: { name: 'Alex Rivera' }, scheduledTime: '10.30 – 12.00 AM', time: '10.30 – 12.00 AM', color: 'border-l-4 border-l-[#FF5D8F]', done: true },
+    { id: '103', interviewTitle: 'Product Design Technical Review', candidate: { name: 'Elena Rostova' }, scheduledTime: '13.30 – 14.00 PM', time: '13.30 – 14.00 PM', color: 'border-l-4 border-l-emerald-500', done: false },
+    { id: '104', interviewTitle: 'Full-Stack Portfolio Deep Dive', candidate: { name: 'Marcus Chen' }, scheduledTime: '14.00 – 16.00 PM', time: '14.00 – 16.00 PM', color: 'border-l-4 border-l-amber-500', done: false },
   ]);
 
   return (
@@ -699,18 +698,35 @@ const MyTaskScheduleList: React.FC = () => {
             <div
               key={t.id}
               onClick={() => setTasks(prev => prev.map(item => item.id === t.id ? { ...item, done: !item.done } : item))}
-              className={`p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/80 border-l-4 ${t.color} flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-100/60 dark:hover:bg-slate-850/60 transition-colors`}
+              className={`p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/80 ${t.color} flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-100/60 dark:hover:bg-slate-850/60 transition-colors`}
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold whitespace-nowrap min-w-[125px]">
                   <Clock size={12} />
-                  <span>{t.time}</span>
+                  <span>{t.time || t.scheduledTime}</span>
                 </div>
-                <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
-                  {t.title}
-                </p>
+                <div className="truncate">
+                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                    {t.interviewTitle}
+                  </p>
+                  <p className="text-[10px] text-slate-500 truncate">
+                    {t.candidate?.name}
+                  </p>
+                </div>
               </div>
-              <CheckCircle2 size={16} className={t.done ? 'text-slate-700 dark:text-slate-300 flex-shrink-0' : 'text-slate-300 flex-shrink-0'} />
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.location.href = `#/interview/room/${t.id}`;
+                  }}
+                  className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-blue-600 hover:bg-blue-500 text-white shadow-xs transition cursor-pointer"
+                >
+                  Join Room
+                </button>
+                <CheckCircle2 size={16} className={t.done ? 'text-slate-700 dark:text-slate-300 flex-shrink-0' : 'text-slate-300 flex-shrink-0'} />
+              </div>
             </div>
           ))}
         </div>
@@ -773,8 +789,8 @@ export const RecruiterDashboard: React.FC = () => {
     const totalPipeline = Object.values(stats.pipeline).reduce((a, b) => a + b, 0) || 1;
 
     const displayName = currentUser?.name || 'Alex Vance';
-    const displayRole = currentUser?.headline || 'Lead Technical Recruiter • Enterprise Talent';
-    const displayAvatar = currentUser?.profilePicture || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+    const displayRole = currentUser?.headline || 'Hiring Lead';
+    const displayAvatar = currentUser?.profilePicture || DEFAULT_AVATAR;
 
     return (
         <div className="space-y-6 animate-in fade-in duration-300">

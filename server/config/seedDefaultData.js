@@ -69,7 +69,7 @@ const seedDefaultData = async () => {
           name: 'Acme HR Director',
           email: 'org@procruit.com',
           password: hashedPassword,
-          role: 'organization',
+          role: 'ORGANIZATION',
           approvalStatus: 'APPROVED'
         });
         await orgAdmin.save();

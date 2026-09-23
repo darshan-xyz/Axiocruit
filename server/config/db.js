@@ -11,7 +11,7 @@ const startAutoReconnect = (uri) => {
     try {
       isConnecting = true;
       const conn = await mongoose.connect(uri, { serverSelectionTimeoutMS: 2000 });
-      console.log(`[Axiocruit Database] ✅ MongoDB connected successfully: ${conn.connection.host}`);
+      console.log(`[Procruit Database] ✅ MongoDB connected successfully: ${conn.connection.host}`);
     } catch (e) {
       // Still offline, will retry silently
     } finally {
@@ -27,8 +27,13 @@ const connectDB = async () => {
   // 1. Attempt standard connection (Atlas or running local Mongo)
   try {
     const conn = await mongoose.connect(uri, { serverSelectionTimeoutMS: 2500 });
-    console.log(`[Procruit Database] ✅ MongoDB Connected: ${conn.connection.host}`);
-    require('./seedDefaultData')().catch(console.error);
+    try {
+      require('./seedDefaultData')().catch((err) => {
+        console.warn('[Procruit Database] Seed data execution warning:', err.message);
+      });
+    } catch (seedReqErr) {
+      console.warn('[Procruit Database] Seed module load warning:', seedReqErr.message);
+    }
     return conn;
   } catch (error) {
     console.warn(`[Procruit Database] Local/remote MongoDB at ${uri} is not reachable (${error.message}).`);
@@ -43,7 +48,13 @@ const connectDB = async () => {
       const memUri = memoryServerInstance.getUri();
       const conn = await mongoose.connect(memUri);
       console.log(`[Procruit Database] ✅ Embedded MongoDB active at ${memUri}! Full database functionality enabled.`);
-      require('./seedDefaultData')().catch(console.error);
+      try {
+        require('./seedDefaultData')().catch((err) => {
+          console.warn('[Procruit Database] Embedded seed data execution warning:', err.message);
+        });
+      } catch (seedReqErr) {
+        console.warn('[Procruit Database] Embedded seed module load warning:', seedReqErr.message);
+      }
       return conn;
     } catch (memErr) {
       console.error('[Procruit Database] Could not start embedded MongoDB:', memErr.message);

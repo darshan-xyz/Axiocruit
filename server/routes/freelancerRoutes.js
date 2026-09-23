@@ -22,7 +22,7 @@ const {
 } = require('../controllers/freelancerController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
-const FREELANCER_ROLES = ['freelancer', 'INTERVIEWER'];
+const FREELANCER_ROLES = ['INTERVIEWER', 'ADMIN'];
 
 // ── Service Marketplace (Freelancer publishes services) ───────────────────────
 router.get('/services',               protect, authorize(...FREELANCER_ROLES), getMyServices);

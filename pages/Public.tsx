@@ -123,16 +123,16 @@ const DoodleChartsVector = () => (
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { isDark } = useTheme();
-  const [activeSegment, setActiveSegment] = useState<'ats' | 'proctoring'>('ats');
+  const [activeSegment, setActiveSegment] = useState<'marketing' | 'website_design' | 'ats' | 'proctoring'>('marketing');
 
   return (
     <div className={`space-y-0 overflow-x-hidden min-h-[100dvh] font-sans antialiased transition-colors duration-200 ${isDark ? 'bg-[#0A0E1A] text-slate-100' : 'text-[#111111]'}`}>
 
-      {/* ── SECTION 1: HERO (Axiocruit Talent Cloud with dual light-lime / dark-obsidian canvas & 3D Tablet Mockup) ── */}
-      <section className={`relative pt-10 pb-20 md:pt-14 md:pb-24 px-4 overflow-hidden border-b transition-colors duration-200 ${
-        isDark ? 'bg-[#0A0E1A] border-slate-800' : 'bg-[#D4F882] border-[#111111]/10'
+      {/* ── SECTION 1: HERO (Herb Agency Light-Lime Canvas & 3D Tablet Mockup) ── */}
+      <section className={`relative pt-10 pb-20 md:pt-14 md:pb-24 px-4 overflow-hidden border-b border-[#111111]/10 transition-colors duration-200 ${
+        isDark ? 'bg-[#0A0E1A] border-slate-800' : 'bg-[#D4F882]'
       }`}>
-        {/* Top Axiocruit Platform Badge */}
+        {/* Top Procruit Platform Badge */}
         <div className="flex justify-center mb-8">
           <div
             className={`${
@@ -147,20 +147,63 @@ export const HomePage: React.FC = () => {
 
         <div className="max-w-6xl mx-auto text-center relative z-10">
 
-          {/* 3D Perspective Tablet Mockup Container matching Reference 5 */}
-          <div className="relative max-w-5xl mx-auto [perspective:1400px]">
+          {/* 3D Perspective Tablet Mockup Container */}
+          <div className="relative max-w-5xl mx-auto [perspective:1200px]">
             {/* Depth drop-shadow underneath */}
             <div
-              className={`absolute -bottom-10 left-1/2 -translate-x-1/2 w-[90%] h-16 ${
-                isDark ? 'bg-black/60 blur-3xl' : 'bg-[#111111]/25 blur-3xl'
-              } rounded-full pointer-events-none`}
+              className={`absolute -bottom-8 sm:-bottom-12 left-1/2 -translate-x-1/2 w-[90%] h-16 ${
+                isDark ? 'bg-black/60 blur-2xl rounded-full' : 'bg-[#111111]/25 blur-2xl rounded-full'
+              } pointer-events-none`}
               aria-hidden="true"
             />
 
+            {/* Floating 3D Metric Card 1: Total Income (bottom-left) */}
+            <div className={`absolute -left-6 sm:-left-12 -bottom-6 sm:-bottom-8 z-20 hidden sm:block [transform:translateZ(50px)] ${
+              isDark ? 'bg-[#141B2D]/95 border-slate-700/80 text-white' : 'bg-white/95 border-neutral-200/80 text-[#111111]'
+            } backdrop-blur-md border rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 min-w-[170px] sm:min-w-[210px] shadow-2xl pointer-events-auto text-left`}>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[10px] sm:text-xs font-semibold text-neutral-500 uppercase tracking-wider">Total Income</span>
+                <span className="inline-flex items-center gap-0.5 text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600">
+                  ↑ 234.45%
+                </span>
+              </div>
+              <div className="text-xl sm:text-2xl font-black tracking-tight">$234.98K</div>
+            </div>
+
+            {/* Floating 3D Metric Card 2: Top Pill (top-right) */}
+            <div className={`absolute -right-4 sm:-right-8 -top-4 sm:-top-6 z-20 hidden md:block [transform:translateZ(65px)] ${
+              isDark ? 'bg-[#141B2D]/95 border-slate-700/80 text-white' : 'bg-white/95 border-neutral-200/80 text-[#111111]'
+            } backdrop-blur-md border rounded-full px-3.5 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2 shadow-xl pointer-events-auto`}>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs sm:text-sm font-black bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
+                ↑ 347.23%
+              </span>
+            </div>
+
+            {/* Floating 3D Metric Card 3: Resolved Identities (right) */}
+            <div className={`absolute -right-6 sm:-right-12 bottom-12 sm:bottom-16 z-20 hidden sm:block [transform:translateZ(55px)] ${
+              isDark ? 'bg-[#141B2D]/95 border-slate-700/80 text-white' : 'bg-white/95 border-neutral-200/80 text-[#111111]'
+            } backdrop-blur-md border rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 min-w-[170px] sm:min-w-[200px] shadow-2xl pointer-events-auto text-left`}>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] sm:text-xs font-semibold text-neutral-500 uppercase tracking-wider">Resolved Identities</span>
+              </div>
+              <div className="text-xl sm:text-2xl font-black tracking-tight mb-2">3,639</div>
+              <div className="flex items-center justify-between">
+                <div className="flex -space-x-1.5 overflow-hidden">
+                  <span className="inline-block h-5 w-5 rounded-full bg-slate-300 ring-2 ring-white" />
+                  <span className="inline-block h-5 w-5 rounded-full bg-slate-400 ring-2 ring-white" />
+                  <span className="inline-block h-5 w-5 rounded-full bg-slate-500 ring-2 ring-white" />
+                </div>
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600">
+                  12k+
+                </span>
+              </div>
+            </div>
+
             {/* Tablet Hardware Frame */}
-            <div className={`relative rounded-[40px] sm:rounded-[48px] ${
-              isDark ? 'bg-[#10141D] border-[#1E2533] ring-1 ring-white/10' : 'bg-[#14181E] border-[#222831] ring-1 ring-white/15'
-            } p-3.5 sm:p-5 md:p-6 shadow-2xl border-[6px] sm:border-[8px] transition-colors`}>
+            <div className={`relative rounded-[36px] sm:rounded-[42px] bg-[#1a1e24] border-4 sm:border-[5px] border-[#2b323c] sm:[transform:rotateX(13deg)_rotateY(-5deg)_rotateZ(1deg)] [transform-style:preserve-3d] ${
+              isDark ? 'ring-1 ring-white/10' : 'ring-1 ring-white/15'
+            } p-3.5 sm:p-5 md:p-6 shadow-2xl transition-colors`}>
               {/* Tablet Camera Hole */}
               <div className="w-3 h-3 rounded-full bg-slate-800 mx-auto mb-3 flex items-center justify-center border border-slate-700/60">
                 <div className="w-1.5 h-1.5 rounded-full bg-black" />
@@ -173,7 +216,6 @@ export const HomePage: React.FC = () => {
 
                 {/* 1. Header inside Tablet Screen */}
                 <div className="flex items-center justify-between px-6 sm:px-10 pt-6 sm:pt-8 pb-4">
-                  {/* Tablet Brand Logo Badge */}
                   <div className={`${
                     isDark ? 'bg-slate-800 border border-slate-700' : 'bg-[#111111]'
                   } text-white px-4 py-1.5 rounded-xl shadow-xs text-center cursor-pointer transition-colors`} onClick={() => navigate('/')}>
@@ -181,7 +223,6 @@ export const HomePage: React.FC = () => {
                     <span className="text-[7px] font-black tracking-[0.2em] uppercase text-lime-300 block">INTELLIGENCE</span>
                   </div>
 
-                  {/* Tablet Navigation Links */}
                   <div className={`hidden md:flex items-center space-x-8 text-xs font-black ${
                     isDark ? 'text-slate-300' : 'text-[#111111]'
                   }`}>
@@ -190,7 +231,6 @@ export const HomePage: React.FC = () => {
                     <a href="#assessments" className="hover:opacity-75 transition-opacity">Coding Sandbox</a>
                   </div>
 
-                  {/* Right Header CTA Button */}
                   <button
                     onClick={() => navigate('/signup')}
                     className={`${
@@ -206,19 +246,19 @@ export const HomePage: React.FC = () => {
 
                 {/* 2. Hero Headline inside Tablet Screen */}
                 <div className="text-center px-4 sm:px-8 pt-6 sm:pt-10 pb-6 max-w-4xl mx-auto">
-                  <h1 className={`text-3xl sm:text-5xl md:text-6xl lg:text-[66px] font-black tracking-tight leading-[1.06] ${
+                  <h1 className={`text-4xl sm:text-6xl md:text-7xl lg:text-[80px] font-black tracking-tight leading-[1.06] ${
                     isDark ? 'text-white' : 'text-[#111111]'
                   } uppercase max-w-4xl mx-auto mb-4`}>
-                    THE ONLY AUTONOMOUS{' '}
+                    THE ONLY RECRUITMENT{' '}
                     <span className={`inline-block ${
                       isDark ? 'bg-white/10 text-white border border-white/20' : 'bg-white text-[#111111] border border-[#111111]/10'
                     } px-3 sm:px-5 py-1 rounded-2xl md:rounded-3xl shadow-sm align-middle mx-1`}>
-                      TECHNICAL
+                      TALENT
                     </span>{' '}
                     <span className={`inline-block ${
                       isDark ? 'bg-white/10 text-white border border-white/20' : 'bg-white text-[#111111] border border-[#111111]/10'
                     } px-3 sm:px-5 py-1 rounded-2xl md:rounded-3xl shadow-sm align-middle mx-1`}>
-                      HIRING
+                      HUB
                     </span>{' '}
                     HUB YOU'LL EVER NEED.
                   </h1>
@@ -229,7 +269,7 @@ export const HomePage: React.FC = () => {
                     Engineered for high-growth engineering teams and talent leaders. Screen resumes with semantic embeddings, run real-time proctored Monaco coding assessments, and scale verified technical hiring 10x faster.
                   </p>
 
-                  {/* Action CTAs: Crisp White Pill (Get Started ↗) + Black/Slate Pill (Learn More ↗) */}
+                  {/* Action CTAs */}
                   <div className="flex flex-wrap items-center justify-center gap-3.5 mb-8">
                     <button
                       onClick={() => navigate('/signup')}
@@ -253,9 +293,37 @@ export const HomePage: React.FC = () => {
                           : 'bg-[#111111] text-white hover:bg-black'
                       } font-black text-xs sm:text-sm px-6 py-3 rounded-full shadow-sm hover:shadow-md transition-all flex items-center gap-2 group cursor-pointer`}
                     >
-                      <span>Explore Platform</span>
+                      <span>Learn More</span>
                       <ArrowUpRight size={15} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     </button>
+                  </div>
+
+                  {/* Segmented Pill Toggle */}
+                  <div className="flex items-center justify-center my-6">
+                    <div className={`p-1.5 rounded-full border inline-flex ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-[#111111]/10'}`}>
+                      <button
+                        type="button"
+                        onClick={() => setActiveSegment('marketing')}
+                        className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                          activeSegment === 'marketing'
+                            ? (isDark ? 'bg-blue-600 text-white shadow-md' : 'bg-[#111111] text-white shadow-md')
+                            : (isDark ? 'text-slate-400 hover:text-white' : 'text-[#111111]/70 hover:text-[#111111]')
+                        }`}
+                      >
+                        Marketing
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveSegment('website_design')}
+                        className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                          activeSegment === 'website_design'
+                            ? (isDark ? 'bg-blue-600 text-white shadow-md' : 'bg-[#111111] text-white shadow-md')
+                            : (isDark ? 'text-slate-400 hover:text-white' : 'text-[#111111]/70 hover:text-[#111111]')
+                        }`}
+                      >
+                        Website design
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -272,7 +340,6 @@ export const HomePage: React.FC = () => {
                   <div className={`relative z-10 ${
                     isDark ? 'bg-[#111726] border-slate-800 text-slate-100 shadow-2xl' : 'bg-white border-slate-200/90 text-slate-900'
                   } rounded-t-[28px] sm:rounded-t-[34px] p-4 sm:p-7 shadow-2xl border-t border-x max-w-4xl mx-auto transition-colors`}>
-                    {/* Top Pill Floating Badge ↑ 98.6% AI Accuracy */}
                     <div className="absolute -top-4 left-10 sm:left-16 z-30">
                       <div className={`${
                         isDark ? 'bg-slate-800 text-white border-slate-700' : 'bg-white text-slate-900 border-slate-200'
@@ -317,7 +384,7 @@ export const HomePage: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Tabs row: ATS Sourcing, Proctored Code, Candidate Ranking, Interviews */}
+                    {/* Tabs row */}
                     <div className={`flex items-center gap-4 text-[11px] font-bold ${
                       isDark ? 'text-slate-400 border-slate-800' : 'text-slate-500 border-slate-100'
                     } border-b pb-2.5 mb-4 overflow-x-auto`}>
@@ -329,29 +396,61 @@ export const HomePage: React.FC = () => {
                       <span className="hover:text-slate-300 cursor-pointer">Live Interviews</span>
                     </div>
 
-                    <div className={`text-xs font-black ${isDark ? 'text-white' : 'text-slate-800'} mb-3`}>Autonomous Talent Pipeline Summary</div>
+                    {activeSegment === 'marketing' ? (
+                      <div>
+                        <div className={`text-xs font-black ${isDark ? 'text-white' : 'text-slate-800'} mb-3 flex items-center justify-between`}>
+                          <span>Marketing Acquisition</span>
+                          <span className="text-[10px] font-medium text-slate-400">Pipeline Progression & Sourcing Activity</span>
+                        </div>
 
-                    {/* Report Metric Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4 text-[11px]">
-                      <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Candidates Screened</span>
-                        <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>3,639</div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4 text-[11px]">
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Resolved Candidates</span>
+                            <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>3,639</div>
+                          </div>
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Inbound Reach</span>
+                            <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>84.5k</div>
+                          </div>
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Interviews Conducted</span>
+                            <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>1,248</div>
+                          </div>
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Avg AI Match Score</span>
+                            <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>88.4%</div>
+                          </div>
+                        </div>
                       </div>
-                      <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Assessment Pass Rate</span>
-                        <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>74.2%</div>
-                      </div>
-                      <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Avg AI Match Score</span>
-                        <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>88.4%</div>
-                      </div>
-                      <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Integrity Violations</span>
-                        <div className="text-base font-black text-emerald-500 mt-0.5">0 (Clean)</div>
-                      </div>
-                    </div>
+                    ) : (
+                      <div>
+                        <div className={`text-xs font-black ${isDark ? 'text-white' : 'text-slate-800'} mb-3 flex items-center justify-between`}>
+                          <span>Website Design & UI/UX</span>
+                          <span className="text-[10px] font-medium text-slate-400">Creative Portfolio Scoring & UI Benchmarks</span>
+                        </div>
 
-                    {/* Green Bar Chart (Candidate Match Score Distribution) */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4 text-[11px]">
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Design Submissions</span>
+                            <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>842</div>
+                          </div>
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Figma & UI Audits</span>
+                            <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>629</div>
+                          </div>
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Senior Design Reviews</span>
+                            <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>312</div>
+                          </div>
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Creative Benchmarks</span>
+                            <div className="text-base font-black text-emerald-500 mt-0.5">96.8%</div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Candidate Match Score Distribution Bar Chart */}
                     <div className={`p-3.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
                       <div className={`flex justify-between items-center mb-2 text-[10px] font-bold ${
                         isDark ? 'text-slate-400' : 'text-slate-500'
@@ -373,8 +472,7 @@ export const HomePage: React.FC = () => {
 
               </div>
 
-              {/* 5. FLOATING 3D METRIC CARDS OVERLAPPING TABLET EDGES */}
-              {/* Left Card: Qualified Pipeline */}
+              {/* FLOATING 3D METRIC CARDS OVERLAPPING TABLET EDGES */}
               <div className="absolute -left-3 sm:-left-8 md:-left-12 top-[48%] sm:top-[52%] -translate-y-1/2 z-30 hidden sm:block pointer-events-auto">
                 <div className={`${
                   isDark ? 'bg-[#111726]/95 border-slate-700 text-slate-100 shadow-black/60' : 'bg-white/95 border-slate-200/90 text-slate-900'
@@ -392,7 +490,6 @@ export const HomePage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Right Card: Verified Engineers */}
               <div className="absolute -right-3 sm:-right-8 md:-right-12 top-[40%] sm:top-[44%] -translate-y-1/2 z-30 hidden sm:block pointer-events-auto">
                 <div className={`${
                   isDark ? 'bg-[#111726]/95 border-slate-700 text-slate-100 shadow-black/60' : 'bg-white/95 border-slate-200/90 text-slate-900'
@@ -463,7 +560,7 @@ export const HomePage: React.FC = () => {
             </button>
           </div>
 
-          {/* Dynamic Module Spotlight depending on Active Segment */}
+          {/* Dynamic Module Spotlight */}
           <div className="mt-8 max-w-4xl mx-auto transition-all duration-300">
             {activeSegment === 'ats' ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-left">
@@ -803,7 +900,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type }) => {
       } else if (userRole === 'CANDIDATE' || userRole === 'candidate') {
         navigate('/candidate/dashboard');
       } else if (userRole === 'INTERVIEWER' || userRole === 'interviewer') {
-        navigate('/interviewer/dashboard');
+        navigate('/interviewer');
       } else {
         navigate('/');
       }

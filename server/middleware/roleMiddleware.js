@@ -1,6 +1,15 @@
+/**
+ * Role Middleware for Procruit
+ * Enforces role checks using canonical role taxonomy with backward-compatibility.
+ */
+
+const { normalizeRole, CanonicalRoles } = require('../schemas/roleTaxonomy');
+
 const checkRole = (role) => {
     return (req, res, next) => {
-        if (req.user && req.user.role === role) {
+        const userRole = normalizeRole(req.user?.role);
+        const targetRole = normalizeRole(role);
+        if (userRole && (userRole === targetRole || userRole === CanonicalRoles.ADMIN)) {
             next();
         } else {
             res.status(403).json({ message: 'Not authorized as ' + role });
@@ -8,4 +17,4 @@ const checkRole = (role) => {
     };
 };
 
-module.exports = { checkRole };
+module.exports = { checkRole, normalizeRole, CanonicalRoles };

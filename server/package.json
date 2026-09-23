@@ -1,7 +1,7 @@
 {
-  "name": "server",
+  "name": "procruit-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Procruit Enterprise Backend API & Socket.IO Gateway",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,14 +9,13 @@
     "dev": "node index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Procruit Engineering Team",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "e": "^0.2.33",
     "express": "^5.2.1",
     "form-data": "^4.0.5",
     "jsonwebtoken": "^9.0.3",

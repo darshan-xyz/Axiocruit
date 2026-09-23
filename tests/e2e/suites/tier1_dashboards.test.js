@@ -35,7 +35,7 @@ describe('Tier 1: StaffCentral, AmaHR & INTCH HUB Dashboards (F17 - F24)', () =>
     id: 'T1-F17-03', tier: 1, feature: 'F17', milestone: 'M3'
   }, () => {
     const content = defaultInspector.readFile(layoutsPath);
-    const hasChrome = content.includes('Search requisitions') || content.includes('axiocruit.enterprise') || content.includes('procruit.enterprise') || content.includes('header');
+    const hasChrome = content.includes('Search requisitions') || content.includes('procruit.enterprise') || content.includes('header');
     expect(hasChrome).toBe(true);
   });
 

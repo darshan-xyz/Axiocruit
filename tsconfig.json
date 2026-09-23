@@ -15,14 +15,41 @@
     "moduleDetection": "force",
     "allowJs": true,
     "jsx": "react-jsx",
+    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@core": ["src/core/index.ts", "src/core"],
+      "@core/*": ["src/core/*"],
+      "@features": ["src/features/index.ts", "src/features"],
+      "@features/*": ["src/features/*"],
+      "@ui": ["src/ui/index.ts", "src/ui"],
+      "@ui/*": ["src/ui/*"],
+      "@data": ["src/data/index.ts", "src/data"],
+      "@data/*": ["src/data/*"],
+      "@theme": ["src/theme/index.ts", "src/theme"],
+      "@theme/*": ["src/theme/*"],
+      "@": ["src/index.ts", "src", "."],
+      "@/*": ["src/*", "./*"]
     },
     "allowImportingTsExtensions": true,
     "types": ["vite/client", "node"],
     "noEmit": true
   },
-  "include": ["**/*.ts", "**/*.tsx", "vite-env.d.ts"]
+  "include": [
+    "src",
+    "components",
+    "pages",
+    "hooks",
+    "utils",
+    "types.ts",
+    "App.tsx",
+    "index.tsx",
+    "vite.config.ts",
+    "vite-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "server/node_modules",
+    "dist",
+    ".agents"
+  ]
 }

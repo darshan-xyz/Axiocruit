@@ -6,19 +6,20 @@
 const fs            = require('fs');
 const os            = require('os');
 const path          = require('path');
-const { execSync }  = require('child_process');
+const { spawn, exec } = require('child_process');
 
 const TestSession    = require('../models/TestSession');
 const CodingQuestion = require('../models/CodingQuestion');
 const { getNextTarget, pickQuestion } = require('../utils/adaptiveEngine');
 
 // Roles that can conduct/manage an interview session (mirrors codingTestRoutes.js)
-const HOST_ROLES = ['RECRUITER', 'ADMIN', 'ORG_ADMIN', 'organization', 'INTERVIEWER', 'freelancer'];
+const HOST_ROLES = ['RECRUITER', 'ADMIN', 'ORGANIZATION', 'INTERVIEWER'];
 
 // ── Configuration ─────────────────────────────────────────────────────────────
 // No fixed question limit — the test continues until the recruiter ends it.
 const MAX_QUESTIONS    = 999; // Practically infinite
 const EXEC_TIMEOUT_MS  = 5000; // Python execution timeout (ms)
+const PYTHON_BIN        = process.env.PYTHON_BIN || (process.platform === 'win32' ? 'python' : 'python3');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Output Normalization & Smart Comparison
@@ -183,82 +184,127 @@ const classifyError = (errText = '') => {
  * @returns {{ passed: boolean, actualOutput: string, errorType: string|null }}
  */
 const runOneCase = (tmpFile, input, expectedOutput) => {
-  try {
-    const rawOutput = execSync(
-      `python "${tmpFile}"`,
-      {
-        input:    input || '',
-        timeout:  EXEC_TIMEOUT_MS,
-        encoding: 'utf8',
-        stdio:    ['pipe', 'pipe', 'pipe'],
-      },
-    );
-
-    const actualOutput = normalizeOutput(rawOutput);
-    const isMatch = smartCompare(actualOutput, expectedOutput);
-
-    return {
-      passed:      isMatch,
-      actualOutput,
-      errorType:   null,
+  return new Promise((resolve) => {
+    let completed = false;
+    const finish = (result) => {
+      if (completed) return;
+      completed = true;
+      resolve(result);
     };
-  } catch (err) {
-    const errText = (err.stderr || '') + (err.message || '');
-    return {
-      passed:      false,
-      actualOutput: normalizeOutput(err.stderr || err.message || 'Execution error'),
-      errorType:   classifyError(errText),
-    };
-  }
+
+    const child = spawn(PYTHON_BIN, [tmpFile], {
+      timeout: EXEC_TIMEOUT_MS,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+
+    let stdout = '';
+    let stderr = '';
+
+    child.stdin.on('error', () => {});
+
+    if (input) {
+      try {
+        child.stdin.write(input);
+        child.stdin.end();
+      } catch (_) {}
+    } else {
+      child.stdin.end();
+    }
+
+    child.stdout.on('data', (d) => { stdout += d.toString(); });
+    child.stderr.on('data', (d) => { stderr += d.toString(); });
+
+    child.on('error', (err) => {
+      const errText = stderr + (err.message || '');
+      finish({
+        passed: false,
+        actualOutput: normalizeOutput(errText || 'Execution process error'),
+        errorType: classifyError(errText),
+      });
+    });
+
+    child.on('close', (code, signal) => {
+      if (signal === 'SIGTERM') {
+        return finish({
+          passed: false,
+          actualOutput: 'Execution Timed Out',
+          errorType: 'TimeLimitExceeded',
+        });
+      }
+
+      // If the process crashed with non-zero exit code or generated error output
+      if (code !== 0 || stderr) {
+        const errText = (stderr || '').trimEnd() || `Process exited with code ${code}`;
+        return finish({
+          passed: false,
+          actualOutput: normalizeOutput(errText),
+          errorType: classifyError(errText),
+        });
+      }
+
+      const actualOutput = normalizeOutput(stdout);
+      const isMatch = smartCompare(actualOutput, expectedOutput);
+      finish({
+        passed: isMatch,
+        actualOutput,
+        errorType: null,
+      });
+    });
+  });
 };
 
 /**
- * Writes `code` to a unique temp file, executes it against every test case,
+ * Writes `code` to a unique temp file, executes it against every test case asynchronously,
  * then deletes the file. Returns per-case result objects.
  *
  * @param {string} code
  * @param {{ input: string, expectedOutput: string }[]} testCases
- * @returns {{ passed: boolean, actualOutput: string, errorType: string|null }[]}
+ * @returns {Promise<{ passed: boolean, actualOutput: string, errorType: string|null }[]>}
  */
-const runAllTestCases = (code, testCases) => {
+const runAllTestCases = async (code, testCases) => {
   const tmpFile = path.join(
     os.tmpdir(),
     `procruit_${Date.now()}_${Math.random().toString(36).slice(2)}.py`,
   );
 
   try {
-    fs.writeFileSync(tmpFile, code, 'utf8');
+    await fs.promises.writeFile(tmpFile, code, 'utf8');
 
-    // Fast-fail on SyntaxError: run once with empty input to catch before looping
+    // Fast-fail on SyntaxError: check compile asynchronously
     let syntaxErrorText = null;
     try {
-      execSync(`python -m py_compile "${tmpFile}"`, {
-        timeout:  3000,
-        encoding: 'utf8',
-        stdio:    ['pipe', 'pipe', 'pipe'],
+      await new Promise((resolve, reject) => {
+        exec(`python -m py_compile "${tmpFile}"`, { timeout: 3000 }, (err, stdout, stderr) => {
+          if (err) reject(stderr || err.message);
+          else resolve();
+        });
       });
     } catch (syntaxErr) {
-      syntaxErrorText = (syntaxErr.stderr || syntaxErr.message || '').trimEnd();
+      syntaxErrorText = String(syntaxErr || '').trimEnd();
     }
 
     if (syntaxErrorText) {
-      // All cases fail with the same SyntaxError message
       return testCases.map(() => ({
-        passed:      false,
+        passed: false,
         actualOutput: syntaxErrorText,
-        errorType:   'SyntaxError',
+        errorType: 'SyntaxError',
       }));
     }
 
-    // Run each test case independently against the same file
-    return testCases.map(tc => runOneCase(tmpFile, tc.input, tc.expectedOutput));
+    // Run test cases sequentially or in parallel
+    const results = [];
+    for (const tc of testCases) {
+      const res = await runOneCase(tmpFile, tc.input, tc.expectedOutput);
+      results.push(res);
+    }
+    return results;
   } finally {
-    try { fs.unlinkSync(tmpFile); } catch (_) { /* already deleted — ignore */ }
+    try { await fs.promises.unlink(tmpFile); } catch (_) {}
   }
 };
 
 /**
- * Asynchronous wrapper to execute Python code for a single input.
+ * Asynchronous non-blocking wrapper to execute Python code for a single input.
  * Returns { stdout, stderr, errorType } for rich error reporting.
  */
 const executePython = (code, input) => {
@@ -267,26 +313,71 @@ const executePython = (code, input) => {
       os.tmpdir(),
       `procruit_exec_${Date.now()}_${Math.random().toString(36).slice(2)}.py`
     );
-    try {
-      fs.writeFileSync(tmpFile, code, 'utf8');
-      const rawOutput = execSync(`python "${tmpFile}"`, {
-        input: input || '',
+
+    let completed = false;
+    const finish = (result) => {
+      if (completed) return;
+      completed = true;
+      try { fs.unlinkSync(tmpFile); } catch (_) {}
+      resolve(result);
+    };
+
+    fs.writeFile(tmpFile, code, 'utf8', (writeErr) => {
+      if (writeErr) {
+        return finish({
+          stdout: '',
+          stderr: 'Failed to write execution script: ' + writeErr.message,
+          errorType: 'SystemError',
+        });
+      }
+
+      const child = spawn(PYTHON_BIN, [tmpFile], {
         timeout: EXEC_TIMEOUT_MS,
-        encoding: 'utf8',
         stdio: ['pipe', 'pipe', 'pipe'],
       });
-      resolve({ stdout: rawOutput, stderr: '', errorType: null });
-    } catch (err) {
-      const stderr = (err.stderr || '').trimEnd();
-      const errText = stderr + (err.message || '');
-      resolve({
-        stdout: err.stdout || '',
-        stderr: stderr || err.message || 'Execution error',
-        errorType: classifyError(errText),
+
+      let stdout = '';
+      let stderr = '';
+
+      child.stdin.on('error', () => {});
+
+      if (input) {
+        try {
+          child.stdin.write(input);
+          child.stdin.end();
+        } catch (_) {}
+      } else {
+        child.stdin.end();
+      }
+
+      child.stdout.on('data', (d) => { stdout += d.toString(); });
+      child.stderr.on('data', (d) => { stderr += d.toString(); });
+
+      child.on('error', (err) => {
+        finish({
+          stdout,
+          stderr: err.message || 'Execution error',
+          errorType: classifyError(err.message || ''),
+        });
       });
-    } finally {
-      try { fs.unlinkSync(tmpFile); } catch (_) { /* ignore */ }
-    }
+
+      child.on('close', (code, signal) => {
+        const isTimeout = signal === 'SIGTERM';
+        const errText = (stderr || '').trimEnd();
+        const hasError = isTimeout || code !== 0 || errText.length > 0;
+        const errDescription = isTimeout
+          ? 'Execution Timed Out'
+          : errText || (code !== 0 ? `Process exited with code ${code}` : '');
+
+        finish({
+          stdout,
+          stderr: errDescription,
+          errorType: isTimeout
+            ? 'TimeLimitExceeded'
+            : (hasError ? classifyError(errDescription) : null),
+        });
+      });
+    });
   });
 };
 
@@ -307,9 +398,11 @@ const analyzeCodeWithAI = async (code, testScore) => {
 
     const prompt = `Analyze this Python code. The candidate scored ${testScore}% on the basic test cases. Evaluate the code's time complexity, logic accuracy, and readability. Provide a JSON response with: 'logicScore' (0-100), 'accuracyFeedback', and 'efficiencyFeedback'.\n\nCode:\n${code}`;
 
+    const fetchFn = global.fetch || require('node-fetch');
+
     if (apiKey.startsWith('AIza') || process.env.GEMINI_API_KEY) {
       // Gemini
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      const response = await fetchFn(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -323,7 +416,7 @@ const analyzeCodeWithAI = async (code, testScore) => {
       return JSON.parse(resultText);
     } else {
       // OpenAI
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetchFn('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
         body: JSON.stringify({
@@ -895,4 +988,17 @@ const endSession = async (req, res) => {
   }
 };
 
-module.exports = { startSession, getNextQuestion, getNextQuestionAuto, submitAnswer, getResult, getSessionByCandidateAndJob, endSession };
+module.exports = {
+  startSession,
+  getNextQuestion,
+  getNextQuestionAuto,
+  submitAnswer,
+  getResult,
+  getSessionByCandidateAndJob,
+  endSession,
+  executePython,
+  runAllTestCases,
+  smartCompare,
+  normalizeOutput,
+  classifyError,
+};

@@ -32,6 +32,7 @@ MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "face_land
 # We'll hold the FaceLandmarker instance in a module-level variable so it can
 # be reused across WebSocket connections.
 face_landmarker_instance = None
+landmarker_lock = asyncio.Lock()
 
 
 @asynccontextmanager
@@ -53,7 +54,7 @@ async def lifespan(app: FastAPI):
     options = vision.FaceLandmarkerOptions(
         base_options=mp_tasks.BaseOptions(model_asset_path=MODEL_PATH),
         running_mode=vision.RunningMode.IMAGE,
-        num_faces=1,
+        num_faces=4,
         min_face_detection_confidence=0.5,
         min_face_presence_confidence=0.5,
         min_tracking_confidence=0.5,
@@ -65,14 +66,18 @@ async def lifespan(app: FastAPI):
     yield
     # Cleanup
     if face_landmarker_instance:
-        face_landmarker_instance.close()
+        try:
+            face_landmarker_instance.close()
+        except Exception:
+            pass
+        face_landmarker_instance = None
     logger.info("Proctoring service shut down.")
 
 
 # ---------------------------------------------------------------------------
 # FastAPI App
 # ---------------------------------------------------------------------------
-app = FastAPI(title="Axiocruit Proctoring Service", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Procruit Proctoring Service", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -225,23 +230,42 @@ async def proctor_ws(ws: WebSocket):
                 await ws.send_json({"type": "error", "detail": "Invalid JSON"})
                 continue
 
-            if msg.get("type") != "frame":
-                await ws.send_json({"type": "error", "detail": "Unknown message type"})
+            # Support ping / keepalive
+            if msg.get("type") == "ping":
+                await ws.send_json({"type": "pong", "timestamp": time.time()})
                 continue
 
-            frame_b64 = msg.get("data", "")
+            # Extract frame data supporting {type: "frame", data}, {image, timestamp}, or {frame}
+            frame_b64 = msg.get("data") or msg.get("image") or msg.get("frame") or ""
+            if not frame_b64 and msg.get("type") != "frame":
+                await ws.send_json({"type": "error", "detail": "Unknown message type or missing frame data"})
+                continue
+
             if not frame_b64:
                 logger.info("[Frame] Empty frame data received — skipping.")
                 await ws.send_json({
                     "type": "gaze_result",
                     "gaze": "unknown",
                     "face_detected": False,
+                    "multiple_faces": False,
+                    "looking_away": True,
+                    "phone_detected": False,
+                    "alerts": ["face_lost"],
+                    "h_ratio": None,
+                    "v_ratio": None,
                     "timestamp": time.time(),
                 })
                 continue
 
-            # ── Decode Base64 JPEG → OpenCV BGR image ─────────────────
+            # ── Sanitize & Decode Base64 JPEG → OpenCV BGR image ──────
             try:
+                # Strip data URL prefix if present
+                if "," in frame_b64:
+                    frame_b64 = frame_b64.split(",", 1)[1]
+                frame_b64 = frame_b64.strip()
+                # Ensure correct base64 padding
+                frame_b64 += "=" * ((4 - len(frame_b64) % 4) % 4)
+
                 img_bytes = base64.b64decode(frame_b64)
                 np_arr = np.frombuffer(img_bytes, dtype=np.uint8)
                 frame_bgr = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
@@ -251,68 +275,105 @@ async def proctor_ws(ws: WebSocket):
                     "type": "gaze_result",
                     "gaze": "unknown",
                     "face_detected": False,
-                    "timestamp": time.time(),
-                })
-                continue
-
-            if frame_bgr is None:
-                await ws.send_json({
-                    "type": "gaze_result",
-                    "gaze": "unknown",
-                    "face_detected": False,
-                    "timestamp": time.time(),
-                })
-                continue
-
-            # ── Run MediaPipe FaceLandmarker (in thread to avoid blocking) ─
-            img_h, img_w = frame_bgr.shape[:2]
-            frame_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
-
-            # Convert to MediaPipe Image format
-            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
-
-            # Run CPU-bound detection in a thread executor so the event loop
-            # stays responsive for other WS messages.
-            try:
-                results = await asyncio.to_thread(
-                    face_landmarker_instance.detect, mp_image
-                )
-            except Exception as det_err:
-                logger.warning("[Frame] MediaPipe detect error: %s", det_err)
-                await ws.send_json({
-                    "type": "gaze_result",
-                    "gaze": "unknown",
-                    "face_detected": False,
-                    "timestamp": time.time(),
-                })
-                continue
-
-            if not results.face_landmarks:
-                # No face detected in the frame
-                logger.info("[Frame] No face detected in %dx%d frame.", img_w, img_h)
-                await ws.send_json({
-                    "type": "gaze_result",
-                    "gaze": "away",
-                    "face_detected": False,
+                    "multiple_faces": False,
+                    "looking_away": True,
+                    "phone_detected": False,
+                    "alerts": ["decode_error"],
                     "h_ratio": None,
                     "v_ratio": None,
                     "timestamp": time.time(),
                 })
                 continue
 
-            # Use the first (and only) detected face
+            # Guard against None, empty, or zero-dimension images
+            if frame_bgr is None or frame_bgr.size == 0 or frame_bgr.shape[0] == 0 or frame_bgr.shape[1] == 0:
+                await ws.send_json({
+                    "type": "gaze_result",
+                    "gaze": "unknown",
+                    "face_detected": False,
+                    "multiple_faces": False,
+                    "looking_away": True,
+                    "phone_detected": False,
+                    "alerts": ["empty_frame"],
+                    "h_ratio": None,
+                    "v_ratio": None,
+                    "timestamp": time.time(),
+                })
+                continue
+
+            # ── Run MediaPipe FaceLandmarker (under Lock to avoid concurrent C++ race) ─
+            img_h, img_w = frame_bgr.shape[:2]
+            frame_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
+
+            # Convert to MediaPipe Image format
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
+
+            # Run CPU-bound detection safely wrapped in lock
+            try:
+                async with landmarker_lock:
+                    results = await asyncio.to_thread(
+                        face_landmarker_instance.detect, mp_image
+                    )
+            except Exception as det_err:
+                logger.warning("[Frame] MediaPipe detect error: %s", det_err)
+                await ws.send_json({
+                    "type": "gaze_result",
+                    "gaze": "unknown",
+                    "face_detected": False,
+                    "multiple_faces": False,
+                    "looking_away": True,
+                    "phone_detected": False,
+                    "alerts": ["detection_error"],
+                    "h_ratio": None,
+                    "v_ratio": None,
+                    "timestamp": time.time(),
+                })
+                continue
+
+            if not results or not results.face_landmarks:
+                # No face detected in the frame
+                logger.info("[Frame] No face detected in %dx%d frame.", img_w, img_h)
+                await ws.send_json({
+                    "type": "gaze_result",
+                    "gaze": "away",
+                    "face_detected": False,
+                    "multiple_faces": False,
+                    "looking_away": True,
+                    "phone_detected": False,
+                    "alerts": ["face_lost"],
+                    "h_ratio": None,
+                    "v_ratio": None,
+                    "timestamp": time.time(),
+                })
+                continue
+
+            # Process faces
+            num_detected = len(results.face_landmarks)
+            multiple_faces = num_detected > 1
             face_landmarks = results.face_landmarks[0]
             gaze_info = compute_gaze(face_landmarks, img_w, img_h)
+            looking_away = gaze_info["gaze"] != "center"
+
+            alerts = []
+            if multiple_faces:
+                alerts.append("multiple_faces")
+            if looking_away:
+                alerts.append("looking_away")
 
             logger.info(
-                "[Frame] Gaze result: %s (h=%.3f, v=%.3f) | face_detected=True",
+                "[Frame] Gaze: %s (h=%.3f, v=%.3f) | faces=%d | alerts=%s",
                 gaze_info["gaze"], gaze_info["h_ratio"], gaze_info["v_ratio"],
+                num_detected, alerts,
             )
 
             await ws.send_json({
                 "type": "gaze_result",
                 "gaze": gaze_info["gaze"],
                 "face_detected": True,
+                "multiple_faces": multiple_faces,
+                "looking_away": looking_away,
+                "phone_detected": False,
+                "alerts": alerts,
                 "h_ratio": gaze_info["h_ratio"],
                 "v_ratio": gaze_info["v_ratio"],
                 "timestamp": time.time(),
@@ -323,7 +384,9 @@ async def proctor_ws(ws: WebSocket):
     except Exception as e:
         logger.error("Proctoring WebSocket error: %s", e)
         try:
-            await ws.close(code=1011, reason=str(e))
+            # Truncate close reason to <= 120 bytes per RFC 6455 & Starlette limits
+            reason_str = str(e)[:120] if e else None
+            await ws.close(code=1011, reason=reason_str)
         except Exception:
             pass
 
@@ -345,4 +408,5 @@ async def health():
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)
+    port = int(os.getenv("PORT", 8001))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

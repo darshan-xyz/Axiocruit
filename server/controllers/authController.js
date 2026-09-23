@@ -32,7 +32,7 @@ exports.registerOrg = async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            role: 'organization' // Organization Admin
+            role: 'ORGANIZATION' // Organization Admin
         });
 
         await user.save();
@@ -194,8 +194,9 @@ exports.registerCandidate = async (req, res) => {
 
     try {
         // Input Sanitization & Validation
-        const nameRegex = /^[a-zA-Z\s]*$/;
-        if (!nameRegex.test(name)) {
+        const trimmedName = (name || '').trim();
+        const nameRegex = /^[a-zA-ZÀ-ÿ\s'-]{2,60}$/;
+        if (!trimmedName || !nameRegex.test(trimmedName)) {
             return res.status(400).json({ message: 'Name can only contain letters and spaces' });
         }
 
@@ -210,7 +211,7 @@ exports.registerCandidate = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         user = new User({
-            name,
+            name: trimmedName,
             email,
             password: hashedPassword,
             role: 'CANDIDATE'

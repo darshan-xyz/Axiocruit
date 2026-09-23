@@ -9,7 +9,7 @@ const {
 } = require('../controllers/organizationController');
 
 // All routes require authentication + organization role
-router.use(protect, authorize('organization'));
+router.use(protect, authorize('ORGANIZATION', 'ADMIN'));
 
 router.get('/jobs', getOrgJobs);
 router.get('/recruiters', getRecruiters);

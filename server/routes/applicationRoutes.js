@@ -21,7 +21,7 @@ const upload = multer({
 router.post('/:applicationId/retry-ai', protect, authorize('RECRUITER', 'INTERVIEWER', 'freelancer'), retryAiAnalysis);
 
 // POST /api/applications/:jobId — Candidate applies with CV upload
-router.post('/:jobId', protect, authorize('CANDIDATE'), applyWithCV);
+router.post('/:jobId', protect, authorize('CANDIDATE'), upload.single('resume'), applyWithCV);
 
 // GET /api/applications/my-applications — Candidate views their applications
 router.get('/my-applications', protect, authorize('CANDIDATE'), getMyApplications);

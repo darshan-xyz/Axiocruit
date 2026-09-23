@@ -134,11 +134,17 @@ export function useProctoring(config: UseProctoringProps): ProctoringReturn {
     } = config;
 
     // State
+    const [events, setEvents] = useState<ProctoringEvent[]>([]);
     const [isConnected, setIsConnected] = useState(false);
 
     // Refs (avoid stale closures in event handlers)
     const eventsRef = useRef<ProctoringEvent[]>([]);
     const wsRef = useRef<WebSocket | null>(null);
+    const isClosingRef = useRef(false);
+    const isVideoOffRef = useRef(isVideoOff);
+    useEffect(() => {
+        isVideoOffRef.current = isVideoOff;
+    }, [isVideoOff]);
     const captureTimerRef = useRef<number | null>(null);
     const reconnectAttemptRef = useRef(0);
     const reconnectTimerRef = useRef<number | null>(null);
@@ -160,6 +166,7 @@ export function useProctoring(config: UseProctoringProps): ProctoringReturn {
             timestamp: new Date().toISOString(),
         };
         eventsRef.current.push(event);
+        setEvents(prev => [...prev, event]);
         console.log(`[Proctor] ✅ EVENT CAPTURED → ${type}: "${detail}" | total events: ${eventsRef.current.length}`);
 
         // Emit via Socket.IO for real-time relay to the recruiter/interviewer
@@ -174,7 +181,12 @@ export function useProctoring(config: UseProctoringProps): ProctoringReturn {
 
     // ── WebSocket connection to Python proctoring service ────────────
     const connectWs = useCallback(() => {
-        if (wsRef.current?.readyState === WebSocket.OPEN) return;
+        if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) return;
+        isClosingRef.current = false;
+        if (reconnectTimerRef.current) {
+            clearTimeout(reconnectTimerRef.current);
+            reconnectTimerRef.current = null;
+        }
 
         try {
             const ws = new WebSocket(PROCTOR_WS_URL);
@@ -266,6 +278,11 @@ export function useProctoring(config: UseProctoringProps): ProctoringReturn {
             ws.onclose = () => {
                 setIsConnected(false);
                 console.log('[Proctor] 🔴 WebSocket to Python proctoring service DISCONNECTED');
+                if (reconnectTimerRef.current) {
+                    clearTimeout(reconnectTimerRef.current);
+                    reconnectTimerRef.current = null;
+                }
+                if (isClosingRef.current) return;
                 // Auto-reconnect
                 if (reconnectAttemptRef.current < MAX_RECONNECT_ATTEMPTS) {
                     reconnectAttemptRef.current += 1;
@@ -287,7 +304,7 @@ export function useProctoring(config: UseProctoringProps): ProctoringReturn {
     // ── Frame capture: grab JPEG from <video> and send to Python ─────
     const captureAndSend = useCallback(() => {
         // Pause capture if video is intentionally muted
-        if (isVideoOff) return;
+        if (isVideoOffRef.current) return;
 
         const video = videoRef.current;
         const ws = wsRef.current;
@@ -314,7 +331,7 @@ export function useProctoring(config: UseProctoringProps): ProctoringReturn {
         if (base64) {
             ws.send(JSON.stringify({ type: 'frame', data: base64 }));
         }
-    }, [videoRef, isVideoOff]);
+    }, [videoRef]);
 
     // ── Start / stop frame capture interval ──────────────────────────
     const startCapture = useCallback(() => {
@@ -434,6 +451,7 @@ export function useProctoring(config: UseProctoringProps): ProctoringReturn {
             if (reconnectTimerRef.current) {
                 clearTimeout(reconnectTimerRef.current);
             }
+            isClosingRef.current = true;
             if (wsRef.current) {
                 wsRef.current.close();
                 wsRef.current = null;
@@ -454,13 +472,14 @@ export function useProctoring(config: UseProctoringProps): ProctoringReturn {
             const result = await apiRequest(`/interviews/${interviewId}/proctor-log`, 'POST', { events });
             console.log(`[Proctor] ✅ Flushed ${events.length} events to backend. Server confirmed: saved=${result?.saved}, total=${result?.total}`);
             eventsRef.current = []; // Clear after successful flush
+            setEvents([]);
         } catch (err) {
             console.error('[Proctor] ❌ Failed to flush events:', err);
         }
     }, [interviewId]);
 
     return {
-        events: eventsRef.current,
+        events,
         isConnected,
         flushLogs,
     };

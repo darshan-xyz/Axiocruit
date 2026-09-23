@@ -342,8 +342,7 @@ export const RankedCandidates: React.FC = () => {
     });
 
     try {
-      const formData = new FormData();
-      const data = await apiRequest(`/applications/${applicationId}/retry-ai`, 'POST', formData);
+      const data = await apiRequest(`/applications/${applicationId}/retry-ai`, 'POST');
 
       setCandidates(prev =>
         prev.map(c =>

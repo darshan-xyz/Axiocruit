@@ -1,5 +1,5 @@
 {
-  "name": "AXIOCRUIT - Technical Recruitment & Proctoring Platform",
-  "description": "An AI-powered interview and recruitment platform enabling seamless hiring workflows for admins, recruiters, and candidates.",
+  "name": "PROCRUIT - Autonomous Talent Intelligence & Proctoring Platform",
+  "description": "Enterprise-grade technical recruitment platform featuring automated CV parsing, dense-vector ATS scoring, real-time MediaPipe AI proctoring, Monaco collaborative IDE, and WebRTC streaming.",
   "requestFramePermissions": []
 }

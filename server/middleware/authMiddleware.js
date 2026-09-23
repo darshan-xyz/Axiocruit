@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { normalizeRole } = require('../schemas/roleTaxonomy');
 
 const protect = async (req, res, next) => {
     let token;
@@ -34,13 +35,18 @@ const protect = async (req, res, next) => {
 };
 
 const authorize = (...roles) => {
+    const targetRoles = roles.flat().map(normalizeRole);
     return (req, res, next) => {
-        if (!req.user || !roles.includes(req.user.role)) {
-            return res.status(403).json({
-                message: `User role ${req.user?.role || 'anonymous'} is not authorized to access this route`
-            });
+        if (!req.user) {
+            return res.status(401).json({ message: 'Authentication required' });
         }
-        next();
+        const userRole = normalizeRole(req.user.role);
+        if (targetRoles.includes(userRole) || userRole === 'ADMIN') {
+            return next();
+        }
+        return res.status(403).json({
+            message: `User role ${req.user.role || 'anonymous'} is not authorized to access this route`
+        });
     };
 };
 
@@ -61,4 +67,4 @@ const optionalAuth = async (req, res, next) => {
     next();
 };
 
-module.exports = { protect, authorize, optionalAuth };
+module.exports = { protect, authorize, optionalAuth, normalizeRole };

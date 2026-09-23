@@ -144,7 +144,10 @@ async function run() {
         data = await res.json();
         if (!res.ok) throw new Error(`Fetch Candidate Interviews Failed: ${data.message}`);
 
-        const foundInterview = data.find(i => i._id === interviewId);
+        const allCandidateInterviews = Array.isArray(data)
+            ? data
+            : [...(data.activeInterviews || []), ...(data.pastInterviews || [])];
+        const foundInterview = allCandidateInterviews.find(i => (i._id || '').toString() === (interviewId || '').toString());
         if (!foundInterview) throw new Error('Interview not found for candidate');
         console.log('Candidate Interview Verified');
 

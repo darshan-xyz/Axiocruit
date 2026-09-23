@@ -22,16 +22,16 @@ export const ApplicantReviewModal: React.FC<ApplicantReviewModalProps> = ({
 
     // Helper to get consistent data (Snapshot vs Live Profile)
     const getCandidateData = (app: any) => {
-        const profile = app.candidate.profile || {};
+        const profile = app?.candidate?.profile || {};
         return {
-            name: app.candidate.name,
-            profilePicture: app.candidate.profilePicture,
-            headline: profile.headline || app.candidate.headline || 'Candidate',
-            bio: profile.bio,
-            skills: app.skills?.length > 0 ? app.skills : (profile.skills || app.candidate.skills || []),
-            experience: app.experience?.length > 0 ? app.experience : (profile.experience || app.candidate.experience || []),
-            education: app.education?.length > 0 ? app.education : (profile.education || app.candidate.education || []),
-            resume: app.resume || profile.resume || app.candidate.resumeUrl
+            name: app?.candidate?.name || 'Unknown Candidate',
+            profilePicture: app?.candidate?.profilePicture,
+            headline: profile?.headline || app?.candidate?.headline || 'Candidate',
+            bio: profile?.bio,
+            skills: app?.skills?.length > 0 ? app.skills : (profile?.skills || app?.candidate?.skills || []),
+            experience: app?.experience?.length > 0 ? app.experience : (profile?.experience || app?.candidate?.experience || []),
+            education: app?.education?.length > 0 ? app.education : (profile?.education || app?.candidate?.education || []),
+            resume: app?.resume || profile?.resume || app?.candidate?.resumeUrl
         };
     };
 
@@ -53,13 +53,13 @@ export const ApplicantReviewModal: React.FC<ApplicantReviewModalProps> = ({
                             <div>
                                 <h2 className="text-2xl font-bold mb-1 text-white">{data.name}</h2>
                                 <p className="text-blue-600 dark:text-blue-400 font-medium mb-2">{data.headline}</p>
-                                <p className="text-sm text-neutral-500">Applied for <span className="text-white font-medium">{application.job.title}</span></p>
+                                <p className="text-sm text-neutral-500">Applied for <span className="text-white font-medium">{application?.job?.title || 'Position'}</span></p>
                             </div>
                             <div className="flex flex-col items-end gap-3">
                                 <select
                                     className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-900 dark:text-white focus:border-blue-500 outline-none transition-colors"
-                                    value={application.status}
-                                    onChange={(e) => onStatusUpdate(application._id, e.target.value)}
+                                    value={application?.status || 'Applied'}
+                                    onChange={(e) => onStatusUpdate(application?._id, e.target.value)}
                                 >
                                     <option value="Applied">Applied</option>
                                     <option value="Screening">Screening</option>
@@ -80,7 +80,11 @@ export const ApplicantReviewModal: React.FC<ApplicantReviewModalProps> = ({
                                 <Button
                                     variant="outline"
                                     className="w-full justify-center border-neutral-700 text-neutral-300 hover:text-white"
-                                    onClick={() => window.open(`#/recruiter/coding-test-result/${application.job._id || application.job}/candidate/${application.candidate._id}`, '_blank')}
+                                    onClick={() => {
+                                        const jobId = application?.job?._id || application?.job || '';
+                                        const candidateId = application?.candidate?._id || application?.candidate || application?._id || '';
+                                        window.open(`#/recruiter/coding-test-result/${jobId}/candidate/${candidateId}`, '_blank');
+                                    }}
                                 >
                                     <Code2 className="w-4 h-4 mr-2" />
                                     Coding Test Results
@@ -183,7 +187,7 @@ export const ApplicantReviewModal: React.FC<ApplicantReviewModalProps> = ({
                             ⭐ Propose as Final Hire
                         </Button>
                     )}
-                    <Button variant="outline" className="border-red-900/50 text-red-400 hover:bg-red-900/20 hover:border-red-900" onClick={() => onStatusUpdate(application._id, 'Rejected')}>Reject</Button>
+                    <Button variant="outline" className="border-red-900/50 text-red-400 hover:bg-red-900/20 hover:border-red-900" onClick={() => onStatusUpdate(application?._id, 'Rejected')}>Reject</Button>
                 </div>
             </div>
         </Modal>

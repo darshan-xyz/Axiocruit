@@ -42,5 +42,4 @@ server/public/uploads/*
 
 # Agent artifacts & test reports
 .agents/
-m1_report.json
 *.local

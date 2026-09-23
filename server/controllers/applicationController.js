@@ -142,45 +142,54 @@ exports.applyWithCV = async (req, res) => {
         }
 
         // 4. Validate that the candidate has a resumeUrl
-        const userResumeUrl = user.resumeUrl || (profileData ? profileData.resume : null);
+        let userResumeUrl = user.resumeUrl || (profileData ? profileData.resume : null);
         console.log('[DEBUG ApplicationController] user.id:', req.user.id);
         console.log('[DEBUG ApplicationController] user.resumeUrl:', user.resumeUrl);
         console.log('[DEBUG ApplicationController] profileData.resume:', profileData ? profileData.resume : 'N/A');
         console.log('[DEBUG ApplicationController] Final userResumeUrl resolved as:', userResumeUrl);
 
-        if (!userResumeUrl) {
+        if (!req.file && !userResumeUrl) {
             console.error('[DEBUG ApplicationController] Rejecting application due to missing CV URL!');
             return res.status(400).json({ message: 'Please update your profile and upload a CV before applying' });
         }
 
-        // 5. Read the existing resume file from disk
+        // 5. Read the resume file (from direct upload or profile URL)
         let fileBuffer;
         let originalName = 'resume.pdf';
-        try {
-            console.log('[DEBUG ApplicationController] Attempting to read file from userResumeUrl:', userResumeUrl);
-            // Extact filename from full URL like http://localhost:5000/uploads/filename.pdf
-            const urlParts = userResumeUrl.split('/');
-            const filename = urlParts[urlParts.length - 1];
-            // Files from CandidateProfile upload to public/uploads
-            const relativePath = userResumeUrl.includes('/uploads/resumes/')
-                ? path.join('uploads', 'resumes', filename)
-                : path.join('uploads', filename);
-            const resumePath = path.join(__dirname, '..', 'public', relativePath);
-            console.log('[DEBUG ApplicationController] Resolved absolute file path:', resumePath);
-            fileBuffer = fs.readFileSync(resumePath);
-            originalName = filename;
-            console.log('[DEBUG ApplicationController] Successfully read file buffer of size:', fileBuffer.length);
-        } catch (fileErr) {
-            console.error('[File Read] Error reading existing resume:', fileErr.message);
-            // Graceful fallback to neutral sample resume if original file is missing
-            const fallbackPath = path.join(__dirname, '..', 'public', 'uploads', 'sample-resume.pdf');
-            if (fs.existsSync(fallbackPath)) {
-                try {
-                    fileBuffer = fs.readFileSync(fallbackPath);
-                    originalName = 'sample-resume.pdf';
-                    console.log('[DEBUG ApplicationController] Using neutral sample resume fallback, size:', fileBuffer.length);
-                } catch (fbErr) {
-                    console.error('[File Read] Fallback resume also unreadable:', fbErr.message);
+
+        if (req.file && req.file.buffer) {
+            fileBuffer = req.file.buffer;
+            originalName = req.file.originalname || 'resume.pdf';
+            userResumeUrl = saveResumeFile(fileBuffer, originalName);
+            user.resumeUrl = userResumeUrl;
+            await user.save();
+        } else if (userResumeUrl) {
+            try {
+                if (userResumeUrl.startsWith('http://') || userResumeUrl.startsWith('https://')) {
+                    const absoluteUrl = resolveResumeUrl(userResumeUrl, req);
+                    fileBuffer = await fetchResumeAsBuffer(absoluteUrl);
+                    const urlParts = userResumeUrl.split('/');
+                    if (urlParts.length > 0) originalName = urlParts[urlParts.length - 1];
+                } else {
+                    const urlParts = userResumeUrl.split('/');
+                    const filename = urlParts[urlParts.length - 1];
+                    const relativePath = userResumeUrl.includes('/uploads/resumes/')
+                        ? path.join('uploads', 'resumes', filename)
+                        : path.join('uploads', filename);
+                    const resumePath = path.join(__dirname, '..', 'public', relativePath);
+                    fileBuffer = await fs.promises.readFile(resumePath);
+                    originalName = filename;
+                }
+            } catch (fileErr) {
+                console.error('[File Read] Error reading existing resume:', fileErr.message);
+                const fallbackPath = path.join(__dirname, '..', 'public', 'uploads', 'sample-resume.pdf');
+                if (fs.existsSync(fallbackPath)) {
+                    try {
+                        fileBuffer = await fs.promises.readFile(fallbackPath);
+                        originalName = 'sample-resume.pdf';
+                    } catch (fbErr) {
+                        console.error('[File Read] Fallback resume also unreadable:', fbErr.message);
+                    }
                 }
             }
         }
@@ -336,6 +345,10 @@ exports.retryAiAnalysis = async (req, res) => {
 
         if (!application) {
             return res.status(404).json({ message: 'Application not found' });
+        }
+
+        if (!application.job) {
+            return res.status(404).json({ message: 'Associated job no longer exists' });
         }
 
         // 2. Verify permissions (Recruiter who posted it OR delegated Freelancer/Interviewer)

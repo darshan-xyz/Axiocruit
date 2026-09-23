@@ -53,6 +53,12 @@ const MessagesTab: React.FC = () => {
   const currentUser = userStr ? JSON.parse(userStr) : null;
   const currentUserId = currentUser?._id || currentUser?.id;
 
+  // Keep activeContact ref in sync for socket handler
+  const activeContactRef = useRef(activeContact);
+  useEffect(() => {
+    activeContactRef.current = activeContact;
+  }, [activeContact]);
+
   // ─── Socket.IO: register for real-time messaging ───
   useEffect(() => {
     if (!currentUserId) return;
@@ -69,77 +75,14 @@ const MessagesTab: React.FC = () => {
     });
 
     socket.on('receive-message', (msg: ChatMessage) => {
-      // If the message is from the active chat, add it to the chat
-      setChatMessages(prev => {
-        const isFromActiveContact =
-          msg.senderId._id === activeContact?._id;
-        if (isFromActiveContact) {
-          // Mark as read immediately
-          apiRequest(`/interviews/messages/read/${msg.senderId._id}`, 'PUT').catch(() => {});
-          return [...prev, msg];
-        }
-        return prev;
-      });
-
-      // Update conversation list
-      setConversations(prev => {
-        const contactId = msg.senderId._id === currentUserId
-          ? msg.receiverId._id
-          : msg.senderId._id;
-
-        const existing = prev.find(c => c.contact._id === contactId);
-        if (existing) {
-          return prev.map(c => {
-            if (c.contact._id === contactId) {
-              return {
-                ...c,
-                lastMessage: msg,
-                unreadCount: msg.senderId._id !== currentUserId
-                  ? c.unreadCount + 1
-                  : c.unreadCount,
-              };
-            }
-            return c;
-          }).sort((a, b) =>
-            new Date(b.lastMessage.createdAt).getTime() - new Date(a.lastMessage.createdAt).getTime()
-          );
-        } else {
-          // New conversation
-          const newConvo: Conversation = {
-            contact: msg.senderId._id === currentUserId
-              ? msg.receiverId as any
-              : msg.senderId as any,
-            lastMessage: msg,
-            unreadCount: msg.senderId._id !== currentUserId ? 1 : 0,
-          };
-          return [newConvo, ...prev];
-        }
-      });
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [currentUserId]);
-
-  // Keep activeContact ref in sync for socket handler
-  const activeContactRef = useRef(activeContact);
-  useEffect(() => {
-    activeContactRef.current = activeContact;
-  }, [activeContact]);
-
-  // Patch the socket handler to use ref
-  useEffect(() => {
-    if (!socketRef.current) return;
-    const socket = socketRef.current;
-
-    const handler = (msg: ChatMessage) => {
       const isFromActiveContact = msg.senderId._id === activeContactRef.current?._id;
       if (isFromActiveContact) {
         setChatMessages(prev => [...prev, msg]);
+        // Mark as read immediately
         apiRequest(`/interviews/messages/read/${msg.senderId._id}`, 'PUT').catch(() => {});
       }
 
+      // Update conversation list
       setConversations(prev => {
         const contactId = msg.senderId._id === currentUserId
           ? msg.receiverId._id
@@ -162,23 +105,24 @@ const MessagesTab: React.FC = () => {
             new Date(b.lastMessage.createdAt).getTime() - new Date(a.lastMessage.createdAt).getTime()
           );
         } else {
+          // New conversation
           const newConvo: Conversation = {
-            contact: msg.senderId._id === currentUserId ? msg.receiverId as any : msg.senderId as any,
+            contact: msg.senderId._id === currentUserId ? (msg.receiverId as any) : (msg.senderId as any),
             lastMessage: msg,
-            unreadCount: msg.senderId._id !== currentUserId ? 1 : 0,
+            unreadCount: msg.senderId._id !== currentUserId && msg.senderId._id !== activeContactRef.current?._id ? 1 : 0,
           };
           return [newConvo, ...prev];
         }
       });
-    };
-
-    socket.off('receive-message');
-    socket.on('receive-message', handler);
+    });
 
     return () => {
-      socket.off('receive-message', handler);
+      socket.off('connect');
+      socket.off('receive-message');
+      socket.disconnect();
+      socketRef.current = null;
     };
-  }, [activeContact, currentUserId]);
+  }, [currentUserId]);
 
   // ─── Fetch conversations ───
   useEffect(() => {

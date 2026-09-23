@@ -123,11 +123,14 @@ exports.acceptRequest = async (req, res) => {
 
     // Send a system message/notification to the recruiter
     const candidateName = interview.candidateId?.name || 'the candidate';
-    await Message.create({
-      senderId: req.user._id,
-      receiverId: interview.recruiterId._id,
-      content: `Freelancer ${req.user.name} accepted your interview request for ${candidateName}.`
-    });
+    const recruiterReceiverId = interview.recruiterId?._id || interview.recruiterId;
+    if (recruiterReceiverId) {
+      await Message.create({
+        senderId: req.user._id,
+        receiverId: recruiterReceiverId,
+        content: `Freelancer ${req.user.name} accepted your interview request for ${candidateName}.`
+      });
+    }
 
     res.json({ message: 'Request accepted successfully', interview });
   } catch (error) {
@@ -155,11 +158,14 @@ exports.rejectRequest = async (req, res) => {
     await interview.save();
 
     const candidateName = interview.candidateId?.name || 'the candidate';
-    await Message.create({
-      senderId: req.user._id,
-      receiverId: interview.recruiterId._id,
-      content: `Freelancer ${req.user.name} declined your interview request for ${candidateName}.`
-    });
+    const recruiterReceiverId = interview.recruiterId?._id || interview.recruiterId;
+    if (recruiterReceiverId) {
+      await Message.create({
+        senderId: req.user._id,
+        receiverId: recruiterReceiverId,
+        content: `Freelancer ${req.user.name} declined your interview request for ${candidateName}.`
+      });
+    }
 
     res.json({ message: 'Request rejected successfully', interview });
   } catch (error) {
@@ -277,6 +283,10 @@ exports.updateAvailability = async (req, res) => {
   try {
     const { timeSlots } = req.body; // Array of { dayOfWeek, startTime, endTime }
 
+    if (!Array.isArray(timeSlots)) {
+      return res.status(400).json({ message: 'timeSlots must be an array' });
+    }
+
     // Clear old availability
     await Availability.deleteMany({ freelancerId: req.user._id });
 
@@ -357,11 +367,14 @@ exports.acceptDelegation = async (req, res) => {
     await job.save();
 
     // Notify the recruiter that the freelancer accepted
-    await Message.create({
-      senderId: req.user._id,
-      receiverId: job.postedBy._id,
-      content: `Freelancer ${req.user.name} accepted the delegation for job "${job.title}".`
-    });
+    const recruiterReceiverId = job.postedBy?._id || job.postedBy;
+    if (recruiterReceiverId) {
+      await Message.create({
+        senderId: req.user._id,
+        receiverId: recruiterReceiverId,
+        content: `Freelancer ${req.user.name} accepted the delegation for job "${job.title}".`
+      });
+    }
 
     const updatedJob = await Job.findById(job._id)
       .populate('postedBy', 'name email')
@@ -404,11 +417,14 @@ exports.rejectDelegation = async (req, res) => {
     await job.save();
 
     // Notify the recruiter that the freelancer rejected
-    await Message.create({
-      senderId: req.user._id,
-      receiverId: job.postedBy._id,
-      content: `Freelancer ${req.user.name} declined the delegation for job "${job.title}".`
-    });
+    const recruiterReceiverId = job.postedBy?._id || job.postedBy;
+    if (recruiterReceiverId) {
+      await Message.create({
+        senderId: req.user._id,
+        receiverId: recruiterReceiverId,
+        content: `Freelancer ${req.user.name} declined the delegation for job "${job.title}".`
+      });
+    }
 
     res.json({ message: 'Delegation rejected — job is available for re-delegation', job });
   } catch (error) {
@@ -476,11 +492,14 @@ exports.proposeHire = async (req, res) => {
     }
 
     // Notify the recruiter
-    await Message.create({
-      senderId: req.user._id,
-      receiverId: job.postedBy._id,
-      content: `Your delegated freelancer has proposed a final candidate for the ${job.title} role. Please review.`
-    });
+    const recruiterReceiverId = job.postedBy?._id || job.postedBy;
+    if (recruiterReceiverId) {
+      await Message.create({
+        senderId: req.user._id,
+        receiverId: recruiterReceiverId,
+        content: `Your delegated freelancer has proposed a final candidate for the ${job.title} role. Please review.`
+      });
+    }
 
     res.json({ message: 'Hire proposed successfully', job });
   } catch (error) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   SlidersHorizontal,
@@ -60,7 +60,31 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
     return c.candidate?.department === activeCategory;
   });
 
-  const displayTotal = totalCount !== undefined ? totalCount : 46;
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredList.length / pageSize));
+  const displayTotal = totalCount !== undefined ? totalCount : filteredList.length;
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedList = filteredList.slice(startIndex, startIndex + pageSize);
+
+  const getPaginationItems = (): (number | string)[] => {
+    if (totalPages <= 5) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    if (currentPage <= 3) {
+      return [1, 2, 3, '...', totalPages];
+    }
+    if (currentPage >= totalPages - 2) {
+      return [1, '...', totalPages - 2, totalPages - 1, totalPages];
+    }
+    return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+  };
 
   // Category pills list
   const categoryPills: ('All' | 'Design' | 'Engineering' | 'Product' | 'Marketing')[] = [
@@ -160,7 +184,8 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
           </div>
         ) : (
           <div className="divide-y divide-slate-100 dark:divide-slate-800/70 min-w-[620px]">
-            {filteredList.map((cand, index) => {
+            {paginatedList.map((cand, pageIndex) => {
+              const index = startIndex + pageIndex;
               const isSelected = selectedCandidateId === cand._id || selectedCandidateId === cand.candidate?._id;
               const dept = getDepartmentMeta(cand.candidate?.department || cand.candidate?.headline);
               const DeptIcon = dept.icon;
@@ -267,75 +292,51 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
         )}
       </div>
 
-      {/* Table Footer with Exact Pagination Pills (< 1 2 3 ... 46 >) (Requirement R2 / F11) */}
+      {/* Table Footer with Dynamic Pagination Pills */}
       <div className="px-5 py-3.5 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 bg-slate-50/40 dark:bg-slate-900/30">
-        <span>Showing 1 to {filteredList.length} of {displayTotal} candidates</span>
+        <span>Showing {filteredList.length === 0 ? 0 : startIndex + 1} to {Math.min(startIndex + pageSize, filteredList.length)} of {displayTotal} candidates</span>
 
         <div className="flex items-center gap-1.5">
           {/* Previous Page button (<) */}
           <button
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-            className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center transition-colors shadow-2xs"
+            disabled={currentPage <= 1}
+            className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center transition-colors shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label="Previous page"
           >
             &lt;
           </button>
 
-          {/* Page 1 (Active solid blue pill) */}
-          <button
-            onClick={() => setCurrentPage(1)}
-            className={`w-7 h-7 rounded-lg font-black flex items-center justify-center shadow-2xs transition-all ${
-              currentPage === 1
-                ? 'bg-blue-600 text-white'
-                : 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50'
-            }`}
-          >
-            1
-          </button>
-
-          {/* Page 2 */}
-          <button
-            onClick={() => setCurrentPage(2)}
-            className={`w-7 h-7 rounded-lg font-bold flex items-center justify-center transition-all ${
-              currentPage === 2
-                ? 'bg-blue-600 text-white'
-                : 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
-            }`}
-          >
-            2
-          </button>
-
-          {/* Page 3 */}
-          <button
-            onClick={() => setCurrentPage(3)}
-            className={`w-7 h-7 rounded-lg font-bold flex items-center justify-center transition-all ${
-              currentPage === 3
-                ? 'bg-blue-600 text-white'
-                : 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
-            }`}
-          >
-            3
-          </button>
-
-          {/* Ellipsis */}
-          <span className="px-1 text-slate-400 font-bold select-none">...</span>
-
-          {/* Page 46 */}
-          <button
-            onClick={() => setCurrentPage(46)}
-            className={`w-7 h-7 rounded-lg font-bold flex items-center justify-center transition-all ${
-              currentPage === 46
-                ? 'bg-blue-600 text-white'
-                : 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
-            }`}
-          >
-            46
-          </button>
+          {getPaginationItems().map((item, idx) => {
+            if (item === '...') {
+              return (
+                <span key={`ellipsis-${idx}`} className="px-1 text-slate-400 font-bold select-none">
+                  ...
+                </span>
+              );
+            }
+            const pageNum = item as number;
+            const isActive = currentPage === pageNum;
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentPage(pageNum)}
+                className={`w-7 h-7 rounded-lg font-bold flex items-center justify-center shadow-2xs transition-all ${
+                  isActive
+                    ? 'bg-blue-600 text-white font-black'
+                    : 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                }`}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
 
           {/* Next Page button (>) */}
           <button
-            onClick={() => setCurrentPage(prev => Math.min(46, prev + 1))}
-            className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center transition-colors shadow-2xs"
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, Math.min(46, prev + 1)))}
+            disabled={currentPage >= totalPages}
+            className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center transition-colors shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label="Next page"
           >
             &gt;
