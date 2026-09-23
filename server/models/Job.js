@@ -43,5 +43,6 @@ const jobSchema = new mongoose.Schema({
 
 jobSchema.index({ postedBy: 1, status: 1 });
 jobSchema.index({ delegatedFreelancerId: 1, delegationStatus: 1 });
+jobSchema.index({ status: 1 });
 
 module.exports = mongoose.model('Job', jobSchema);

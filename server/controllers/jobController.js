@@ -1,6 +1,8 @@
 const Job = require('../models/Job');
 const Application = require('../models/Application');
 
+const escapeRegex = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 // @desc    Get all jobs with filters
 // @route   GET /api/jobs
 // @access  Public
@@ -20,11 +22,11 @@ exports.getJobs = async (req, res) => {
         }
 
         if (title) {
-            query.title = { $regex: title, $options: 'i' };
+            query.title = { $regex: escapeRegex(title), $options: 'i' };
         }
 
         if (location) {
-            query.location = { $regex: location, $options: 'i' };
+            query.location = { $regex: escapeRegex(location), $options: 'i' };
         }
 
         if (type) {
@@ -32,7 +34,7 @@ exports.getJobs = async (req, res) => {
         }
 
         if (skill) {
-            query.skills = { $in: [new RegExp(skill, 'i')] };
+            query.skills = { $in: [new RegExp(escapeRegex(skill), 'i')] };
         }
 
         // Note: Salary filtering is tricky with string. Skipping complex range for now.
@@ -501,6 +503,41 @@ exports.getPastJobs = async (req, res) => {
         res.json(jobs);
     } catch (err) {
         console.error('getPastJobs error:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+// @desc    Update a job
+// @route   PUT /api/jobs/:id
+// @access  Private (Recruiter/Admin/Org)
+exports.updateJob = async (req, res) => {
+    try {
+        const job = await Job.findById(req.params.id);
+        if (!job) return res.status(404).json({ message: 'Job not found' });
+
+        const userId = (req.user._id || req.user.id).toString();
+        const isOwner = job.postedBy && job.postedBy.toString() === userId;
+        const isAdmin = req.user.role === 'ADMIN';
+
+        if (!isOwner && !isAdmin) {
+            return res.status(403).json({ message: 'Not authorized to update this job' });
+        }
+
+        const { title, description, requirements, company, location, type, salary, skills, status } = req.body;
+        if (title !== undefined) job.title = title;
+        if (description !== undefined) job.description = description;
+        if (requirements !== undefined) job.requirements = requirements;
+        if (company !== undefined) job.company = company;
+        if (location !== undefined) job.location = location;
+        if (type !== undefined) job.type = type;
+        if (salary !== undefined) job.salary = salary;
+        if (skills !== undefined) job.skills = skills;
+        if (status !== undefined && ['Active', 'Closed', 'Draft'].includes(status)) job.status = status;
+
+        await job.save();
+        res.json(job);
+    } catch (err) {
+        console.error('updateJob error:', err);
         res.status(500).json({ message: 'Server error' });
     }
 };

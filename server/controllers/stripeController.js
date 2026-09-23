@@ -102,7 +102,7 @@ const stripeWebhook = async (req, res) => {
         const session = event.data.object;
 
         // Fulfill the purchase...
-        const interviewId = session.metadata.interviewId;
+        const interviewId = session?.metadata?.interviewId;
 
         if (interviewId) {
             try {
@@ -116,6 +116,9 @@ const stripeWebhook = async (req, res) => {
                 console.error(`Error updating interview ${interviewId} to Paid:`, err);
             }
         }
+    } else if (event.type === 'payment_intent.payment_failed') {
+        const paymentIntent = event.data.object;
+        console.warn(`[Stripe] Payment failed for intent: ${paymentIntent?.id}, reason: ${paymentIntent?.last_payment_error?.message || 'Unknown'}`);
     }
 
     // Return a 200 response to acknowledge receipt of the event

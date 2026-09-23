@@ -126,7 +126,6 @@ exports.applyWithCV = async (req, res) => {
         });
 
         if (existingApplication) {
-            console.error('[DEBUG ApplicationController] Rejecting application due to DUPLICATE APPLICATION!');
             return res.status(400).json({ message: 'You have already applied to this job' });
         }
 
@@ -143,13 +142,8 @@ exports.applyWithCV = async (req, res) => {
 
         // 4. Validate that the candidate has a resumeUrl
         let userResumeUrl = user.resumeUrl || (profileData ? profileData.resume : null);
-        console.log('[DEBUG ApplicationController] user.id:', req.user.id);
-        console.log('[DEBUG ApplicationController] user.resumeUrl:', user.resumeUrl);
-        console.log('[DEBUG ApplicationController] profileData.resume:', profileData ? profileData.resume : 'N/A');
-        console.log('[DEBUG ApplicationController] Final userResumeUrl resolved as:', userResumeUrl);
 
         if (!req.file && !userResumeUrl) {
-            console.error('[DEBUG ApplicationController] Rejecting application due to missing CV URL!');
             return res.status(400).json({ message: 'Please update your profile and upload a CV before applying' });
         }
 
@@ -275,8 +269,9 @@ exports.getRankedCandidates = async (req, res) => {
             return res.status(404).json({ message: 'Job not found' });
         }
 
-        const isOwner = job.postedBy.toString() === (req.user.id || req.user._id);
-        const isDelegated = job.delegatedFreelancerId && job.delegatedFreelancerId.toString() === (req.user.id || req.user._id);
+        const currentUserId = (req.user.id || req.user._id).toString();
+        const isOwner = job.postedBy && job.postedBy.toString() === currentUserId;
+        const isDelegated = job.delegatedFreelancerId && job.delegatedFreelancerId.toString() === currentUserId;
 
         if (!isOwner && !isDelegated) {
             return res.status(403).json({ message: 'Not authorized to view candidates for this job' });

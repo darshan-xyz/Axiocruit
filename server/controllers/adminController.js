@@ -4,6 +4,7 @@ const Organization = require('../models/Organization');
 const Profile = require('../models/Profile');
 const Application = require('../models/Application');
 const Interview = require('../models/Interview');
+const Message = require('../models/Message');
 
 // @desc    Get dashboard stats
 // @route   GET /api/admin/stats
@@ -24,7 +25,6 @@ exports.getDashboardStats = async (req, res) => {
             pendingApprovals: pendingInterviewers
         };
 
-        console.log("Admin fetching stats:", stats);
         res.status(200).json({ success: true, stats });
     } catch (err) {
         console.error(err);
@@ -54,7 +54,6 @@ exports.getAllUsers = async (req, res) => {
             .populate('organization', 'name')
             .sort({ createdAt: -1 });
 
-        console.log(`Admin fetching users... Found ${users.length} users.`);
         res.status(200).json({ success: true, users });
     } catch (err) {
         console.error(err);
@@ -90,9 +89,17 @@ exports.deleteUser = async (req, res) => {
                 // Find all recruiters in this org
                 const recruiters = await User.find({ organization: org._id });
                 for (const rec of recruiters) {
-                    // Delete mock jobs posted by these recruiters
+                    const recJobs = await Job.find({ postedBy: rec._id }).select('_id');
+                    const recJobIds = recJobs.map(j => j._id);
+                    if (recJobIds.length > 0) {
+                        await Application.deleteMany({ job: { $in: recJobIds } });
+                        await Interview.deleteMany({ jobId: { $in: recJobIds } });
+                    }
                     await Job.deleteMany({ postedBy: rec._id });
-                    // Delete the recruiter user
+                    await Message.deleteMany({ $or: [{ senderId: rec._id }, { receiverId: rec._id }] });
+                    if (rec.profile) {
+                        await Profile.findByIdAndDelete(rec.profile);
+                    }
                     await User.findByIdAndDelete(rec._id);
                 }
                 // Delete the Organization
@@ -102,6 +109,12 @@ exports.deleteUser = async (req, res) => {
 
         // 3. If RECRUITER: Remove from Org list and delete their jobs
         if (roleUpper === 'RECRUITER') {
+            const recJobs = await Job.find({ postedBy: user._id }).select('_id');
+            const recJobIds = recJobs.map(j => j._id);
+            if (recJobIds.length > 0) {
+                await Application.deleteMany({ job: { $in: recJobIds } });
+                await Interview.deleteMany({ jobId: { $in: recJobIds } });
+            }
             await Job.deleteMany({ postedBy: user._id });
             if (user.organization) {
                 await Organization.findByIdAndUpdate(user.organization, {
@@ -118,6 +131,11 @@ exports.deleteUser = async (req, res) => {
         // 5. Clean up associated interviews
         await Interview.deleteMany({
             $or: [{ candidateId: user._id }, { recruiterId: user._id }, { interviewerId: user._id }]
+        });
+
+        // 6. Clean up associated messages
+        await Message.deleteMany({
+            $or: [{ senderId: user._id }, { receiverId: user._id }]
         });
 
         // Finally, delete the user
@@ -138,7 +156,6 @@ exports.getAllJobs = async (req, res) => {
             .populate('postedBy', 'name email')
             .sort({ createdAt: -1 });
 
-        console.log(`Admin fetching jobs... Found ${jobs.length} jobs.`);
         res.status(200).json({ success: true, jobs });
     } catch (err) {
         console.error(err);
@@ -151,8 +168,8 @@ exports.getAllJobs = async (req, res) => {
 exports.deleteJob = async (req, res) => {
     try {
         await Job.findByIdAndDelete(req.params.id);
-        // Also remove applications? (Optional, MongoDB usually orphans are fine or handled by separate cleanup)
         await Application.deleteMany({ job: req.params.id });
+        await Interview.deleteMany({ jobId: req.params.id });
 
         res.json({ message: 'Job deleted' });
     } catch (err) {
@@ -170,7 +187,6 @@ exports.getPendingFreelancers = async (req, res) => {
             approvalStatus: 'PENDING'
         }).select('-password').populate('profile');
 
-        console.log(`Admin fetching pending freelancers... Found ${freelancers.length}.`);
         res.status(200).json({ success: true, users: freelancers });
     } catch (err) {
         console.error(err);

@@ -2,6 +2,8 @@ const User = require('../models/User');
 const Organization = require('../models/Organization');
 const Job = require('../models/Job');
 const Application = require('../models/Application');
+const Interview = require('../models/Interview');
+const Profile = require('../models/Profile');
 const bcrypt = require('bcryptjs');
 
 // @desc    Get all recruiters for the logged-in organization
@@ -116,6 +118,21 @@ exports.removeRecruiter = async (req, res) => {
         await Organization.findByIdAndUpdate(orgUser.organization, {
             $pull: { recruiters: recruiter._id }
         });
+
+        // Cascade cleanup: applications, interviews, and jobs posted by this recruiter
+        const recJobs = await Job.find({ postedBy: recruiter._id }).select('_id');
+        const recJobIds = recJobs.map(j => j._id);
+        if (recJobIds.length > 0) {
+            await Application.deleteMany({ job: { $in: recJobIds } });
+            await Interview.deleteMany({ jobId: { $in: recJobIds } });
+        }
+        await Job.deleteMany({ postedBy: recruiter._id });
+        await Interview.deleteMany({
+            $or: [{ recruiterId: recruiter._id }, { interviewerId: recruiter._id }]
+        });
+        if (recruiter.profile) {
+            await Profile.findByIdAndDelete(recruiter.profile);
+        }
 
         // Delete the recruiter user
         await User.findByIdAndDelete(recruiter._id);

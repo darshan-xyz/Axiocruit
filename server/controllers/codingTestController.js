@@ -274,7 +274,7 @@ const runAllTestCases = async (code, testCases) => {
     let syntaxErrorText = null;
     try {
       await new Promise((resolve, reject) => {
-        exec(`python -m py_compile "${tmpFile}"`, { timeout: 3000 }, (err, stdout, stderr) => {
+        exec(`"${PYTHON_BIN}" -m py_compile "${tmpFile}"`, { timeout: 3000 }, (err, stdout, stderr) => {
           if (err) reject(stderr || err.message);
           else resolve();
         });

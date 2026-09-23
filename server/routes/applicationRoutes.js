@@ -17,14 +17,14 @@ const upload = multer({
     },
 });
 
+// GET /api/applications/my-applications — Candidate views their applications
+router.get('/my-applications', protect, authorize('CANDIDATE'), getMyApplications);
+
 // POST /api/applications/:applicationId/retry-ai — Recruiter or delegated freelancer manually retries AI parsing
 router.post('/:applicationId/retry-ai', protect, authorize('RECRUITER', 'INTERVIEWER', 'freelancer'), retryAiAnalysis);
 
 // POST /api/applications/:jobId — Candidate applies with CV upload
 router.post('/:jobId', protect, authorize('CANDIDATE'), upload.single('resume'), applyWithCV);
-
-// GET /api/applications/my-applications — Candidate views their applications
-router.get('/my-applications', protect, authorize('CANDIDATE'), getMyApplications);
 
 // GET /api/applications/:jobId/candidates — Recruiter views ranked candidates
 router.get('/:jobId/candidates', protect, authorize('RECRUITER', 'INTERVIEWER', 'freelancer'), getRankedCandidates);

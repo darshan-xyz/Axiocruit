@@ -72,7 +72,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
-    // Fallback if not inside provider
+    // Resilient fallback if invoked outside provider
     const storedToken = localStorage.getItem('token');
     let storedUser: User | null = null;
     const raw = localStorage.getItem('user');
@@ -84,8 +84,17 @@ export const useAuth = (): AuthContextType => {
       token: storedToken,
       role: storedUser?.role || null,
       isAuthenticated: Boolean(storedToken),
-      login: () => {},
-      logout: () => {},
+      login: (newToken: string, newUser: User) => {
+        localStorage.setItem('token', newToken);
+        localStorage.setItem('user', JSON.stringify(newUser));
+        if (newUser?.role) localStorage.setItem('role', newUser.role);
+      },
+      logout: () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('role');
+        window.dispatchEvent(new Event('auth:logout'));
+      },
     };
   }
   return context;

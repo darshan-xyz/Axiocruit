@@ -20,6 +20,9 @@ const createSocketServer = (httpServer, options = {}) => {
       credentials: true,
       ...options.cors,
     },
+    maxHttpBufferSize: 5e6, // 5MB maximum message buffer
+    pingTimeout: 30000,
+    pingInterval: 10000,
     ...options,
   });
 

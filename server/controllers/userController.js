@@ -3,6 +3,7 @@
  * Author: Procruit Core Engineering
  */
 
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const Profile = require('../models/Profile');
 const Organization = require('../models/Organization');
@@ -188,7 +189,6 @@ exports.getCandidates = async (req, res) => {
 // @access  Private
 exports.getUserById = async (req, res) => {
   try {
-    const mongoose = require('mongoose');
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ message: 'Invalid user ID format' });
     }

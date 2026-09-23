@@ -16,9 +16,21 @@ const generateToken = (id, role, name) => {
 // @access  Public
 exports.registerOrg = async (req, res) => {
     let { name, email, password, website, description } = req.body;
-    email = email?.toLowerCase();
+    email = email?.toLowerCase()?.trim();
+    const trimmedName = (name || '').trim();
+
+    if (!trimmedName) {
+        return res.status(400).json({ message: 'Name is required' });
+    }
+    if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+    }
+    if (!password || password.length < 8) {
+        return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+    }
+
     // Default orgName if not provided (for quick signup)
-    const orgName = req.body.orgName || `${name}'s Organization`;
+    const orgName = req.body.orgName || `${trimmedName}'s Organization`;
 
     try {
         let user = await User.findOne({ email });
@@ -29,7 +41,7 @@ exports.registerOrg = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         user = new User({
-            name,
+            name: trimmedName,
             email,
             password: hashedPassword,
             role: 'ORGANIZATION' // Organization Admin
@@ -70,13 +82,24 @@ exports.registerOrg = async (req, res) => {
 // @access  Private (Admin only)
 exports.addRecruiter = async (req, res) => {
     let { name, email, password } = req.body;
-    email = email?.toLowerCase();
+    email = email?.toLowerCase()?.trim();
+    const trimmedName = (name || '').trim();
+
+    if (!trimmedName) {
+        return res.status(400).json({ message: 'Name is required' });
+    }
+    if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+    }
+    if (!password || password.length < 8) {
+        return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+    }
 
     try {
         // Ensure requester is an Admin and has an organization
         // req.user is set by authMiddleware
         const adminUser = await User.findById(req.user.id);
-        if (!adminUser.organization) {
+        if (!adminUser || !adminUser.organization) {
             return res.status(400).json({ message: 'Admin does not belong to an organization' });
         }
 
@@ -87,7 +110,7 @@ exports.addRecruiter = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         user = new User({
-            name,
+            name: trimmedName,
             email,
             password: hashedPassword,
             role: 'RECRUITER',
@@ -101,7 +124,10 @@ exports.addRecruiter = async (req, res) => {
             $push: { recruiters: user._id }
         });
 
-        res.status(201).json({ message: 'Recruiter added successfully', user });
+        const userResponse = user.toObject();
+        delete userResponse.password;
+
+        res.status(201).json({ message: 'Recruiter added successfully', user: userResponse });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
@@ -135,7 +161,18 @@ exports.getRecruiters = async (req, res) => {
 // @access  Public
 exports.registerFreelancer = async (req, res) => {
     let { name, email, password, hourlyRate, yearsOfExperience, availability, headline, bio, skills } = req.body;
-    email = email?.toLowerCase();
+    email = email?.toLowerCase()?.trim();
+    const trimmedName = (name || '').trim();
+
+    if (!trimmedName) {
+        return res.status(400).json({ message: 'Name is required' });
+    }
+    if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+    }
+    if (!password || password.length < 8) {
+        return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+    }
 
     try {
         let user = await User.findOne({ email });
@@ -146,7 +183,7 @@ exports.registerFreelancer = async (req, res) => {
 
         // Create User
         user = new User({
-            name,
+            name: trimmedName,
             email,
             password: hashedPassword,
             role: 'INTERVIEWER',
@@ -277,16 +314,20 @@ exports.login = async (req, res) => {
 exports.changePassword = async (req, res) => {
     const { oldPassword, newPassword } = req.body;
 
+    if (!oldPassword || !newPassword) {
+        return res.status(400).json({ message: 'Both old and new passwords are required' });
+    }
+
+    if (typeof newPassword !== 'string' || newPassword.length < 8) {
+        return res.status(400).json({ message: 'New password must be at least 8 characters long' });
+    }
+
     try {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ message: 'User not found' });
 
         const isMatch = await bcrypt.compare(oldPassword, user.password);
         if (!isMatch) return res.status(400).json({ message: 'Invalid old password' });
-
-        if (newPassword.length < 8) {
-            return res.status(400).json({ message: 'New password must be at least 8 characters long' });
-        }
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);

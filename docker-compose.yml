@@ -93,6 +93,8 @@ services:
       - PROCTORING_SERVICE_URL=http://proctoring-service:8001
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
     depends_on:
       mongodb:
         condition: service_healthy

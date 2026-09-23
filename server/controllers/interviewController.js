@@ -345,11 +345,9 @@ exports.submitFeedback = async (req, res) => {
       return res.status(404).json({ message: 'Interview not found' });
     }
 
-    const userId = req.user._id.toString();
-    const isInterviewer =
-      interview.interviewerId?.toString() === userId ||
-      interview.interviewerId?.toString() === req.user._id;
-    const isRecruiter = interview.recruiterId.toString() === userId;
+    const userId = (req.user._id || req.user.id).toString();
+    const isInterviewer = interview.interviewerId?.toString() === userId;
+    const isRecruiter = interview.recruiterId?.toString() === userId;
 
     if (!isInterviewer && !isRecruiter && req.user.role !== 'ADMIN') {
       return res.status(403).json({ message: 'Not authorized to submit feedback for this interview' });

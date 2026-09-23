@@ -200,15 +200,17 @@ exports.acceptGig = async (req, res) => {
   try {
     const { gigId } = req.params;
     
-    // Find and lock the gig
-    const gig = await InterviewGig.findById(gigId);
-    if (!gig) return res.status(404).json({ message: 'Gig not found' });
-    if (gig.status !== 'open') return res.status(400).json({ message: 'This gig has already been assigned or closed.' });
-
-    // Assign to freelancer
-    gig.status = 'assigned';
-    gig.assignedFreelancerId = req.user._id;
-    await gig.save();
+    // Atomically find and lock the gig to prevent race conditions
+    const gig = await InterviewGig.findOneAndUpdate(
+      { _id: gigId, status: 'open' },
+      { status: 'assigned', assignedFreelancerId: req.user._id },
+      { new: true }
+    );
+    if (!gig) {
+      const exists = await InterviewGig.findById(gigId);
+      if (!exists) return res.status(404).json({ message: 'Gig not found' });
+      return res.status(400).json({ message: 'This gig has already been assigned or closed.' });
+    }
 
     // Generate WebRTC meeting
     const newInterview = new Interview({
