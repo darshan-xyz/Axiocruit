@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Job = require('../models/Job');
 const Application = require('../models/Application');
 
@@ -52,6 +53,9 @@ exports.getJobs = async (req, res) => {
 // @access  Public
 exports.getJobById = async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
         const job = await Job.findById(req.params.id).populate('postedBy', 'name email companyName');
         if (!job) return res.status(404).json({ message: 'Job not found' });
         res.json(job);

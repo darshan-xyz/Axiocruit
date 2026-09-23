@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const FreelancerService = require('../models/FreelancerService');
 const InterviewGig = require('../models/InterviewGig'); // legacy — kept for old gig routes
 const Interview = require('../models/Interview');
@@ -5,6 +6,7 @@ const Message = require('../models/Message');
 const User = require('../models/User');
 const Availability = require('../models/Availability');
 const Job = require('../models/Job');
+const Application = require('../models/Application');
 const { v4: uuidv4 } = require('uuid');
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -197,16 +199,32 @@ exports.getOpenGigs = async (req, res) => {
 // @route   POST /api/freelancers/gigs/accept/:gigId
 // @access  Private (Freelancer / Interviewer)
 exports.acceptGig = async (req, res) => {
+  const session = await mongoose.startSession();
+  let inTransaction = false;
+  let gig = null;
+
   try {
     const { gigId } = req.params;
-    
+
+    try {
+      session.startTransaction();
+      inTransaction = true;
+    } catch (txErr) {
+      inTransaction = false;
+    }
+
+    const sessionOpt = inTransaction ? { session } : {};
+
     // Atomically find and lock the gig to prevent race conditions
-    const gig = await InterviewGig.findOneAndUpdate(
+    gig = await InterviewGig.findOneAndUpdate(
       { _id: gigId, status: 'open' },
       { status: 'assigned', assignedFreelancerId: req.user._id },
-      { new: true }
+      { new: true, ...sessionOpt }
     );
     if (!gig) {
+      if (inTransaction) {
+        await session.abortTransaction();
+      }
       const exists = await InterviewGig.findById(gigId);
       if (!exists) return res.status(404).json({ message: 'Gig not found' });
       return res.status(400).json({ message: 'This gig has already been assigned or closed.' });
@@ -224,12 +242,31 @@ exports.acceptGig = async (req, res) => {
       status: 'Scheduled'
     });
 
-    await newInterview.save();
-    
+    await newInterview.save(sessionOpt);
+
+    if (inTransaction) {
+      await session.commitTransaction();
+    }
+
     res.json({ message: 'Gig accepted successfully', gig, interview: newInterview });
   } catch (error) {
+    if (inTransaction) {
+      try { await session.abortTransaction(); } catch (abortErr) {}
+    } else if (gig) {
+      // Compensating rollback for standalone MongoDB
+      try {
+        await InterviewGig.findByIdAndUpdate(gig._id, {
+          status: 'open',
+          assignedFreelancerId: null
+        });
+      } catch (rbErr) {
+        console.error('Compensating rollback failed for acceptGig:', rbErr);
+      }
+    }
     console.error('acceptGig error:', error);
     res.status(500).json({ message: 'Failed to accept gig', error: error.message });
+  } finally {
+    session.endSession();
   }
 };
 
@@ -282,6 +319,10 @@ exports.updateProfile = async (req, res) => {
 // @route   POST /api/freelancers/availability
 // @access  Private (Freelancer)
 exports.updateAvailability = async (req, res) => {
+  const session = await mongoose.startSession();
+  let inTransaction = false;
+  let previousSlots = [];
+
   try {
     const { timeSlots } = req.body; // Array of { dayOfWeek, startTime, endTime }
 
@@ -289,8 +330,20 @@ exports.updateAvailability = async (req, res) => {
       return res.status(400).json({ message: 'timeSlots must be an array' });
     }
 
+    // Capture previous slots for compensating rollback in case of standalone Mongo
+    previousSlots = await Availability.find({ freelancerId: req.user._id }).lean();
+
+    try {
+      session.startTransaction();
+      inTransaction = true;
+    } catch (txErr) {
+      inTransaction = false;
+    }
+
+    const sessionOpt = inTransaction ? { session } : {};
+
     // Clear old availability
-    await Availability.deleteMany({ freelancerId: req.user._id });
+    await Availability.deleteMany({ freelancerId: req.user._id }, sessionOpt);
 
     // Insert new slots
     const newSlots = timeSlots.map(slot => ({
@@ -299,13 +352,30 @@ exports.updateAvailability = async (req, res) => {
     }));
 
     if (newSlots.length > 0) {
-      await Availability.insertMany(newSlots);
+      await Availability.insertMany(newSlots, sessionOpt);
+    }
+
+    if (inTransaction) {
+      await session.commitTransaction();
     }
 
     res.json({ message: 'Availability updated successfully' });
   } catch (error) {
+    if (inTransaction) {
+      try { await session.abortTransaction(); } catch (abortErr) {}
+    } else if (previousSlots.length > 0) {
+      // Compensating rollback for standalone MongoDB
+      try {
+        await Availability.deleteMany({ freelancerId: req.user._id });
+        await Availability.insertMany(previousSlots);
+      } catch (rbErr) {
+        console.error('Compensating rollback failed for availability:', rbErr);
+      }
+    }
     console.error('updateAvailability error:', error);
     res.status(500).json({ message: 'Failed to update availability', error: error.message });
+  } finally {
+    session.endSession();
   }
 };
 
@@ -345,6 +415,10 @@ exports.getMyDelegatedJobs = async (req, res) => {
 // @route   PUT /api/freelancers/delegations/:jobId/accept
 // @access  Private (freelancer | INTERVIEWER — must be the delegated freelancer)
 exports.acceptDelegation = async (req, res) => {
+  const session = await mongoose.startSession();
+  let inTransaction = false;
+  let prevDelegationStatus = null;
+
   try {
     const job = await Job.findById(req.params.jobId)
       .populate('postedBy', 'name email');
@@ -365,17 +439,39 @@ exports.acceptDelegation = async (req, res) => {
       });
     }
 
+    try {
+      session.startTransaction();
+      inTransaction = true;
+    } catch (txErr) {
+      inTransaction = false;
+    }
+
+    prevDelegationStatus = job.delegationStatus;
+    const sessionOpt = inTransaction ? { session } : {};
+
     job.delegationStatus = 'accepted';
-    await job.save();
+    await job.save(sessionOpt);
 
     // Notify the recruiter that the freelancer accepted
     const recruiterReceiverId = job.postedBy?._id || job.postedBy;
     if (recruiterReceiverId) {
-      await Message.create({
-        senderId: req.user._id,
-        receiverId: recruiterReceiverId,
-        content: `Freelancer ${req.user.name} accepted the delegation for job "${job.title}".`
-      });
+      if (inTransaction) {
+        await Message.create([{
+          senderId: req.user._id,
+          receiverId: recruiterReceiverId,
+          content: `Freelancer ${req.user.name} accepted the delegation for job "${job.title}".`
+        }], { session });
+      } else {
+        await Message.create({
+          senderId: req.user._id,
+          receiverId: recruiterReceiverId,
+          content: `Freelancer ${req.user.name} accepted the delegation for job "${job.title}".`
+        });
+      }
+    }
+
+    if (inTransaction) {
+      await session.commitTransaction();
     }
 
     const updatedJob = await Job.findById(job._id)
@@ -384,8 +480,17 @@ exports.acceptDelegation = async (req, res) => {
 
     res.json({ message: 'Delegation accepted', job: updatedJob });
   } catch (error) {
+    if (inTransaction) {
+      try { await session.abortTransaction(); } catch (abortErr) {}
+    } else if (prevDelegationStatus) {
+      try {
+        await Job.findByIdAndUpdate(req.params.jobId, { delegationStatus: prevDelegationStatus });
+      } catch (rbErr) {}
+    }
     console.error('acceptDelegation error:', error);
     res.status(500).json({ message: 'Failed to accept delegation', error: error.message });
+  } finally {
+    session.endSession();
   }
 };
 
@@ -393,6 +498,11 @@ exports.acceptDelegation = async (req, res) => {
 // @route   PUT /api/freelancers/delegations/:jobId/reject
 // @access  Private (freelancer | INTERVIEWER — must be the delegated freelancer)
 exports.rejectDelegation = async (req, res) => {
+  const session = await mongoose.startSession();
+  let inTransaction = false;
+  let prevDelegationStatus = null;
+  let prevDelegatedFreelancer = null;
+
   try {
     const job = await Job.findById(req.params.jobId)
       .populate('postedBy', 'name email');
@@ -413,25 +523,60 @@ exports.rejectDelegation = async (req, res) => {
       });
     }
 
+    try {
+      session.startTransaction();
+      inTransaction = true;
+    } catch (txErr) {
+      inTransaction = false;
+    }
+
+    prevDelegationStatus = job.delegationStatus;
+    prevDelegatedFreelancer = job.delegatedFreelancerId;
+    const sessionOpt = inTransaction ? { session } : {};
+
     // Reset delegation fields so the recruiter can delegate to someone else
     job.delegatedFreelancerId = null;
     job.delegationStatus = 'none';
-    await job.save();
+    await job.save(sessionOpt);
 
     // Notify the recruiter that the freelancer rejected
     const recruiterReceiverId = job.postedBy?._id || job.postedBy;
     if (recruiterReceiverId) {
-      await Message.create({
-        senderId: req.user._id,
-        receiverId: recruiterReceiverId,
-        content: `Freelancer ${req.user.name} declined the delegation for job "${job.title}".`
-      });
+      if (inTransaction) {
+        await Message.create([{
+          senderId: req.user._id,
+          receiverId: recruiterReceiverId,
+          content: `Freelancer ${req.user.name} declined the delegation for job "${job.title}".`
+        }], { session });
+      } else {
+        await Message.create({
+          senderId: req.user._id,
+          receiverId: recruiterReceiverId,
+          content: `Freelancer ${req.user.name} declined the delegation for job "${job.title}".`
+        });
+      }
+    }
+
+    if (inTransaction) {
+      await session.commitTransaction();
     }
 
     res.json({ message: 'Delegation rejected — job is available for re-delegation', job });
   } catch (error) {
+    if (inTransaction) {
+      try { await session.abortTransaction(); } catch (abortErr) {}
+    } else if (prevDelegationStatus) {
+      try {
+        await Job.findByIdAndUpdate(req.params.jobId, {
+          delegatedFreelancerId: prevDelegatedFreelancer,
+          delegationStatus: prevDelegationStatus
+        });
+      } catch (rbErr) {}
+    }
     console.error('rejectDelegation error:', error);
     res.status(500).json({ message: 'Failed to reject delegation', error: error.message });
+  } finally {
+    session.endSession();
   }
 };
 
@@ -439,9 +584,13 @@ exports.rejectDelegation = async (req, res) => {
 // @route   POST /api/freelancers/delegations/:jobId/propose/:candidateId
 // @access  Private (freelancer | INTERVIEWER)
 exports.proposeHire = async (req, res) => {
+  const session = await mongoose.startSession();
+  let inTransaction = false;
+  let prevJobState = null;
+  let prevAppState = null;
+
   try {
     const { jobId, candidateId } = req.params;
-    const Application = require('../models/Application');
 
     // Fetch the job and populate recruiter
     const job = await Job.findById(jobId).populate('postedBy', 'name email');
@@ -471,41 +620,90 @@ exports.proposeHire = async (req, res) => {
     // 2. Extract the report from the DB model
     const exactAiReport = completedInterview ? completedInterview.aiEvaluation : null;
 
+    try {
+      session.startTransaction();
+      inTransaction = true;
+    } catch (txErr) {
+      inTransaction = false;
+    }
+
+    // Capture previous state for compensating rollback if standalone Mongo
+    prevJobState = {
+      proposedCandidateId: job.proposedCandidateId,
+      delegationStatus: job.delegationStatus,
+      freelancerFinalReport: job.freelancerFinalReport,
+      aiEvaluationSummary: job.aiEvaluationSummary
+    };
+
+    const sessionOpt = inTransaction ? { session } : {};
+
     // Update the Job document
     job.proposedCandidateId = candidateId;
     job.delegationStatus = 'reviewing';
     job.freelancerFinalReport = finalNotes || '';
     
     // 3. Save it securely to the Job handoff package
-    // Merge the exact DB report with the incoming UI wrapper to keep codingTestResults etc.
     job.aiEvaluationSummary = {
         ...(aiReportData || {}),
         aiEvaluation: exactAiReport || (aiReportData && aiReportData.aiEvaluation) || {}
     };
     job.markModified('aiEvaluationSummary');
     
-    await job.save();
+    await job.save(sessionOpt);
 
     // Update the Application document
-    const application = await Application.findOne({ job: jobId, candidate: candidateId });
+    const application = await Application.findOne({ job: jobId, candidate: candidateId }, null, sessionOpt);
     if (application) {
+        prevAppState = application.status;
         application.status = 'Proposed'; 
-        await application.save();
+        await application.save(sessionOpt);
     }
 
     // Notify the recruiter
     const recruiterReceiverId = job.postedBy?._id || job.postedBy;
     if (recruiterReceiverId) {
-      await Message.create({
-        senderId: req.user._id,
-        receiverId: recruiterReceiverId,
-        content: `Your delegated freelancer has proposed a final candidate for the ${job.title} role. Please review.`
-      });
+      if (inTransaction) {
+        await Message.create([{
+          senderId: req.user._id,
+          receiverId: recruiterReceiverId,
+          content: `Your delegated freelancer has proposed a final candidate for the ${job.title} role. Please review.`
+        }], { session });
+      } else {
+        await Message.create({
+          senderId: req.user._id,
+          receiverId: recruiterReceiverId,
+          content: `Your delegated freelancer has proposed a final candidate for the ${job.title} role. Please review.`
+        });
+      }
+    }
+
+    if (inTransaction) {
+      await session.commitTransaction();
     }
 
     res.json({ message: 'Hire proposed successfully', job });
   } catch (error) {
+    if (inTransaction) {
+      try { await session.abortTransaction(); } catch (abortErr) {}
+    } else {
+      // Compensating rollback for standalone MongoDB
+      try {
+        if (prevJobState) {
+          await Job.findByIdAndUpdate(req.params.jobId, prevJobState);
+        }
+        if (prevAppState !== null) {
+          await Application.findOneAndUpdate(
+            { job: req.params.jobId, candidate: req.params.candidateId },
+            { status: prevAppState }
+          );
+        }
+      } catch (rbErr) {
+        console.error('Compensating rollback failed for proposeHire:', rbErr);
+      }
+    }
     console.error('proposeHire error:', error);
     res.status(500).json({ message: 'Failed to propose hire', error: error.message });
+  } finally {
+    session.endSession();
   }
 };

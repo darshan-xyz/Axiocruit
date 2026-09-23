@@ -3,6 +3,7 @@
  * Author: Procruit Core Engineering
  */
 
+const mongoose = require('mongoose');
 const Message = require('../models/Message');
 
 // @desc    Get all incoming messages for logged-in user (Inbox)
@@ -84,8 +85,12 @@ exports.getConversations = async (req, res) => {
 // @access  Private
 exports.getMessagesWithUser = async (req, res) => {
   try {
-    const myId = req.user._id;
     const otherId = req.params.userId;
+    if (!mongoose.Types.ObjectId.isValid(otherId)) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const myId = req.user._id;
 
     const messages = await Message.find({
       $or: [
@@ -109,6 +114,10 @@ exports.getMessagesWithUser = async (req, res) => {
 // @access  Private
 exports.markMessagesRead = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     await Message.updateMany(
       { senderId: req.params.userId, receiverId: req.user._id, isRead: false },
       { $set: { isRead: true } }

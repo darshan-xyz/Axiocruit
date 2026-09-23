@@ -5,6 +5,10 @@ const Profile = require('../models/Profile');
 const Application = require('../models/Application');
 const Interview = require('../models/Interview');
 const Message = require('../models/Message');
+const FreelancerService = require('../models/FreelancerService');
+const Availability = require('../models/Availability');
+const TestSession = require('../models/TestSession');
+const InterviewGig = require('../models/InterviewGig');
 
 // @desc    Get dashboard stats
 // @route   GET /api/admin/stats
@@ -82,7 +86,7 @@ exports.deleteUser = async (req, res) => {
 
         const roleUpper = (user.role || '').toUpperCase();
 
-        // 2. If organization: Delete Organization and its Recruiters
+        // 2. If organization: Delete Organization, Recruiters, and direct/recruiter jobs
         if (roleUpper === 'ORGANIZATION') {
             const org = await Organization.findOne({ admin: user._id });
             if (org) {
@@ -94,9 +98,12 @@ exports.deleteUser = async (req, res) => {
                     if (recJobIds.length > 0) {
                         await Application.deleteMany({ job: { $in: recJobIds } });
                         await Interview.deleteMany({ jobId: { $in: recJobIds } });
+                        await TestSession.deleteMany({ jobId: { $in: recJobIds } });
+                        await InterviewGig.deleteMany({ jobId: { $in: recJobIds } });
                     }
                     await Job.deleteMany({ postedBy: rec._id });
                     await Message.deleteMany({ $or: [{ senderId: rec._id }, { receiverId: rec._id }] });
+                    await InterviewGig.deleteMany({ $or: [{ recruiterId: rec._id }, { candidateId: rec._id }, { assignedFreelancerId: rec._id }] });
                     if (rec.profile) {
                         await Profile.findByIdAndDelete(rec.profile);
                     }
@@ -105,6 +112,17 @@ exports.deleteUser = async (req, res) => {
                 // Delete the Organization
                 await Organization.findByIdAndDelete(org._id);
             }
+
+            // Direct jobs posted by the organization admin user
+            const orgDirectJobs = await Job.find({ postedBy: user._id }).select('_id');
+            const orgDirectJobIds = orgDirectJobs.map(j => j._id);
+            if (orgDirectJobIds.length > 0) {
+                await Application.deleteMany({ job: { $in: orgDirectJobIds } });
+                await Interview.deleteMany({ jobId: { $in: orgDirectJobIds } });
+                await TestSession.deleteMany({ jobId: { $in: orgDirectJobIds } });
+                await InterviewGig.deleteMany({ jobId: { $in: orgDirectJobIds } });
+            }
+            await Job.deleteMany({ postedBy: user._id });
         }
 
         // 3. If RECRUITER: Remove from Org list and delete their jobs
@@ -114,6 +132,8 @@ exports.deleteUser = async (req, res) => {
             if (recJobIds.length > 0) {
                 await Application.deleteMany({ job: { $in: recJobIds } });
                 await Interview.deleteMany({ jobId: { $in: recJobIds } });
+                await TestSession.deleteMany({ jobId: { $in: recJobIds } });
+                await InterviewGig.deleteMany({ jobId: { $in: recJobIds } });
             }
             await Job.deleteMany({ postedBy: user._id });
             if (user.organization) {
@@ -123,17 +143,40 @@ exports.deleteUser = async (req, res) => {
             }
         }
 
-        // 4. Delete Applications (if Candidate)
-        if (roleUpper === 'CANDIDATE') {
-            await Application.deleteMany({ candidate: user._id });
+        // 4. If INTERVIEWER / FREELANCER: delete services, availability, reset delegated jobs
+        if (roleUpper === 'INTERVIEWER' || roleUpper === 'FREELANCER') {
+            await FreelancerService.deleteMany({ freelancerId: user._id });
+            await Availability.deleteMany({ freelancerId: user._id });
+            await Job.updateMany(
+                { delegatedFreelancerId: user._id },
+                { delegatedFreelancerId: null, delegationStatus: 'none' }
+            );
         }
 
-        // 5. Clean up associated interviews
+        // 5. If CANDIDATE: delete applications, pull from job applicants, and delete test sessions
+        if (roleUpper === 'CANDIDATE') {
+            await Application.deleteMany({ candidate: user._id });
+            await Job.updateMany(
+                { applicants: user._id },
+                { $pull: { applicants: user._id } }
+            );
+            await TestSession.deleteMany({ candidateId: user._id });
+        }
+
+        // 6. Clean up associated interviews
         await Interview.deleteMany({
             $or: [{ candidateId: user._id }, { recruiterId: user._id }, { interviewerId: user._id }]
         });
 
-        // 6. Clean up associated messages
+        // 7. Clean up associated interview gigs
+        await InterviewGig.deleteMany({
+            $or: [{ candidateId: user._id }, { recruiterId: user._id }, { assignedFreelancerId: user._id }]
+        });
+
+        // 8. Clean up associated test sessions (e.g. if candidate or any leftover)
+        await TestSession.deleteMany({ candidateId: user._id });
+
+        // 9. Clean up associated messages
         await Message.deleteMany({
             $or: [{ senderId: user._id }, { receiverId: user._id }]
         });
@@ -170,6 +213,8 @@ exports.deleteJob = async (req, res) => {
         await Job.findByIdAndDelete(req.params.id);
         await Application.deleteMany({ job: req.params.id });
         await Interview.deleteMany({ jobId: req.params.id });
+        await TestSession.deleteMany({ jobId: req.params.id });
+        await InterviewGig.deleteMany({ jobId: req.params.id });
 
         res.json({ message: 'Job deleted' });
     } catch (err) {
