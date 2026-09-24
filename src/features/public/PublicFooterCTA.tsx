@@ -8,9 +8,9 @@ export const PublicFooterCTA: React.FC = () => {
   const { isDark } = useTheme();
 
   return (
-    <section className={`py-16 px-4 ${
+    <section id="pricing" className={`py-16 px-4 ${
       isDark ? 'bg-[#111726] border-slate-800 text-white' : 'bg-[#D4F882] border-[#111111]/10 text-[#111111]'
-    } border-t text-center transition-colors duration-200`}>
+    } border-t text-center transition-colors duration-200 scroll-mt-20`}>
       <div className="max-w-4xl mx-auto space-y-6">
         <h2 className={`text-3xl sm:text-5xl font-black ${
           isDark ? 'text-white' : 'text-[#111111]'

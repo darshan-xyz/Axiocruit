@@ -42,9 +42,9 @@ export const FeatureComparisonMatrix: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           {/* CARD 1: Clean White in Light / Deep Slate in Dark */}
-          <div className={`${
+          <div id="ats-engine" className={`${
             isDark ? 'bg-[#111726] border-slate-800 text-slate-100' : 'bg-white border-slate-200/80 text-[#111111]'
-          } rounded-[32px] p-8 border shadow-md flex flex-col justify-between group hover:shadow-xl transition-all duration-300`}>
+          } rounded-[32px] p-8 border shadow-md flex flex-col justify-between group hover:shadow-xl transition-all duration-300 scroll-mt-24`}>
             <div className="flex justify-between items-start">
               <div className="max-w-[280px]">
                 <span className={`${
@@ -75,9 +75,9 @@ export const FeatureComparisonMatrix: React.FC = () => {
           </div>
 
           {/* CARD 2: Light Grey-Blue (#CBD5E1) in Light / Dark Steel (#1E293B) in Dark */}
-          <div className={`${
+          <div id="assessments" className={`${
             isDark ? 'bg-[#1E293B] border border-slate-700/70 text-slate-100' : 'bg-[#CBD5E1] text-[#111111]'
-          } rounded-[32px] p-8 shadow-md flex flex-col justify-between group hover:shadow-xl transition-all duration-300`}>
+          } rounded-[32px] p-8 shadow-md flex flex-col justify-between group hover:shadow-xl transition-all duration-300 scroll-mt-24`}>
             <div className="flex justify-between items-start">
               <div className="max-w-[280px]">
                 <span className={`${
@@ -106,9 +106,9 @@ export const FeatureComparisonMatrix: React.FC = () => {
           </div>
 
           {/* CARD 3: Deep Forest (#587150) in Light / Deep Emerald (#064E3B) in Dark */}
-          <div className={`${
+          <div id="ai-proctoring" className={`${
             isDark ? 'bg-[#064E3B] border border-emerald-800/80' : 'bg-[#587150]'
-          } text-white rounded-[32px] p-8 shadow-md flex flex-col justify-between group hover:shadow-xl transition-all duration-300`}>
+          } text-white rounded-[32px] p-8 shadow-md flex flex-col justify-between group hover:shadow-xl transition-all duration-300 scroll-mt-24`}>
             <div className="flex justify-between items-start">
               <div className="max-w-[280px]">
                 <span className={`${

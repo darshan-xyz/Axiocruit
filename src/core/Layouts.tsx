@@ -60,7 +60,7 @@ export const PublicLayout: React.FC = () => {
     <div className={`min-h-[100dvh] flex flex-col ${isHomePage ? (isDark ? 'bg-[#0A0E1A] text-slate-100' : 'bg-[#D4F882] text-[#111111]') : (isDark ? 'bg-[#0A0E1A] text-slate-100' : 'bg-[#F8F9FC] text-slate-900')}`}>
       {/* Floating Island Navbar */}
       <header className={`sticky top-0 z-40 w-full px-4 sm:px-6 lg:px-8 pt-3 pb-2 transition-colors duration-200 ${
-        isHomePage ? 'bg-[#D4F882]' : (isDark ? 'bg-slate-900' : 'bg-white')
+        isHomePage ? (isDark ? 'bg-[#0A0E1A]' : 'bg-[#D4F882]') : (isDark ? 'bg-slate-900' : 'bg-white')
       } ${isHomePage && isScrolled ? (isDark ? 'bg-[#0A0E1A]/90 backdrop-blur-md border-b border-slate-800/50' : 'bg-[#D4F882]/90 backdrop-blur-md border-b border-[#111111]/10') : ''}`}>
         <nav className={`max-w-6xl mx-auto rounded-full px-5 py-2.5 flex items-center justify-between border transition-all shadow-sm ${
           isDark
