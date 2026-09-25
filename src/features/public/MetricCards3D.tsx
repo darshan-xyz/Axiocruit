@@ -10,7 +10,7 @@ export const MetricCards3D: React.FC<MetricCards3DProps> = ({ isDark = false }) 
     <>
       {/* Card 1: Total Income (Floating bottom-left) */}
       <div
-        className={`absolute -left-6 sm:-left-12 -bottom-6 sm:-bottom-8 z-20 [transform:translateZ(50px)] ${
+        className={`absolute -left-4 sm:-left-8 lg:-left-12 -bottom-6 sm:-bottom-8 z-20 hidden sm:block [transform:translateZ(50px)] ${
           isDark
             ? 'bg-[#141B2D]/95 border-slate-700/80 shadow-2xl text-white'
             : 'bg-white/95 border-neutral-200/80 shadow-2xl text-[#111111]'
@@ -33,7 +33,7 @@ export const MetricCards3D: React.FC<MetricCards3DProps> = ({ isDark = false }) 
 
       {/* Card 2: Top Capsule Badge (Floating top-right) */}
       <div
-        className={`absolute -right-4 sm:-right-8 -top-4 sm:-top-6 z-20 [transform:translateZ(65px)] ${
+        className={`absolute -right-3 sm:-right-6 lg:-right-8 -top-4 sm:-top-6 z-20 hidden md:block [transform:translateZ(65px)] ${
           isDark
             ? 'bg-[#141B2D]/95 border-slate-700/80 shadow-xl text-white'
             : 'bg-white/95 border-neutral-200/80 shadow-xl text-[#111111]'
@@ -50,7 +50,7 @@ export const MetricCards3D: React.FC<MetricCards3DProps> = ({ isDark = false }) 
 
       {/* Card 3: Resolved Identities (Floating right edge) */}
       <div
-        className={`absolute -right-6 sm:-right-12 bottom-12 sm:bottom-16 z-20 [transform:translateZ(55px)] ${
+        className={`absolute -right-4 sm:-right-8 lg:-right-12 bottom-12 sm:bottom-16 z-20 hidden sm:block [transform:translateZ(55px)] ${
           isDark
             ? 'bg-[#141B2D]/95 border-slate-700/80 shadow-2xl text-white'
             : 'bg-white/95 border-neutral-200/80 shadow-2xl text-[#111111]'

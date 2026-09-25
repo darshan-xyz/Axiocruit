@@ -79,7 +79,9 @@ userSchema.pre('validate', function (next) {
       this.role = 'CANDIDATE';
     }
   }
-  next();
+  if (typeof next === 'function') {
+    next();
+  }
 });
 
 module.exports = mongoose.model('User', userSchema);

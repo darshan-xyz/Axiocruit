@@ -48,6 +48,21 @@ export const PublicLayout: React.FC = () => {
   const isHomePage = location.pathname === '/' || location.pathname === '';
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const handleScrollTo = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    if (!isHomePage) {
+      navigate('/');
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        el?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      const el = document.getElementById(id);
+      el?.scrollIntoView({ behavior: 'smooth' });
+    }
+    setIsMenuOpen(false);
+  };
+
   React.useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -75,15 +90,19 @@ export const PublicLayout: React.FC = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-7">
-            {['Platform', 'AI Proctoring', 'ATS Engine', 'Pricing'].map(item => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase().replace(/ /g, '-')}`}
-                className="text-xs font-semibold text-neutral-300 hover:text-white dark:text-slate-400 dark:hover:text-white transition-colors"
-              >
-                {item}
-              </a>
-            ))}
+            {['Platform', 'AI Proctoring', 'ATS Engine', 'Pricing'].map(item => {
+              const id = item.toLowerCase().replace(/ /g, '-');
+              return (
+                <a
+                  key={item}
+                  href={`#${id}`}
+                  onClick={(e) => handleScrollTo(e, id)}
+                  className="text-xs font-semibold text-neutral-300 hover:text-white dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer"
+                >
+                  {item}
+                </a>
+              );
+            })}
           </div>
 
           <div className="hidden md:flex items-center gap-3">
@@ -118,16 +137,19 @@ export const PublicLayout: React.FC = () => {
             isDark ? 'bg-[#111726] border-slate-800' : 'bg-[#0A0A0A] border-neutral-800 text-white'
           }`}>
             <div className="flex flex-col space-y-3">
-              {['Platform', 'AI Proctoring', 'ATS Engine', 'Pricing'].map(item => (
-                <a
-                  key={item}
-                  href={`#${item.toLowerCase().replace(/ /g, '-')}`}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="px-3 py-2 text-sm font-medium text-neutral-300 hover:text-white dark:text-slate-300 rounded-xl hover:bg-neutral-800/80 dark:hover:bg-slate-800"
-                >
-                  {item}
-                </a>
-              ))}
+              {['Platform', 'AI Proctoring', 'ATS Engine', 'Pricing'].map(item => {
+                const id = item.toLowerCase().replace(/ /g, '-');
+                return (
+                  <a
+                    key={item}
+                    href={`#${id}`}
+                    onClick={(e) => handleScrollTo(e, id)}
+                    className="px-3 py-2 text-sm font-medium text-neutral-300 hover:text-white dark:text-slate-300 rounded-xl hover:bg-neutral-800/80 dark:hover:bg-slate-800 cursor-pointer"
+                  >
+                    {item}
+                  </a>
+                );
+              })}
               <div className="pt-3 border-t border-neutral-800 dark:border-slate-800 flex flex-col gap-2">
                 <Button
                   variant="outline"
