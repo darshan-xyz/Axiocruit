@@ -46,7 +46,7 @@ router.get('/health', (req, res) => {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     uptimeSeconds: Math.floor(process.uptime()),
-    service: 'procruit-backend',
+    service: 'axiocruit-backend',
     version: '1.0.0',
     environment: process.env.NODE_ENV || 'development',
     system: {

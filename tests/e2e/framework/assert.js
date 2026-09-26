@@ -1,5 +1,5 @@
 /**
- * Procruit E2E Test Suite - Custom Assertion Engine
+ * Axiocruit E2E Test Suite - Custom Assertion Engine
  * Opaque-box requirement verification with detailed error reporting
  */
 

@@ -1,5 +1,5 @@
 /**
- * useProctoring — AI Proctoring Hook for the Procruit Interview Room
+ * useProctoring — AI Proctoring Hook for the Axiocruit Interview Room
  * ===================================================================
  * Encapsulates all client-side proctoring logic:
  *

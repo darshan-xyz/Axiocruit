@@ -1,7 +1,7 @@
-# Procruit — Enterprise Autonomous Talent Intelligence & Assessment Ecosystem
+# Axiocruit — Enterprise Autonomous Talent Intelligence & Assessment Ecosystem
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Procruit-Platform-10B981?style=for-the-badge&logo=probot&logoColor=white" alt="Procruit Platform" />
+  <img src="https://img.shields.io/badge/Axiocruit-Platform-10B981?style=for-the-badge&logo=probot&logoColor=white" alt="Axiocruit Platform" />
   <img src="https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 19" />
   <img src="https://img.shields.io/badge/Node.js-20+-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js 20+" />
   <img src="https://img.shields.io/badge/Express-5.2-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express 5" />
@@ -15,13 +15,13 @@
 
 ## Executive Overview
 
-**Procruit** is a next-generation, full-lifecycle technical hiring and biometric proctoring ecosystem. Engineered from first principles for modern engineering organizations, recruitment agencies, and freelance technical interviewers, Procruit replaces subjective evaluations and keyword-stuffed resumes with mathematically calibrated talent intelligence.
+**Axiocruit** is a next-generation, full-lifecycle technical hiring and biometric proctoring ecosystem. Engineered from first principles for modern engineering organizations, recruitment agencies, and freelance technical interviewers, Axiocruit replaces subjective evaluations and keyword-stuffed resumes with mathematically calibrated talent intelligence.
 
 The platform unifies **vector-embedded resume parsing**, **real-time computer-vision proctoring**, **collaborative in-browser Monaco live coding**, **mesh WebRTC audio/video signaling**, and **autonomous candidate pipeline orchestration** into a cohesive, high-performance web experience.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                                  PROCRUIT ECOSYSTEM                                    │
+│                                  AXIOCRUIT ECOSYSTEM                                    │
 ├─────────────────────┬──────────────────────┬────────────────────┬──────────────────────┤
 │    AUTONOMOUS ATS   │  BIOMETRIC INTEGRITY │  COLLABORATIVE IDE │ PIPELINE INTELLIGENCE│
 │   Dense Embeddings  │  478-Point FaceMesh  │  Monaco Execution  │ Real-Time Telemetry  │
@@ -33,7 +33,7 @@ The platform unifies **vector-embedded resume parsing**, **real-time computer-vi
 
 ## Platform Architecture
 
-Procruit operates as a decoupled microservices architecture designed for ultra-low latency, modular scaling, and resilient failover.
+Axiocruit operates as a decoupled microservices architecture designed for ultra-low latency, modular scaling, and resilient failover.
 
 ```mermaid
 flowchart TD
@@ -71,7 +71,7 @@ flowchart TD
 ## Key Platform Capabilities
 
 ### 1. Semantic ATS & Dense Vector Screening
-Traditional applicant tracking systems rely on brittle keyword string matching easily bypassed by prompt injections or keyword stuffing. Procruit deploys a dense vector embedding pipeline:
+Traditional applicant tracking systems rely on brittle keyword string matching easily bypassed by prompt injections or keyword stuffing. Axiocruit deploys a dense vector embedding pipeline:
 - **In-Memory PDF Parsing**: Resumes are ingested directly into memory streams via `pdfplumber` without persisting unencrypted candidate documents to disk.
 - **Dense Vector Representation**: Applicant work experience, skills, and projects are mapped into 384-dimensional semantic space via SentenceTransformers (`all-MiniLM-L6-v2`).
 - **Calibrated Cosine Similarity**: Computes continuous mathematical alignment between applicant resumes and technical job descriptions, outputting objective match percentages.
@@ -107,7 +107,7 @@ Ensures absolute assessment integrity during remote evaluations while respecting
 The codebase is organized into an enterprise feature-driven architecture:
 
 ```
-Procruit-main/
+Axiocruit-main/
 ├── ai-service/                     # Python NLP & Semantic Vector Microservice
 │   ├── main.py                     # FastAPI app, SentenceTransformers & spaCy pipeline
 │   ├── requirements.txt            # Python dependencies
@@ -188,8 +188,8 @@ Procruit-main/
 ### 1. Clone & Install Dependencies
 ```bash
 # Clone the repository
-git clone https://github.com/darshan-com/Procruit.git
-cd Procruit-main
+git clone https://github.com/darshan-com/Axiocruit.git
+cd Axiocruit-main
 
 # Install frontend dependencies
 npm install
@@ -214,7 +214,7 @@ cd ..
 ```
 
 ### 3. Launch All Services Concurrently
-Procruit includes a single command that boots the client, backend, and both Python microservices:
+Axiocruit includes a single command that boots the client, backend, and both Python microservices:
 
 ```bash
 npm run dev
@@ -247,17 +247,17 @@ Upon initial startup with an empty database or in zero-config development mode, 
 
 | Role | Email Address | Password | Permissions & Scope |
 | :--- | :--- | :--- | :--- |
-| **Recruiter** | `recruiter@procruit.com` | `Password123!` | Job creation, candidate pipeline, scoring review |
-| **System Admin** | `admin@procruit.com` | `Password123!` | Global platform governance, user management, audit logs |
-| **Organization** | `org@procruit.com` | `Password123!` | Department administration, recruiter team management |
-| **Interviewer** | `interviewer@procruit.com` | `Password123!` | Freelance gig claims, live interview assessment rooms |
-| **Candidate** | `candidate@procruit.com` | `Password123!` | Job search, resume submission, Monaco coding tests |
+| **Recruiter** | `recruiter@axiocruit.com` | `Password123!` | Job creation, candidate pipeline, scoring review |
+| **System Admin** | `admin@axiocruit.com` | `Password123!` | Global platform governance, user management, audit logs |
+| **Organization** | `org@axiocruit.com` | `Password123!` | Department administration, recruiter team management |
+| **Interviewer** | `interviewer@axiocruit.com` | `Password123!` | Freelance gig claims, live interview assessment rooms |
+| **Candidate** | `candidate@axiocruit.com` | `Password123!` | Job search, resume submission, Monaco coding tests |
 
 ---
 
 ## Verification & Quality Assurance Battery
 
-Procruit maintains a 100% automated test pass rate across unit, component, adversarial, and cross-feature integration batteries:
+Axiocruit maintains a 100% automated test pass rate across unit, component, adversarial, and cross-feature integration batteries:
 
 ```bash
 # 1. Strict TypeScript Compiler Audit (Zero Errors Required)
@@ -310,9 +310,9 @@ node tests/m4_backend_invariants_adversarial.test.js
 
 ## Enterprise Support & License
 
-Procruit is distributed under the **ISC License**. For enterprise licensing, custom LLM fine-tuning, or dedicated proctoring infrastructure, contact the engineering team.
+Axiocruit is distributed under the **ISC License**. For enterprise licensing, custom LLM fine-tuning, or dedicated proctoring infrastructure, contact the engineering team.
 
 ```
-Copyright (c) 2026 Procruit Platform Engineering Team.
+Copyright (c) 2026 Axiocruit Platform Engineering Team.
 All rights reserved.
 ```

@@ -1,5 +1,5 @@
 /**
- * Procruit Enterprise Backend Invariants Adversarial Test Harness
+ * Axiocruit Enterprise Backend Invariants Adversarial Test Harness
  * Author: Empirical Challenger (challenger_6_2)
  *
  * Verifies:

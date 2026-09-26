@@ -4,12 +4,12 @@ services:
   # --- MongoDB Database ---
   mongodb:
     image: mongo:7.0
-    container_name: procruit-mongodb
+    container_name: axiocruit-mongodb
     restart: unless-stopped
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_DATABASE: procruit
+      MONGO_INITDB_DATABASE: axiocruit
     volumes:
       - mongo-data:/data/db
     healthcheck:
@@ -18,14 +18,14 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - procruit-network
+      - axiocruit-network
 
   # --- AI Microservice (NLP & CV Matching) ---
   ai-service:
     build:
       context: .
       dockerfile: Dockerfile.ai
-    container_name: procruit-ai
+    container_name: axiocruit-ai
     restart: unless-stopped
     ports:
       - "8002:8002"
@@ -45,14 +45,14 @@ services:
         limits:
           memory: 2G
     networks:
-      - procruit-network
+      - axiocruit-network
 
   # --- Proctoring Microservice (MediaPipe & Gaze Detection) ---
   proctoring-service:
     build:
       context: .
       dockerfile: Dockerfile.proctor
-    container_name: procruit-proctor
+    container_name: axiocruit-proctor
     restart: unless-stopped
     ports:
       - "8001:8001"
@@ -69,7 +69,7 @@ services:
         limits:
           memory: 2G
     networks:
-      procruit-network:
+      axiocruit-network:
         aliases:
           - proctor
           - proctoring-service
@@ -79,15 +79,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.server
-    container_name: procruit-backend
+    container_name: axiocruit-backend
     restart: unless-stopped
     ports:
       - "5001:5001"
     environment:
       - NODE_ENV=production
       - PORT=5001
-      - MONGO_URI=mongodb://mongodb:27017/procruit
-      - JWT_SECRET=${JWT_SECRET:-procruit_enterprise_jwt_secret_change_in_prod}
+      - MONGO_URI=mongodb://mongodb:27017/axiocruit
+      - JWT_SECRET=${JWT_SECRET:-axiocruit_enterprise_jwt_secret_change_in_prod}
       - CLIENT_URL=http://localhost:3000
       - AI_SERVICE_URL=http://ai-service:8002
       - PROCTORING_SERVICE_URL=http://proctoring-service:8001
@@ -105,14 +105,14 @@ services:
     volumes:
       - uploads-data:/app/public/uploads
     networks:
-      - procruit-network
+      - axiocruit-network
 
   # --- Frontend Client (Nginx SPA + Reverse Proxy) ---
   frontend:
     build:
       context: .
       dockerfile: Dockerfile.client
-    container_name: procruit-frontend
+    container_name: axiocruit-frontend
     restart: unless-stopped
     ports:
       - "3000:80"
@@ -121,7 +121,7 @@ services:
       - proctoring-service
       - ai-service
     networks:
-      - procruit-network
+      - axiocruit-network
 
 volumes:
   mongo-data:
@@ -130,5 +130,5 @@ volumes:
     driver: local
 
 networks:
-  procruit-network:
+  axiocruit-network:
     driver: bridge

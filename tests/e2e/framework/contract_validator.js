@@ -1,5 +1,5 @@
 /**
- * Procruit E2E Test Suite - Interface & Microservices Contract Validator
+ * Axiocruit E2E Test Suite - Interface & Microservices Contract Validator
  * Validates TypeScript interfaces, REST endpoints, WebRTC events, and Microservices contracts
  */
 
@@ -140,7 +140,7 @@ export const EXPECTED_WEBRTC_EVENTS = [
 ];
 
 export class ContractValidator {
-  constructor(rootPath = 'd:/projects/Procruit-main') {
+  constructor(rootPath = process.cwd()) {
     this.rootPath = rootPath;
   }
 

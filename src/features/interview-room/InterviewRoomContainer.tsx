@@ -37,7 +37,7 @@ export const InterviewRoomContainer: React.FC = () => {
 
     // Starter code
     const getStarterCode = (name = 'Candidate') =>
-        `# Welcome to the Procruit Interview Sandbox, ${name}!\n# Write your code here...\n\nprint("Hello World!")\n`;
+        `# Welcome to the Axiocruit Interview Sandbox, ${name}!\n# Write your code here...\n\nprint("Hello World!")\n`;
 
     const userString = localStorage.getItem('user');
     const user = userString ? JSON.parse(userString) : null;
@@ -327,7 +327,7 @@ export const InterviewRoomContainer: React.FC = () => {
                     </div>
                     <div>
                         <h1 className="text-sm font-semibold">
-                            {interview?.jobId?.title ? `Interview: ${interview.jobId.title}` : 'Procruit Technical Interview'}
+                            {interview?.jobId?.title ? `Interview: ${interview.jobId.title}` : 'Axiocruit Technical Interview'}
                         </h1>
                         <p className={`text-xs ${isDark ? 'text-neutral-500' : 'text-slate-500'}`}>
                             {interview?.meetingId?.slice(0, 8)}... • {interview?.status}

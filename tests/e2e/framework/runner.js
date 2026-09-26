@@ -1,5 +1,5 @@
 /**
- * Procruit E2E Test Suite - Core Test Runner
+ * Axiocruit E2E Test Suite - Core Test Runner
  * Executes Tier 1-4 tests, provides formatted reporting and clean exit codes
  */
 
@@ -124,7 +124,7 @@ class TestRegistry {
 
     if (!this.options.json) {
       console.log(`${colors.bold}${colors.cyan}========================================================================${colors.reset}`);
-      console.log(`${colors.bold}${colors.cyan} PROCRUIT ENTERPRISE E2E TEST SUITE RUNNER (TIERS 1-4) ${colors.reset}`);
+      console.log(`${colors.bold}${colors.cyan} AXIOCRUIT ENTERPRISE E2E TEST SUITE RUNNER (TIERS 1-4) ${colors.reset}`);
       console.log(`${colors.dim} Filter: Tier=${this.options.tier || 'ALL'}, Feature=${this.options.feature || 'ALL'}, Milestone=${this.options.milestone || 'ALL'}${colors.reset}`);
       console.log(`${colors.bold}${colors.cyan}========================================================================${colors.reset}\n`);
     }

@@ -1,6 +1,6 @@
 /**
  * Express Application Bootstrap & Middleware Assembly
- * Author: Procruit Core Engineering
+ * Author: Axiocruit Core Engineering
  */
 
 const express = require('express');
@@ -87,7 +87,7 @@ const createApp = () => {
   app.use('/api/recruiter', requireDatabase, recruiterServiceRoutes);
 
   app.get('/', (req, res) => {
-    res.send('Procruit Platform API is running...');
+    res.send('Axiocruit Platform API is running...');
   });
 
   // Error Handler (must be last)

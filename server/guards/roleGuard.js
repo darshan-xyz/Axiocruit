@@ -1,5 +1,5 @@
 /**
- * Enterprise Role Guard Middleware for Procruit
+ * Enterprise Role Guard Middleware for Axiocruit
  */
 
 const { normalizeRole, CanonicalRoles } = require('../schemas/roleTaxonomy');

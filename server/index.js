@@ -1,6 +1,6 @@
 /**
- * Procruit Enterprise API & Realtime Gateway Entrypoint
- * Author: Procruit Core Engineering
+ * Axiocruit Enterprise API & Realtime Gateway Entrypoint
+ * Author: Axiocruit Core Engineering
  */
 
 const path = require('path');

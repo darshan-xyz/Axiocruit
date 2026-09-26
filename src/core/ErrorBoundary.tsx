@@ -20,7 +20,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('[Procruit ErrorBoundary] Uncaught application error:', error, errorInfo);
+    console.error('[Axiocruit ErrorBoundary] Uncaught application error:', error, errorInfo);
   }
 
   public render() {

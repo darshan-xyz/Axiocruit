@@ -1,6 +1,6 @@
 /**
  * Realtime Proctoring Telemetry Handler
- * Author: Procruit Proctoring Engineering
+ * Author: Axiocruit Proctoring Engineering
  */
 
 const PROCTOR_THROTTLE_MS = 3000;

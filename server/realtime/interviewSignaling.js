@@ -1,6 +1,6 @@
 /**
  * Realtime WebRTC Interview Signaling & Collaborative Session Handler
- * Author: Procruit Realtime Engineering
+ * Author: Axiocruit Realtime Engineering
  */
 
 const Interview = require('../models/Interview');

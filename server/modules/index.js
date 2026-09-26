@@ -1,6 +1,6 @@
 /**
- * Procruit Enterprise Backend Domain Modules Registry
- * Author: Procruit Core Engineering
+ * Axiocruit Enterprise Backend Domain Modules Registry
+ * Author: Axiocruit Core Engineering
  */
 
 const authModule = {

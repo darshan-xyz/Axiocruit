@@ -1,5 +1,5 @@
 {
-  "name": "PROCRUIT - Autonomous Talent Intelligence & Proctoring Platform",
+  "name": "AXIOCRUIT - Autonomous Talent Intelligence & Proctoring Platform",
   "description": "Enterprise-grade technical recruitment platform featuring automated CV parsing, dense-vector ATS scoring, real-time MediaPipe AI proctoring, Monaco collaborative IDE, and WebRTC streaming.",
   "requestFramePermissions": []
 }

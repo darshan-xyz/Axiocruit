@@ -57,7 +57,7 @@ const leetCodeStyleQuestions = [
 
 const seedDatabase = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/procruit');
+        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/axiocruit');
 
         console.log('Connected to Database. Clearing old coding questions...');
         await CodingQuestion.deleteMany({});

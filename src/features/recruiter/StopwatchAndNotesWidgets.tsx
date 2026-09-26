@@ -151,7 +151,7 @@ export const MiniCalendarWidget: React.FC = () => {
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
             September 2026
           </h3>
-          <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400">Procruit Live ATS</span>
+          <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400">Axiocruit Live ATS</span>
         </div>
 
         <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-extrabold text-slate-400 mb-2">

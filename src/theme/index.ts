@@ -1,5 +1,5 @@
 /**
- * Procruit Enterprise Theme Tokens & Styling System
+ * Axiocruit Enterprise Theme Tokens & Styling System
  */
 
 export const THEME_COLORS = {

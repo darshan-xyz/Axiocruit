@@ -1,5 +1,5 @@
 /**
- * Role Middleware for Procruit
+ * Role Middleware for Axiocruit
  * Enforces role checks using canonical role taxonomy with backward-compatibility.
  */
 

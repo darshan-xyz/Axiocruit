@@ -1,5 +1,5 @@
 /**
- * Procruit Feature Modules Aggregation Barrel
+ * Axiocruit Feature Modules Aggregation Barrel
  * Exposes feature domain namespaces and discrete subcomponents.
  */
 

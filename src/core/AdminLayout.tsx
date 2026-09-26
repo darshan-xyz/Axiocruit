@@ -66,7 +66,7 @@ export const AdminLayout: React.FC = () => {
                     </div>
                     <div>
                         <h1 className="font-extrabold text-sm tracking-tight bg-gradient-to-r from-cobalt-600 to-indigo-600 bg-clip-text text-transparent dark:from-cobalt-400 dark:to-indigo-300">
-                            PROCRUIT
+                            AXIOCRUIT
                         </h1>
                         <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 uppercase tracking-wider mt-0.5">
                             Platform Admin

@@ -77,7 +77,7 @@ async def lifespan(app: FastAPI):
 # ---------------------------------------------------------------------------
 # FastAPI App
 # ---------------------------------------------------------------------------
-app = FastAPI(title="Procruit Proctoring Service", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Axiocruit Proctoring Service", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

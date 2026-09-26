@@ -1,6 +1,6 @@
 /**
  * Socket.IO Initialization & Gateway Layer
- * Author: Procruit Realtime Engineering
+ * Author: Axiocruit Realtime Engineering
  */
 
 const { Server } = require('socket.io');

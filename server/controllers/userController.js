@@ -1,6 +1,6 @@
 /**
  * User & Profile Management Controller
- * Author: Procruit Core Engineering
+ * Author: Axiocruit Core Engineering
  */
 
 const mongoose = require('mongoose');

@@ -89,10 +89,10 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type }) => {
             } flex items-center justify-center font-black text-xl shadow-md transition-colors`}
             onClick={() => navigate('/')}
           >
-            P
+            A
           </div>
           <h2 className={`text-2xl sm:text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-[#111111]'}`}>
-            {type === 'login' ? 'Sign in to Procruit' : 'Create an Account'}
+            {type === 'login' ? 'Sign in to Axiocruit' : 'Create an Account'}
           </h2>
           <p className={`mt-1 text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             {type === 'login' ? 'Access your intelligence hiring workspace.' : 'Join the next-generation talent platform.'}

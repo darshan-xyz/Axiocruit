@@ -1,5 +1,5 @@
 """
-Procruit AI Microservice — CV Parsing & NLP Matching
+Axiocruit AI Microservice — CV Parsing & NLP Matching
 =====================================================
 FastAPI server that extracts text from PDF resumes, computes semantic
 similarity with a job description using SentenceTransformers, and
@@ -134,7 +134,7 @@ async def lifespan(app: FastAPI):
     logger.info("AI service shut down.")
 
 
-app = FastAPI(title="Procruit AI Service", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Axiocruit AI Service", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

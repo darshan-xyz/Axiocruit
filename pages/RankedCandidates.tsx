@@ -549,9 +549,9 @@ export const RankedCandidates: React.FC = () => {
         <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/recruiter')}>
             <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-sm shadow-sm shadow-blue-500/25">
-              P
+              A
             </div>
-            <span className="font-black text-lg text-slate-900 dark:text-white tracking-tight">PROCRUIT</span>
+            <span className="font-black text-lg text-slate-900 dark:text-white tracking-tight">AXIOCRUIT</span>
           </div>
 
           {/* Center Pill Navigation Tabs (Home, Candidates [active], Jobs, Analytics, Menu ⌄) */}

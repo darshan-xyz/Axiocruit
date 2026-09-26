@@ -17,7 +17,7 @@ export const PublicNavbar: React.FC = () => {
         } text-white px-4 py-1.5 rounded-xl shadow-xs text-center cursor-pointer transition-colors`}
         onClick={() => navigate('/')}
       >
-        <span className="text-sm font-black tracking-tight block leading-none">PROCRUIT</span>
+        <span className="text-sm font-black tracking-tight block leading-none">AXIOCRUIT</span>
         <span className="text-[7px] font-black tracking-[0.2em] uppercase text-lime-300 block">INTELLIGENCE</span>
       </div>
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Procruit Enterprise E2E Test Suite Runner
+ * Axiocruit Enterprise E2E Test Suite Runner
  * Executes Tier 1-4 tests covering Features F1 - F25
  * Usage:
  *   node tests/e2e/run_all.js [options]

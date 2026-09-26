@@ -1,6 +1,6 @@
 /**
- * Canonical Role Taxonomy for Procruit Platform
- * Author: Procruit Core Engineering
+ * Canonical Role Taxonomy for Axiocruit Platform
+ * Author: Axiocruit Core Engineering
  */
 
 const CanonicalRoles = Object.freeze({

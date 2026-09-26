@@ -43,17 +43,17 @@ const seedDefaultData = async () => {
   try {
     const userCount = await User.countDocuments();
     if (userCount <= 1) {
-      console.log('[Procruit Database] 📦 Checking/seeding demo accounts...');
+      console.log('[Axiocruit Database] 📦 Checking/seeding demo accounts...');
 
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash('Password123!', salt);
 
       // 1. Admin
-      const existingAdmin = await User.findOne({ email: 'admin@procruit.com' });
+      const existingAdmin = await User.findOne({ email: 'admin@axiocruit.com' });
       if (!existingAdmin) {
         const admin = new User({
           name: 'System Admin',
-          email: 'admin@procruit.com',
+          email: 'admin@axiocruit.com',
           password: hashedPassword,
           role: 'ADMIN',
           approvalStatus: 'APPROVED'
@@ -63,11 +63,11 @@ const seedDefaultData = async () => {
 
       // 2. Organization & Org Admin
       let org = await Organization.findOne({ name: 'Acme Corp' });
-      const existingOrgAdmin = await User.findOne({ email: 'org@procruit.com' });
+      const existingOrgAdmin = await User.findOne({ email: 'org@axiocruit.com' });
       if (!existingOrgAdmin) {
         const orgAdmin = new User({
           name: 'Acme HR Director',
-          email: 'org@procruit.com',
+          email: 'org@axiocruit.com',
           password: hashedPassword,
           role: 'ORGANIZATION',
           approvalStatus: 'APPROVED'
@@ -89,11 +89,11 @@ const seedDefaultData = async () => {
       }
 
       // 3. Recruiter
-      const existingRecruiter = await User.findOne({ email: 'recruiter@procruit.com' });
+      const existingRecruiter = await User.findOne({ email: 'recruiter@axiocruit.com' });
       if (!existingRecruiter && org) {
         const recruiter = new User({
           name: 'Jane Recruiter',
-          email: 'recruiter@procruit.com',
+          email: 'recruiter@axiocruit.com',
           password: hashedPassword,
           role: 'RECRUITER',
           organization: org._id,
@@ -104,11 +104,11 @@ const seedDefaultData = async () => {
       }
 
       // 4. Interviewer
-      const existingInterviewer = await User.findOne({ email: 'interviewer@procruit.com' });
+      const existingInterviewer = await User.findOne({ email: 'interviewer@axiocruit.com' });
       if (!existingInterviewer) {
         const interviewer = new User({
           name: 'Alex Interviewer',
-          email: 'interviewer@procruit.com',
+          email: 'interviewer@axiocruit.com',
           password: hashedPassword,
           role: 'INTERVIEWER',
           approvalStatus: 'APPROVED',
@@ -129,11 +129,11 @@ const seedDefaultData = async () => {
       }
 
       // 5. Candidate
-      const existingCandidate = await User.findOne({ email: 'candidate@procruit.com' });
+      const existingCandidate = await User.findOne({ email: 'candidate@axiocruit.com' });
       if (!existingCandidate) {
         const candidate = new User({
           name: 'Alex Candidate',
-          email: 'candidate@procruit.com',
+          email: 'candidate@axiocruit.com',
           password: hashedPassword,
           role: 'CANDIDATE',
           approvalStatus: 'APPROVED'
@@ -145,17 +145,17 @@ const seedDefaultData = async () => {
         await candidateProfile.save();
       }
 
-      console.log('[Procruit Database] ✅ Demo accounts ready: admin@procruit.com, org@procruit.com, recruiter@procruit.com, interviewer@procruit.com, candidate@procruit.com (Password: Password123!)');
+      console.log('[Axiocruit Database] ✅ Demo accounts ready: admin@axiocruit.com, org@axiocruit.com, recruiter@axiocruit.com, interviewer@axiocruit.com, candidate@axiocruit.com (Password: Password123!)');
     }
 
     const questionCount = await CodingQuestion.countDocuments();
     if (questionCount === 0) {
-      console.log('[Procruit Database] 📦 Seeding default coding questions...');
+      console.log('[Axiocruit Database] 📦 Seeding default coding questions...');
       await CodingQuestion.insertMany(defaultQuestions);
-      console.log('[Procruit Database] ✅ Coding questions seeded successfully.');
+      console.log('[Axiocruit Database] ✅ Coding questions seeded successfully.');
     }
   } catch (err) {
-    console.warn('[Procruit Database] Notice: auto-seeding skipped or encountered error:', err.message);
+    console.warn('[Axiocruit Database] Notice: auto-seeding skipped or encountered error:', err.message);
   }
 };
 

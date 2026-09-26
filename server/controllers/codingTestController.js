@@ -264,7 +264,7 @@ const runOneCase = (tmpFile, input, expectedOutput) => {
 const runAllTestCases = async (code, testCases) => {
   const tmpFile = path.join(
     os.tmpdir(),
-    `procruit_${Date.now()}_${Math.random().toString(36).slice(2)}.py`,
+    `axiocruit_${Date.now()}_${Math.random().toString(36).slice(2)}.py`,
   );
 
   try {
@@ -311,7 +311,7 @@ const executePython = (code, input) => {
   return new Promise((resolve) => {
     const tmpFile = path.join(
       os.tmpdir(),
-      `procruit_exec_${Date.now()}_${Math.random().toString(36).slice(2)}.py`
+      `axiocruit_exec_${Date.now()}_${Math.random().toString(36).slice(2)}.py`
     );
 
     let completed = false;

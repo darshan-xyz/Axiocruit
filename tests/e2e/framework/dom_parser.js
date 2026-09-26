@@ -1,5 +1,5 @@
 /**
- * Procruit E2E Test Suite - Opaque-Box DOM & AST Inspector
+ * Axiocruit E2E Test Suite - Opaque-Box DOM & AST Inspector
  * Inspects React/JSX component tree, DOM structures, CSS classes, and attributes
  */
 
@@ -7,7 +7,7 @@ import fs from 'fs';
 import path from 'path';
 
 export class SourceInspector {
-  constructor(rootPath = 'd:/projects/Procruit-main') {
+  constructor(rootPath = process.cwd()) {
     this.rootPath = rootPath;
     this.cache = new Map();
   }

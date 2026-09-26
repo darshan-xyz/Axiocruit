@@ -1,5 +1,5 @@
 /**
- * Enterprise Authentication Guard for Procruit
+ * Enterprise Authentication Guard for Axiocruit
  */
 
 const jwt = require('jsonwebtoken');

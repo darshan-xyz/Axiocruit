@@ -1,5 +1,5 @@
 /**
- * Procruit E2E Test Suite - API & Microservice Probe Engine
+ * Axiocruit E2E Test Suite - API & Microservice Probe Engine
  * Supports live network verification with graceful simulation fallback
  */
 

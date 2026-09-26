@@ -1,7 +1,7 @@
 {
-  "name": "procruit-backend",
+  "name": "axiocruit-backend",
   "version": "1.0.0",
-  "description": "Procruit Enterprise Backend API & Socket.IO Gateway",
+  "description": "Axiocruit Enterprise Backend API & Socket.IO Gateway",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,7 @@
     "dev": "node index.js"
   },
   "keywords": [],
-  "author": "Procruit Engineering Team",
+  "author": "Axiocruit Engineering Team",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {

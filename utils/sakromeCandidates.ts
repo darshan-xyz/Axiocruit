@@ -709,7 +709,7 @@ export const normalizeToSakromeCandidate = (app: any): SakromeCandidate => {
     candidate: {
       _id: candUser._id || 'user-generic',
       name: candUser.name || 'Candidate',
-      email: candUser.email || 'candidate@procruit.enterprise',
+      email: candUser.email || 'candidate@axiocruit.enterprise',
       headline: headline,
       department: deptMeta.name,
       location: candUser.location || profile.location || 'San Francisco, CA',

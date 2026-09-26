@@ -367,7 +367,7 @@ const questions = [
 
 const seed = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/procruit');
+    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/axiocruit');
     console.log('MongoDB connected');
 
     await CodingQuestion.deleteMany({});

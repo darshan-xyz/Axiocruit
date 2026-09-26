@@ -12,7 +12,7 @@ import { useTheme } from './ThemeContext';
 // Reusable Logo Component (Cobalt Minimalist Engine)
 export const BrandLogo: React.FC<{ className?: string }> = ({ className = "w-8 h-8 text-sm" }) => (
   <div className={`${className} rounded-xl bg-blue-600 flex items-center justify-center text-white font-black tracking-tighter shadow-sm shadow-blue-500/30 select-none`}>
-    P
+    A
   </div>
 );
 
@@ -86,7 +86,7 @@ export const PublicLayout: React.FC = () => {
         }`}>
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
             <BrandLogo className="w-8 h-8 text-sm" />
-            <span className="font-extrabold text-lg tracking-tight text-white">PROCRUIT</span>
+            <span className="font-extrabold text-lg tracking-tight text-white">AXIOCRUIT</span>
           </div>
 
           <div className="hidden md:flex items-center space-x-7">
@@ -178,7 +178,7 @@ export const PublicLayout: React.FC = () => {
           <div>
             <div className="flex items-center gap-2.5 mb-4">
               <BrandLogo className="w-7 h-7 text-xs" />
-              <span className="text-base font-bold text-white tracking-tight">PROCRUIT</span>
+              <span className="text-base font-bold text-white tracking-tight">AXIOCRUIT</span>
             </div>
             <p className="text-xs leading-relaxed text-neutral-400 dark:text-slate-400">
               Enterprise hiring and AI proctoring platform delivering calibrated talent matching, verified integrity, and automated assessment scoring.
@@ -206,7 +206,7 @@ export const PublicLayout: React.FC = () => {
           ))}
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 pt-6 border-t border-neutral-800 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-neutral-400 dark:text-slate-400">
-          <span>(c) 2026 PROCRUIT Platform. Enterprise Recruitment System. All rights reserved.</span>
+          <span>(c) 2026 AXIOCRUIT Platform. Enterprise Recruitment System. All rights reserved.</span>
           <span className="flex items-center gap-1.5 font-medium text-neutral-400 dark:text-slate-400">
             <span className="w-2 h-2 rounded-full bg-emerald-500" /> All microservices operational
           </span>
@@ -392,7 +392,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
             {/* Platform Logo */}
             <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigate(`/${role.toLowerCase().replace('_', '-')}`)}>
               <BrandLogo className="w-7 h-7 text-xs" />
-              <span className="font-black text-sm tracking-tight text-slate-900 dark:text-white">PROCRUIT</span>
+              <span className="font-black text-sm tracking-tight text-slate-900 dark:text-white">AXIOCRUIT</span>
             </div>
 
             {/* Top Navigation Pills */}

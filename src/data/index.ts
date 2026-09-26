@@ -1,5 +1,5 @@
 /**
- * Procruit Canonical Data Fixtures & Datasets
+ * Axiocruit Canonical Data Fixtures & Datasets
  * Re-exports candidate records, schemas, and normalization helpers.
  */
 

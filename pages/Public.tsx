@@ -132,7 +132,7 @@ export const HomePage: React.FC = () => {
       <section className={`relative pt-10 pb-20 md:pt-14 md:pb-24 px-4 overflow-hidden border-b border-[#111111]/10 transition-colors duration-200 ${
         isDark ? 'bg-[#0A0E1A] border-slate-800' : 'bg-[#D4F882]'
       }`}>
-        {/* Top Procruit Platform Badge */}
+        {/* Top Axiocruit Platform Badge */}
         <div className="flex justify-center mb-8">
           <div
             className={`${
@@ -140,7 +140,7 @@ export const HomePage: React.FC = () => {
             } text-white px-5 py-2.5 rounded-2xl shadow-md text-center inline-block cursor-pointer transition-colors`}
             onClick={() => navigate('/')}
           >
-            <div className="text-xl font-black tracking-tight leading-none">PROCRUIT</div>
+            <div className="text-xl font-black tracking-tight leading-none">AXIOCRUIT</div>
             <div className="text-[9px] font-black tracking-[0.25em] uppercase text-lime-400 mt-0.5">AUTONOMOUS TALENT HUB</div>
           </div>
         </div>
@@ -219,7 +219,7 @@ export const HomePage: React.FC = () => {
                   <div className={`${
                     isDark ? 'bg-slate-800 border border-slate-700' : 'bg-[#111111]'
                   } text-white px-4 py-1.5 rounded-xl shadow-xs text-center cursor-pointer transition-colors`} onClick={() => navigate('/')}>
-                    <span className="text-sm font-black tracking-tight block leading-none">PROCRUIT</span>
+                    <span className="text-sm font-black tracking-tight block leading-none">AXIOCRUIT</span>
                     <span className="text-[7px] font-black tracking-[0.2em] uppercase text-lime-300 block">INTELLIGENCE</span>
                   </div>
 
@@ -359,10 +359,10 @@ export const HomePage: React.FC = () => {
                         <div className={`w-6 h-6 rounded-lg ${
                           isDark ? 'bg-blue-600' : 'bg-[#111111]'
                         } text-white flex items-center justify-center text-[10px] font-black`}>
-                          P
+                          A
                         </div>
                         <div>
-                          <span className={`font-extrabold ${isDark ? 'text-white' : 'text-slate-900'} text-xs sm:text-sm block leading-none`}>Procruit Talent Cloud</span>
+                          <span className={`font-extrabold ${isDark ? 'text-white' : 'text-slate-900'} text-xs sm:text-sm block leading-none`}>Axiocruit Talent Cloud</span>
                           <span className="text-[10px] text-slate-400 font-medium">133 Requisitions Active</span>
                         </div>
                       </div>
@@ -640,7 +640,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── SECTION 2: PROCRUIT 4-PILLAR RECRUITMENT CAPABILITIES ── */}
+      {/* ── SECTION 2: AXIOCRUIT 4-PILLAR RECRUITMENT CAPABILITIES ── */}
       <section id="features" className={`py-24 px-4 ${
         isDark ? 'bg-[#080C14] border-slate-800' : 'bg-[#FAF9F5] border-slate-200/80'
       } border-b transition-colors duration-200`}>
@@ -925,10 +925,10 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type }) => {
             } flex items-center justify-center font-black text-xl shadow-md transition-colors`}
             onClick={() => navigate('/')}
           >
-            P
+            A
           </div>
           <h2 className={`text-2xl sm:text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-[#111111]'}`}>
-            {type === 'login' ? 'Sign in to Procruit' : 'Create an Account'}
+            {type === 'login' ? 'Sign in to Axiocruit' : 'Create an Account'}
           </h2>
           <p className={`mt-1 text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             {type === 'login' ? 'Access your intelligence hiring workspace.' : 'Join the next-generation talent platform.'}

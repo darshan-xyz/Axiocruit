@@ -248,12 +248,12 @@ describe('Tier 1: Herb Agency Landing Page Fidelity (F1 - F6)', () => {
     expect(content).toMatch(/isHomePage[^?]*\?[^:]*bg-\[#D4F882\]/);
   });
 
-  test('F6-03: Navbar contains brand logo "PROCRUIT" linking to root', {
+  test('F6-03: Navbar contains brand logo "AXIOCRUIT" linking to root', {
     id: 'T1-F6-03', tier: 1, feature: 'F6', milestone: 'M1'
   }, () => {
     const content = defaultInspector.readFile(layoutsPath);
     expect(content).toContain('BrandLogo');
-    expect(content.includes('PROCRUIT')).toBe(true);
+    expect(content.includes('AXIOCRUIT')).toBe(true);
     expect(content).toMatch(/navigate\(['"`]\/['"`]\)/);
   });
 

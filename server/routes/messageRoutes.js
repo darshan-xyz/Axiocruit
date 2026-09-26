@@ -1,6 +1,6 @@
 /**
  * Direct Messaging Routes
- * Author: Procruit Core Engineering
+ * Author: Axiocruit Core Engineering
  */
 
 const express = require('express');

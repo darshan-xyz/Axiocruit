@@ -27,7 +27,7 @@ export const HeroHerbSection: React.FC = () => {
       />
 
       <div className="max-w-6xl mx-auto text-center relative z-10">
-        {/* Top Procruit Platform Pill Badge */}
+        {/* Top Axiocruit Platform Pill Badge */}
         <div className="flex justify-center mb-6">
           <div
             className={`${
@@ -36,7 +36,7 @@ export const HeroHerbSection: React.FC = () => {
             onClick={() => navigate('/')}
           >
             <span className="w-2 h-2 rounded-full bg-lime-400 animate-pulse" />
-            <span className="text-xs font-black tracking-tight leading-none">PROCRUIT</span>
+            <span className="text-xs font-black tracking-tight leading-none">AXIOCRUIT</span>
             <span className="text-[8px] font-black tracking-[0.2em] uppercase text-lime-400">AUTONOMOUS TALENT HUB</span>
           </div>
         </div>
@@ -134,11 +134,11 @@ export const HeroHerbSection: React.FC = () => {
                 <div className={`w-7 h-7 rounded-lg ${
                   isDark ? 'bg-blue-600' : 'bg-[#111111]'
                 } text-white flex items-center justify-center text-xs font-black shadow-sm`}>
-                  P
+                  A
                 </div>
                 <div className="text-left">
                   <span className={`font-extrabold ${isDark ? 'text-white' : 'text-slate-900'} text-xs sm:text-sm block leading-none`}>
-                    Procruit Talent Cloud
+                    Axiocruit Talent Cloud
                   </span>
                   <span className="text-[10px] text-slate-400 font-medium">133 Requisitions Active</span>
                 </div>

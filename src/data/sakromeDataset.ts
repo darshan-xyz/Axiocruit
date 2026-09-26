@@ -1,5 +1,5 @@
 /**
- * Procruit Sakrome Candidate Dataset Re-export
+ * Axiocruit Sakrome Candidate Dataset Re-export
  * Re-exports canonical candidate fixture for backward and alias compatibility.
  */
 

@@ -1,6 +1,6 @@
 /**
  * Interview Domain Controller
- * Author: Procruit Core Engineering
+ * Author: Axiocruit Core Engineering
  */
 
 const { v4: uuidv4 } = require('uuid');

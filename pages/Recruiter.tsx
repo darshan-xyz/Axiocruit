@@ -385,7 +385,7 @@ const ConcentricFormatRings: React.FC = () => {
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
             Working Format
           </h3>
-          <span className="text-[11px] font-bold text-slate-400">Procruit Talent Allocation</span>
+          <span className="text-[11px] font-bold text-slate-400">Axiocruit Talent Allocation</span>
         </div>
 
         <div className="flex items-center justify-center py-3 relative">
@@ -607,7 +607,7 @@ const MiniCalendarWidget: React.FC = () => {
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
             September 2026
           </h3>
-          <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400">Procruit Live ATS</span>
+          <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400">Axiocruit Live ATS</span>
         </div>
 
         <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-extrabold text-slate-400 mb-2">
@@ -816,7 +816,7 @@ export const RecruiterDashboard: React.FC = () => {
                             </span>
                         </div>
                         <p className="text-xs text-slate-500 font-medium mb-2">
-                            {currentUser?.email || 'recruiter@procruit.enterprise'} • Calibrated Technical ATS Pipeline
+                            {currentUser?.email || 'recruiter@axiocruit.enterprise'} • Calibrated Technical ATS Pipeline
                         </p>
                         <div className="flex flex-wrap items-center gap-2 text-xs">
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 font-bold text-[11px]">

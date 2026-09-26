@@ -1,6 +1,6 @@
 /**
  * Realtime Direct Messaging & Room Chat Handler
- * Author: Procruit Realtime Engineering
+ * Author: Axiocruit Realtime Engineering
  */
 
 const registerChatHandlers = (io, socket, userSocketMap) => {

@@ -17,7 +17,7 @@ if (!process.env.MONGO_URI) {
 const createAdmin = async () => {
     try {
         // Connect to MongoDB
-        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/procruit'); // Default if env missing
+        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/axiocruit'); // Default if env missing
         console.log('MongoDB Connected');
 
         const email = process.argv[2]; // Get email from command line arg

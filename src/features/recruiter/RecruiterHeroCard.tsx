@@ -61,7 +61,7 @@ export const RecruiterHeroCard: React.FC<RecruiterHeroCardProps> = ({
               </span>
             </div>
             <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
-              {currentUser?.email || 'kevin.nunez@procruit.enterprise'} • {currentUser?.companyName || 'Procruit Global'}
+              {currentUser?.email || 'kevin.nunez@axiocruit.enterprise'} • {currentUser?.companyName || 'Axiocruit Global'}
             </p>
           </div>
         </div>

@@ -6,7 +6,7 @@
 import { expect } from './framework/assert.js';
 import { SourceInspector } from './framework/dom_parser.js';
 
-const inspector = new SourceInspector('d:/projects/Procruit-main');
+const inspector = new SourceInspector(process.cwd());
 
 console.log('=== Starting Challenger 2: Milestone 1 Verification ===\n');
 
