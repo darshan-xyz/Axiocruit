@@ -17,7 +17,7 @@ import {
   Info,
   Check
 } from 'lucide-react';
-import { UserRole } from '../types';
+import { UserRole, normalizeRole, getRoleHome } from '../types';
 import { apiRequest } from '../utils/api';
 import { useTheme } from '../components/ThemeContext';
 
@@ -882,28 +882,14 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type }) => {
 
       const data = await apiRequest(endpoint, 'POST', payload);
 
-      if (data.role === 'ORG_ADMIN' || data.role === 'org_admin') {
-        data.role = 'organization';
-      }
+      const canonicalRole = normalizeRole(data.role);
+      data.role = canonicalRole;
 
       localStorage.setItem('token', data.token);
-      localStorage.setItem('role', data.role);
+      localStorage.setItem('role', canonicalRole);
       localStorage.setItem('user', JSON.stringify(data));
 
-      const userRole = data.role;
-      if (userRole === 'ADMIN' || userRole === 'admin') {
-        navigate('/admin/dashboard');
-      } else if (userRole === 'organization') {
-        navigate('/organization/dashboard');
-      } else if (userRole === 'RECRUITER' || userRole === 'recruiter') {
-        navigate('/recruiter/dashboard');
-      } else if (userRole === 'CANDIDATE' || userRole === 'candidate') {
-        navigate('/candidate/dashboard');
-      } else if (userRole === 'INTERVIEWER' || userRole === 'interviewer') {
-        navigate('/interviewer');
-      } else {
-        navigate('/');
-      }
+      navigate(getRoleHome(canonicalRole));
 
     } catch (err: any) {
       console.error('Auth Failed:', err);

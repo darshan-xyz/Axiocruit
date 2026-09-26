@@ -5,6 +5,7 @@ import { useToast } from '@/components/Toast';
 import { apiRequest } from '@/utils/api';
 import { useProctoring } from '@/hooks/useProctoring';
 import { useTheme } from '@/core/ThemeContext';
+import { isHostRole, getRoleHome } from '@/types';
 import { useInterviewSignaling } from './useInterviewSignaling';
 import { WebRTCVideoGrid } from './WebRTCVideoGrid';
 import { MonacoCodeEditor } from './MonacoCodeEditor';
@@ -41,12 +42,7 @@ export const InterviewRoomContainer: React.FC = () => {
 
     const userString = localStorage.getItem('user');
     const user = userString ? JSON.parse(userString) : null;
-    const roleBasedIsHost =
-        user?.role === 'RECRUITER' ||
-        user?.role === 'recruiter' ||
-        user?.role === 'organization' ||
-        user?.role === 'FREELANCER' ||
-        user?.role === 'freelancer';
+    const roleBasedIsHost = isHostRole(user?.role);
     const isRecruiter = interview?.isUserHost ?? roleBasedIsHost;
 
     // Headless signaling hook
@@ -129,7 +125,7 @@ export const InterviewRoomContainer: React.FC = () => {
             signaling.socketRef.current.disconnect();
         }
 
-        const dashboardPath = user?.role === 'RECRUITER' ? '/recruiter/schedule' : '/candidate/interviews';
+        const dashboardPath = getRoleHome(user?.role);
         navigate(dashboardPath);
     };
 
@@ -142,8 +138,7 @@ export const InterviewRoomContainer: React.FC = () => {
         signaling.peerConnectionsRef.current.clear();
         if (signaling.socketRef.current) signaling.socketRef.current.disconnect();
 
-        const isFreelancer = user?.role === 'INTERVIEWER' || user?.role === 'freelancer';
-        navigate(isFreelancer ? '/interviewer' : '/recruiter/schedule');
+        navigate(getRoleHome(user?.role));
     };
 
     // Complete interview & trigger AI report
@@ -170,8 +165,7 @@ export const InterviewRoomContainer: React.FC = () => {
 
             setTimeout(() => {
                 if (signaling.socketRef.current) signaling.socketRef.current.disconnect();
-                const isFreelancer = user?.role === 'INTERVIEWER' || user?.role === 'freelancer';
-                navigate(isFreelancer ? '/interviewer' : '/recruiter/schedule');
+                navigate(getRoleHome(user?.role));
             }, 800);
         } catch (err: any) {
             addToast('error', err.message || 'Failed to complete interview');

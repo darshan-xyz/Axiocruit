@@ -31,7 +31,7 @@ export const AdminLayout: React.FC = () => {
     };
 
     const navItems = [
-        { icon: LayoutDashboard, label: 'Overview', path: '/admin' },
+        { icon: LayoutDashboard, label: 'Overview', path: '/admin/dashboard' },
         { icon: Users, label: 'User Management', path: '/admin/users' },
         { icon: Briefcase, label: 'Jobs', path: '/admin/jobs' },
         { icon: CheckCircle, label: 'Approvals', path: '/admin/approvals' },
@@ -47,7 +47,7 @@ export const AdminLayout: React.FC = () => {
         ? 'border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl'
         : 'border-b border-slate-200/80 bg-white/80 backdrop-blur-xl';
 
-    const currentItem = navItems.find(i => location.pathname === i.path || (location.pathname.startsWith(i.path) && i.path !== '/admin'));
+    const currentItem = navItems.find(i => location.pathname === i.path || (location.pathname.startsWith(i.path) && i.path !== '/admin/dashboard'));
     const pageTitle = currentItem?.label || 'Admin Panel';
 
     const adminRole = localStorage.getItem('role') || 'Admin';
@@ -80,7 +80,7 @@ export const AdminLayout: React.FC = () => {
                         <NavLink
                             key={item.path}
                             to={item.path}
-                            end={item.path === '/admin'}
+                            end={item.path === '/admin/dashboard'}
                             className={({ isActive }) =>
                                 `flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium ${isActive
                                     ? 'bg-cobalt-50 text-cobalt-700 dark:bg-cobalt-950/60 dark:text-cobalt-300 shadow-sm ring-1 ring-cobalt-500/20 font-semibold'

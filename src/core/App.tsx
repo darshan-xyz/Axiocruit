@@ -94,7 +94,7 @@ export const App: React.FC = () => {
                   </Route>
 
                   {/* Org Admin Routes */}
-                  <Route path="/organization" element={<DashboardLayout role="organization" />}>
+                  <Route path="/organization" element={<DashboardLayout role="ORGANIZATION" />}>
                     <Route index element={<Navigate to="dashboard" replace />} />
                     <Route path="dashboard" element={<OrgAdminDashboard />} />
                     <Route path="jobs" element={<OrgJobsList />} />

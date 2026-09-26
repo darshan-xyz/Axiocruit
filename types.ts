@@ -1,5 +1,34 @@
 
-export type UserRole = 'ADMIN' | 'ORGANIZATION' | 'RECRUITER' | 'CANDIDATE' | 'INTERVIEWER' | 'organization' | 'freelancer';
+export type CanonicalRole = 'ADMIN' | 'ORGANIZATION' | 'RECRUITER' | 'CANDIDATE' | 'INTERVIEWER';
+export type UserRole = CanonicalRole | 'organization' | 'freelancer' | 'recruiter' | 'candidate' | 'interviewer' | 'admin' | 'ORG_ADMIN';
+
+export const normalizeRole = (role?: string | null): CanonicalRole => {
+  if (!role) return 'CANDIDATE';
+  const upper = String(role).trim().toUpperCase();
+  if (upper === 'ADMIN') return 'ADMIN';
+  if (upper === 'ORGANIZATION' || upper === 'ORG_ADMIN') return 'ORGANIZATION';
+  if (upper === 'RECRUITER') return 'RECRUITER';
+  if (upper === 'INTERVIEWER' || upper === 'FREELANCER') return 'INTERVIEWER';
+  return 'CANDIDATE';
+};
+
+export const isHostRole = (role?: string | null): boolean => {
+  const norm = normalizeRole(role);
+  return norm === 'ADMIN' || norm === 'ORGANIZATION' || norm === 'RECRUITER' || norm === 'INTERVIEWER';
+};
+
+export const getRoleHome = (role?: string | null): string => {
+  const norm = normalizeRole(role);
+  switch (norm) {
+    case 'ADMIN': return '/admin/dashboard';
+    case 'ORGANIZATION': return '/org/dashboard';
+    case 'RECRUITER': return '/recruiter/dashboard';
+    case 'INTERVIEWER': return '/interviewer/dashboard';
+    case 'CANDIDATE':
+    default:
+      return '/candidate/dashboard';
+  }
+};
 
 export interface Experience {
   company: string;

@@ -53,7 +53,9 @@ export const apiRequest = async (
 
     // Check if response is JSON
     const contentType = res.headers.get("content-type");
-    if (contentType && contentType.indexOf("application/json") !== -1) {
+    const isJson = contentType && contentType.indexOf("application/json") !== -1;
+
+    if (isJson) {
       const data = await res.json();
       if (!res.ok) {
         const error = new Error(data.message || 'API Request Failed') as any;
@@ -64,6 +66,11 @@ export const apiRequest = async (
       }
       return data;
     } else {
+      // If successful empty or non-JSON response (e.g. 204 No Content)
+      if (res.ok) {
+        const text = await res.text();
+        return text ? { message: text } : {};
+      }
       // If not JSON, it's likely an HTML error page (404, 500, etc.)
       const text = await res.text();
       console.error('Non-JSON Response:', text);

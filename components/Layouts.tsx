@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Button } from './UI';
 import { useTheme } from './ThemeContext';
+import { normalizeRole, getRoleHome } from '@/types';
 
 // Reusable Logo Component (Cobalt Minimalist Engine)
 export const BrandLogo: React.FC<{ className?: string }> = ({ className = "w-8 h-8 text-sm" }) => (
@@ -226,7 +227,7 @@ interface SidebarItem {
 }
 
 interface DashboardLayoutProps {
-  role: 'ADMIN' | 'organization' | 'RECRUITER' | 'CANDIDATE' | 'INTERVIEWER' | 'freelancer';
+  role: string;
   children?: React.ReactNode;
 }
 
@@ -239,6 +240,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
   // Verify Role Logic
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
+  const userRole = normalizeRole(user?.role);
+  const targetRole = normalizeRole(role);
 
   React.useEffect(() => {
     if (!user) {
@@ -246,17 +249,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
       return;
     }
 
-    if (user.role !== role) {
-      const dashboardPath = user.role === 'ADMIN' ? '/admin/dashboard'
-        : user.role === 'organization' ? '/organization/dashboard'
-          : user.role === 'RECRUITER' ? '/recruiter/dashboard'
-            : (user.role === 'INTERVIEWER' || user.role === 'freelancer') ? '/interviewer'
-              : '/candidate/dashboard';
-      navigate(dashboardPath);
+    if (userRole !== targetRole) {
+      navigate(getRoleHome(userRole));
     }
-  }, [role, user, navigate]);
+  }, [userRole, targetRole, user, navigate]);
 
-  if (!user || user.role !== role) return null;
+  if (!user || userRole !== targetRole) return null;
 
   const adminLinks: SidebarItem[] = [
     { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
@@ -307,10 +305,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
   ];
 
   let links = candidateLinks;
-  if (role === 'ADMIN') links = adminLinks;
-  else if (role === 'organization') links = orgAdminLinks;
-  else if (role === 'RECRUITER') links = recruiterLinks;
-  else if (role === 'INTERVIEWER') links = interviewerLinks;
+  if (targetRole === 'ADMIN') links = adminLinks;
+  else if (targetRole === 'ORGANIZATION') links = orgAdminLinks;
+  else if (targetRole === 'RECRUITER') links = recruiterLinks;
+  else if (targetRole === 'INTERVIEWER') links = interviewerLinks;
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -318,9 +316,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
     navigate('/login');
   };
 
-  const currentLink = links.find(l => location.pathname === l.path || (location.pathname.startsWith(l.path) && l.path !== `/${role.toLowerCase().replace('_', '-')}`));
+  const currentLink = links.find(l => location.pathname === l.path || (location.pathname.startsWith(l.path) && l.path !== `/${targetRole.toLowerCase()}`));
   const pageTitle = currentLink?.name || 'Dashboard';
-  const roleLabel = role === 'organization' ? 'Org Admin' : role.charAt(0) + role.slice(1).toLowerCase();
+  const roleLabel = targetRole === 'ORGANIZATION' ? 'Org Admin' : targetRole.charAt(0) + targetRole.slice(1).toLowerCase();
   const userInitial = (user?.name || user?.email || 'U').charAt(0).toUpperCase();
 
   // Key navigation pills for top bar
@@ -354,9 +352,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
     { name: 'Jobs', path: '/organization/jobs' },
   ];
 
-  const topPills = role === 'RECRUITER' ? recruiterTopPills
-    : (role === 'INTERVIEWER' || role === 'freelancer') ? interviewerTopPills
-    : role === 'organization' ? orgTopPills
+  const topPills = targetRole === 'RECRUITER' ? recruiterTopPills
+    : targetRole === 'INTERVIEWER' ? interviewerTopPills
+    : targetRole === 'ORGANIZATION' ? orgTopPills
     : candidateTopPills;
 
   return (

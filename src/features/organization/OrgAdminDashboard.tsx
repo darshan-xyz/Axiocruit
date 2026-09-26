@@ -14,7 +14,7 @@ export const OrgAdminDashboard: React.FC = () => {
   }, []);
 
   const fetchRecruiters = () => {
-    apiRequest('/auth/recruiters')
+    apiRequest('/organization/recruiters')
       .then((data) => {
         if (Array.isArray(data)) {
           setRecruiters(data);

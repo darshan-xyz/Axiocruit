@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 import { useToast } from '@/components/Toast';
 import { apiRequest } from '@/utils/api';
+import { getRoleHome } from '@/types';
 
 const ICE_SERVERS: RTCConfiguration = {
     iceServers: [
@@ -248,7 +249,7 @@ export const useInterviewSignaling = ({
                 if (!isMounted) return;
                 addToast('error', 'Your request to join was denied');
                 socket.disconnect();
-                const dashboardPath = isRecruiter ? '/recruiter/dashboard' : '/candidate/dashboard';
+                const dashboardPath = getRoleHome(user?.role);
                 navigate(dashboardPath);
             });
 
@@ -408,7 +409,7 @@ export const useInterviewSignaling = ({
                 if (redirectTimeoutRef.current) clearTimeout(redirectTimeoutRef.current);
                 redirectTimeoutRef.current = setTimeout(() => {
                     if (!isMounted) return;
-                    const dashboardPath = user?.role === 'RECRUITER' ? '/recruiter/dashboard' : '/candidate/dashboard';
+                    const dashboardPath = getRoleHome(user?.role);
                     navigate(dashboardPath);
                 }, 1500);
             });
@@ -430,10 +431,7 @@ export const useInterviewSignaling = ({
                 if (redirectTimeoutRef.current) clearTimeout(redirectTimeoutRef.current);
                 redirectTimeoutRef.current = setTimeout(() => {
                     if (!isMounted) return;
-                    const isFreelancer = user?.role === 'INTERVIEWER' || user?.role === 'freelancer';
-                    const dashboardPath = isFreelancer
-                        ? '/interviewer'
-                        : (user?.role === 'RECRUITER' ? '/recruiter/schedule' : '/candidate/interviews');
+                    const dashboardPath = getRoleHome(user?.role);
                     navigate(dashboardPath);
                 }, 2000);
             });
