@@ -188,8 +188,8 @@ Axiocruit-main/
 ### 1. Clone & Install Dependencies
 ```bash
 # Clone the repository
-git clone https://github.com/darshan-com/Axiocruit.git
-cd Axiocruit-main
+git clone https://github.com/darshan-xyz/Axiocruit.git
+cd Axiocruit
 
 # Install frontend dependencies
 npm install
