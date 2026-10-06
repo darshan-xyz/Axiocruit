@@ -26,39 +26,48 @@ export type RankedCandidate = SakromeCandidate;
 export const RankedCandidates: React.FC = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
-  const [candidates, setCandidates] = useState<any[]>(SAKROME_CANDIDATES);
-  const [jobTitle, setJobTitle] = useState('Lead Product Designer & Design Systems');
+  const [candidates, setCandidates] = useState<any[]>([]);
+  const [jobTitle, setJobTitle] = useState('Talent Pipeline');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedCandidate, setSelectedCandidate] = useState<any | null>(SAKROME_SARAH_MILLER);
+  const [selectedCandidate, setSelectedCandidate] = useState<any | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<'All' | 'Design' | 'Engineering' | 'Product' | 'Marketing'>('All');
   const [retryingScores, setRetryingScores] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!jobId) {
-      setLoading(false);
-      return;
-    }
-
     const fetchCandidates = async () => {
       try {
-        const data = await apiRequest(`/applications/${jobId}/candidates`);
-        const fetched = data.candidates || [];
-        if (fetched.length > 0) {
-          setCandidates(fetched);
-          setSelectedCandidate(fetched[0]);
-        } else {
-          setCandidates(SAKROME_CANDIDATES);
-          setSelectedCandidate(SAKROME_SARAH_MILLER);
+        setLoading(true);
+        let targetJobId = jobId;
+
+        if (!targetJobId) {
+          // Auto-discover the first job for the recruiter
+          const myJobs = await apiRequest('/jobs/my-jobs');
+          if (Array.isArray(myJobs) && myJobs.length > 0) {
+            targetJobId = myJobs[0]._id;
+            setJobTitle(myJobs[0].title);
+          }
         }
+
+        if (!targetJobId) {
+          setCandidates([]);
+          setSelectedCandidate(null);
+          setJobTitle('No Requisitions Available');
+          setLoading(false);
+          return;
+        }
+
+        const data = await apiRequest(`/applications/${targetJobId}/candidates`);
+        const fetched = data.candidates || [];
+        setCandidates(fetched);
+        setSelectedCandidate(fetched.length > 0 ? fetched[0] : null);
         if (data.jobTitle) {
           setJobTitle(data.jobTitle);
         }
       } catch (err: any) {
-        // Fallback to reference candidates on error so UI is always functional
-        setCandidates(SAKROME_CANDIDATES);
-        setSelectedCandidate(SAKROME_SARAH_MILLER);
+        console.error('[RankedCandidates] Fetch error:', err);
+        setError(err.message || 'Failed to load candidates');
       } finally {
         setLoading(false);
       }
@@ -155,77 +164,12 @@ export const RankedCandidates: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* macOS Floating Container Top Bar with Window Controls & Pill Navigation */}
-      <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl px-5 py-3.5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          {/* macOS window controls */}
-          <div className="flex items-center gap-1.5 mr-2">
-            <span className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]/60 inline-block shadow-2xs" />
-            <span className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]/60 inline-block shadow-2xs" />
-            <span className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29]/60 inline-block shadow-2xs" />
-          </div>
-
-          {/* Top Pill Tabs: Home, Candidates (blue pill active), Jobs, Schedule, Menu ∨ */}
-          <div className="flex items-center gap-1 overflow-x-auto">
-            <button
-              onClick={() => navigate('/recruiter')}
-              className="px-3.5 py-1.5 rounded-full text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition-all"
-            >
-              Home
-            </button>
-            <button
-              className="px-4 py-1.5 rounded-full text-xs font-black bg-blue-600 text-white shadow-sm shadow-blue-500/25 transition-all"
-            >
-              Candidates
-            </button>
-            <button
-              onClick={() => navigate('/recruiter/jobs')}
-              className="px-3.5 py-1.5 rounded-full text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition-all"
-            >
-              Jobs
-            </button>
-            <button
-              onClick={() => navigate('/recruiter/schedule')}
-              className="px-3.5 py-1.5 rounded-full text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition-all"
-            >
-              Schedule
-            </button>
-            <button
-              className="px-3 py-1.5 rounded-full text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 flex items-center gap-1 transition-all"
-            >
-              <span>Menu</span>
-              <ChevronDown size={13} />
-            </button>
-          </div>
-        </div>
-
-        {/* Right Search & Filter Action Buttons */}
-        <div className="flex items-center gap-2.5 w-full md:w-auto">
-          <div className="relative flex-1 md:w-64">
-            <Search className="absolute left-3.5 top-2.5 text-slate-400 w-4 h-4" />
-            <input
-              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full pl-10 pr-4 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all"
-              placeholder="Search candidate, email, skill..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <button
-            onClick={() => setActiveCategoryFilter('All')}
-            className="px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 flex items-center gap-1.5 shadow-2xs transition-all"
-          >
-            <SlidersHorizontal size={13} />
-            <span>Filter</span>
-          </button>
-        </div>
-      </div>
-
       {/* Top Header & Breadcrumb */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors mb-2 text-xs font-bold"
+            onClick={() => navigate('/recruiter/jobs')}
+            className="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors mb-2 text-xs font-bold cursor-pointer"
           >
             <ArrowLeft size={14} /> Back to Requisitions
           </button>
@@ -241,113 +185,59 @@ export const RankedCandidates: React.FC = () => {
             Requisition pipeline • {candidates.length} active applicant{candidates.length !== 1 ? 's' : ''} evaluated
           </p>
         </div>
+
+        <div className="flex items-center gap-2.5">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => navigate('/recruiter/schedule')}
+            className="text-xs font-bold"
+          >
+            Schedule Interview
+          </Button>
+          <Button
+            variant="pill"
+            size="sm"
+            onClick={() => navigate('/recruiter/jobs')}
+            className="text-xs font-bold"
+          >
+            Manage Jobs
+          </Button>
+        </div>
       </div>
 
-      {/* Top Floating macOS Card Container */}
-      <div className="bg-white dark:bg-[#111726] border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xl space-y-6">
-        {/* Top Navbar: Brand Logo, Pill Tabs, Settings, Bell, Avatar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/recruiter')}>
-            <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-sm shadow-sm shadow-blue-500/25">
-              A
-            </div>
-            <span className="font-black text-lg text-slate-900 dark:text-white tracking-tight">AXIOCRUIT</span>
-          </div>
+      {/* Main Split Layout: CandidateTable on Left, CandidateInspectorDrawer on Right */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className={`${selectedCandidate ? 'lg:col-span-7' : 'lg:col-span-12'} transition-all duration-300 overflow-x-auto`}>
+          <CandidateTable
+            candidates={candidates}
+            selectedCandidateId={selectedCandidate?._id || selectedCandidate?.candidate?._id}
+            onSelectCandidate={(cand) => setSelectedCandidate(cand)}
+            activeCategory={activeCategoryFilter}
+            onCategoryChange={(cat) => setActiveCategoryFilter(cat)}
+            searchTerm={searchTerm}
+            onSearchChange={(term) => setSearchTerm(term)}
+            totalCount={candidates.length}
+            loading={loading}
+            onRetryAI={handleRetryAI}
+            retryingScores={retryingScores}
+          />
+        </div>
 
-          {/* Center Pill Navigation Tabs */}
-          <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-900 p-1 rounded-full border border-slate-200/80 dark:border-slate-800 overflow-x-auto">
-            <button
-              onClick={() => navigate('/recruiter')}
-              className="px-4 py-1.5 rounded-full text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 transition-colors"
-            >
-              <Briefcase size={13} />
-              <span>Home</span>
-            </button>
-            <button
-              className="px-5 py-1.5 rounded-full text-xs font-black bg-blue-600 text-white shadow-sm flex items-center gap-1.5"
-            >
-              <Users size={13} />
-              <span>Candidates</span>
-            </button>
-            <button
-              onClick={() => navigate('/recruiter/jobs')}
-              className="px-4 py-1.5 rounded-full text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 transition-colors"
-            >
-              <Briefcase size={13} />
-              <span>Jobs</span>
-            </button>
-            <button
-              onClick={() => navigate('/recruiter/schedule')}
-              className="px-4 py-1.5 rounded-full text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 transition-colors"
-            >
-              <TrendingUp size={13} />
-              <span>Schedule</span>
-            </button>
-            <button
-              className="px-3.5 py-1.5 rounded-full text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 transition-colors"
-            >
-              <Layers size={13} />
-              <span>Menu</span>
-              <ChevronDown size={12} />
-            </button>
-          </div>
-
-          {/* Right Icons: Settings, Bell, Avatar */}
-          <div className="flex items-center gap-3">
-            <button className="p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-              <SlidersHorizontal size={16} />
-            </button>
-            <button className="p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative">
-              <Clock size={16} />
-              <span className="w-2 h-2 rounded-full bg-blue-600 absolute top-1.5 right-1.5" />
-            </button>
-            <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&h=64&fit=crop&crop=faces"
-              className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700"
-              alt="Recruiter profile"
+        {selectedCandidate && (
+          <div className="lg:col-span-5">
+            <CandidateInspectorDrawer
+              candidate={selectedCandidate}
+              onClose={() => setSelectedCandidate(null)}
+              onSchedule={() => navigate('/recruiter/schedule')}
+              onViewFullProfile={() => navigate('/recruiter/applications-list')}
+              onSendMessage={() => navigate('/recruiter/messages')}
+              onStatusUpdate={handleStatusUpdate}
+              onRetryAI={(id) => handleRetryAI(id)}
+              isRetryingAI={selectedCandidate?._id ? retryingScores.has(selectedCandidate._id) : false}
             />
           </div>
-        </div>
-
-        {/* Header Title Section */}
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Candidates</h1>
-          <p className="text-xs text-slate-500 mt-0.5">Manage candidates and keep your hiring process moving.</p>
-        </div>
-
-        {/* Main Split Layout: Decomposed CandidateTable on Left, CandidateInspectorDrawer on Right */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div className={`${selectedCandidate ? 'lg:col-span-7' : 'lg:col-span-12'} transition-all duration-300 overflow-x-auto`}>
-            <CandidateTable
-              candidates={candidates}
-              selectedCandidateId={selectedCandidate?._id || selectedCandidate?.candidate?._id}
-              onSelectCandidate={(cand) => setSelectedCandidate(cand)}
-              activeCategory={activeCategoryFilter}
-              onCategoryChange={(cat) => setActiveCategoryFilter(cat)}
-              searchTerm={searchTerm}
-              onSearchChange={(term) => setSearchTerm(term)}
-              totalCount={candidates.length > 0 ? 455 : 0}
-              loading={loading}
-              onRetryAI={handleRetryAI}
-              retryingScores={retryingScores}
-            />
-          </div>
-
-          {selectedCandidate && (
-            <div className="lg:col-span-5">
-              <CandidateInspectorDrawer
-                candidate={selectedCandidate}
-                onClose={() => setSelectedCandidate(null)}
-                onSchedule={() => navigate('/recruiter/schedule')}
-                onViewFullProfile={() => navigate('/recruiter/applicants')}
-                onSendMessage={() => navigate('/recruiter/messages')}
-                onStatusUpdate={handleStatusUpdate}
-                onRetryAI={(id) => handleRetryAI(id)}
-                isRetryingAI={selectedCandidate?._id ? retryingScores.has(selectedCandidate._id) : false}
-              />
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );

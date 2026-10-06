@@ -1,5 +1,6 @@
 import React from 'react';
 import { User, Briefcase, Users, PlusCircle, Sparkles } from 'lucide-react';
+import { DEFAULT_AVATAR } from '@/utils/defaultAvatar';
 
 interface RecruiterHeroCardProps {
   currentUser?: {
@@ -13,8 +14,6 @@ interface RecruiterHeroCardProps {
   onFindCandidates?: () => void;
   isDark?: boolean;
 }
-
-const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face';
 
 export const RecruiterHeroCard: React.FC<RecruiterHeroCardProps> = ({
   currentUser,
@@ -37,7 +36,7 @@ export const RecruiterHeroCard: React.FC<RecruiterHeroCardProps> = ({
           {/* Avatar with emerald online dot */}
           <div className="relative">
             <img
-              src={currentUser?.profilePicture || DEFAULT_AVATAR}
+              src={profilePic}
               alt={currentUser?.name || 'Recruiter'}
               className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover ring-2 ring-slate-200 dark:ring-slate-700 shadow-md"
             />
@@ -50,7 +49,7 @@ export const RecruiterHeroCard: React.FC<RecruiterHeroCardProps> = ({
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-1">
               <h1 className="text-xl sm:text-2xl font-black tracking-tight">
-                {currentUser?.name || 'Kevin Nunez'}
+                {currentUser?.name || 'Hiring Lead'}
               </h1>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
                 Hiring Lead
@@ -61,7 +60,7 @@ export const RecruiterHeroCard: React.FC<RecruiterHeroCardProps> = ({
               </span>
             </div>
             <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
-              {currentUser?.email || 'kevin.nunez@axiocruit.enterprise'} • {currentUser?.companyName || 'Axiocruit Global'}
+              {currentUser?.email || 'recruiter@axiocruit.com'} • {currentUser?.companyName || 'Axiocruit Enterprise'}
             </p>
           </div>
         </div>

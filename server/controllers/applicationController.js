@@ -60,6 +60,55 @@ const saveResumeFile = (fileBuffer, originalName) => {
 };
 
 /**
+ * Helper: Retrieve resume buffer robustly from local disk first, then remote fetch, then sample fallback
+ */
+const getResumeBuffer = async (resumeUrl, req) => {
+    let cleanPath = resumeUrl || '';
+    if (cleanPath.startsWith('http://') || cleanPath.startsWith('https://')) {
+        try {
+            cleanPath = new URL(cleanPath).pathname;
+        } catch {}
+    }
+
+    // 1. Try local filesystem if it contains /uploads/
+    if (cleanPath.includes('/uploads/')) {
+        const filename = path.basename(cleanPath);
+        const candidates = [
+            path.join(__dirname, '..', 'public', 'uploads', 'resumes', filename),
+            path.join(__dirname, '..', 'public', 'uploads', filename),
+            path.join(__dirname, '..', 'public', cleanPath.replace(/^\//, '')),
+        ];
+        for (const cPath of candidates) {
+            if (fs.existsSync(cPath)) {
+                const buffer = await fs.promises.readFile(cPath);
+                return { buffer, filename };
+            }
+        }
+    }
+
+    // 2. Fetch over HTTP if external URL
+    if (resumeUrl && (resumeUrl.startsWith('http://') || resumeUrl.startsWith('https://'))) {
+        try {
+            const absoluteUrl = resolveResumeUrl(resumeUrl, req);
+            const buffer = await fetchResumeAsBuffer(absoluteUrl);
+            const filename = path.basename(new URL(absoluteUrl).pathname) || 'resume.pdf';
+            return { buffer, filename };
+        } catch (fetchErr) {
+            console.warn('[getResumeBuffer] Remote fetch failed:', fetchErr.message);
+        }
+    }
+
+    // 3. Fallback to sample resume if present
+    const fallbackPath = path.join(__dirname, '..', 'public', 'uploads', 'sample-resume.pdf');
+    if (fs.existsSync(fallbackPath)) {
+        const buffer = await fs.promises.readFile(fallbackPath);
+        return { buffer, filename: 'sample-resume.pdf' };
+    }
+
+    throw new Error('Resume file not accessible');
+};
+
+/**
  * Helper: Call the Python AI service for CV parsing
  * Returns { suitability_score, matched_keywords, missing_keywords } or null on failure
  */
@@ -139,6 +188,15 @@ exports.applyWithCV = async (req, res) => {
                 profileData = await Profile.findById(user.profile);
             }
         }
+        if (!profileData || Object.keys(profileData).length === 0 || !profileData._id) {
+            const foundProfile = await Profile.findOne({ user: user._id });
+            if (foundProfile) {
+                profileData = foundProfile;
+                if (!user.profile) {
+                    await User.findByIdAndUpdate(user._id, { $set: { profile: foundProfile._id } });
+                }
+            }
+        }
 
         // 4. Validate that the candidate has a resumeUrl
         let userResumeUrl = user.resumeUrl || (profileData ? profileData.resume : null);
@@ -157,34 +215,18 @@ exports.applyWithCV = async (req, res) => {
             userResumeUrl = saveResumeFile(fileBuffer, originalName);
             user.resumeUrl = userResumeUrl;
             await user.save();
+            if (user.profile) {
+                await Profile.findByIdAndUpdate(user.profile._id || user.profile, { resume: userResumeUrl });
+            } else {
+                await Profile.findOneAndUpdate({ user: user._id }, { resume: userResumeUrl });
+            }
         } else if (userResumeUrl) {
             try {
-                if (userResumeUrl.startsWith('http://') || userResumeUrl.startsWith('https://')) {
-                    const absoluteUrl = resolveResumeUrl(userResumeUrl, req);
-                    fileBuffer = await fetchResumeAsBuffer(absoluteUrl);
-                    const urlParts = userResumeUrl.split('/');
-                    if (urlParts.length > 0) originalName = urlParts[urlParts.length - 1];
-                } else {
-                    const urlParts = userResumeUrl.split('/');
-                    const filename = urlParts[urlParts.length - 1];
-                    const relativePath = userResumeUrl.includes('/uploads/resumes/')
-                        ? path.join('uploads', 'resumes', filename)
-                        : path.join('uploads', filename);
-                    const resumePath = path.join(__dirname, '..', 'public', relativePath);
-                    fileBuffer = await fs.promises.readFile(resumePath);
-                    originalName = filename;
-                }
+                const resData = await getResumeBuffer(userResumeUrl, req);
+                fileBuffer = resData.buffer;
+                originalName = resData.filename;
             } catch (fileErr) {
                 console.error('[File Read] Error reading existing resume:', fileErr.message);
-                const fallbackPath = path.join(__dirname, '..', 'public', 'uploads', 'sample-resume.pdf');
-                if (fs.existsSync(fallbackPath)) {
-                    try {
-                        fileBuffer = await fs.promises.readFile(fallbackPath);
-                        originalName = 'sample-resume.pdf';
-                    } catch (fbErr) {
-                        console.error('[File Read] Fallback resume also unreadable:', fbErr.message);
-                    }
-                }
             }
         }
 
@@ -272,8 +314,22 @@ exports.getRankedCandidates = async (req, res) => {
         const currentUserId = (req.user.id || req.user._id).toString();
         const isOwner = job.postedBy && job.postedBy.toString() === currentUserId;
         const isDelegated = job.delegatedFreelancerId && job.delegatedFreelancerId.toString() === currentUserId;
+        const roleUpper = (req.user.role || '').toUpperCase();
+        const isOrgAdmin = roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN';
+        const isAdmin = roleUpper === 'ADMIN';
 
-        if (!isOwner && !isDelegated) {
+        let isOrgAdminOfJob = false;
+        if (isOrgAdmin) {
+            const orgUser = await User.findById(req.user.id);
+            if (orgUser && orgUser.organization) {
+                const poster = await User.findById(job.postedBy);
+                if (poster && poster.organization && poster.organization.toString() === orgUser.organization.toString()) {
+                    isOrgAdminOfJob = true;
+                }
+            }
+        }
+
+        if (!isOwner && !isDelegated && !isOrgAdminOfJob && !isAdmin) {
             return res.status(403).json({ message: 'Not authorized to view candidates for this job' });
         }
 
@@ -282,19 +338,67 @@ exports.getRankedCandidates = async (req, res) => {
         const applications = await Application.find({ job: jobId })
             .populate({
                 path: 'candidate',
-                select: 'name email profilePicture headline',
+                select: 'name firstName lastName email profilePicture headline skills bio experience education location phone resumeUrl',
                 populate: { path: 'profile' },
+            })
+            .populate({
+                path: 'job',
+                select: 'title company location type salary skills department'
             })
             .sort({ aiScore: -1 })
             .lean();
 
+        // Attach real scheduled interviews if any exist
+        let enrichedApplications = applications;
+        try {
+            const Interview = require('../models/Interview');
+            const candidateIds = applications.map(a => a.candidate?._id).filter(Boolean);
+            if (candidateIds.length > 0) {
+                const scheduledInterviews = await Interview.find({
+                    jobId: jobId,
+                    candidateId: { $in: candidateIds },
+                    status: { $in: ['Scheduled', 'InProgress', 'Pending', 'Accepted'] }
+                }).populate('interviewerId', 'name email').lean();
+
+                const interviewMap = new Map();
+                for (const inv of scheduledInterviews) {
+                    const candKey = inv.candidateId?.toString();
+                    if (candKey && !interviewMap.has(candKey)) {
+                        interviewMap.set(candKey, inv);
+                    }
+                }
+
+                enrichedApplications = applications.map(app => {
+                    const candId = app.candidate?._id?.toString();
+                    const inv = candId ? interviewMap.get(candId) : null;
+                    let nextInterviewSlot = null;
+                    if (inv && inv.scheduledTime) {
+                        const d = new Date(inv.scheduledTime);
+                        nextInterviewSlot = {
+                            date: d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+                            time: d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+                            interviewer: inv.interviewerId?.name || 'Assigned Interviewer',
+                            roomLink: `#/interview/room/${inv.meetingId || inv._id}`
+                        };
+                    }
+                    return {
+                        ...app,
+                        nextInterviewSlot,
+                        resumeUrl: app.resumeUrl || app.resume || app.candidate?.resumeUrl || (app.candidate?.profile?.resume) || ''
+                    };
+                });
+            }
+        } catch (invErr) {
+            console.warn('[getRankedCandidates] Interview lookup error:', invErr.message);
+        }
+
         // Move null-score applications to the end
-        const scored = applications.filter(a => a.aiScore !== null);
-        const unscored = applications.filter(a => a.aiScore === null);
+        const scored = enrichedApplications.filter(a => a.aiScore !== null);
+        const unscored = enrichedApplications.filter(a => a.aiScore === null);
 
         res.json({
             jobTitle: job.title,
-            totalCandidates: applications.length,
+            totalCandidates: enrichedApplications.length,
             candidates: [...scored, ...unscored],
         });
     } catch (err) {
@@ -346,13 +450,27 @@ exports.retryAiAnalysis = async (req, res) => {
             return res.status(404).json({ message: 'Associated job no longer exists' });
         }
 
-        // 2. Verify permissions (Recruiter who posted it OR delegated Freelancer/Interviewer)
+        // 2. Verify permissions (Recruiter who posted it OR delegated Freelancer/Interviewer OR Org/Admin)
         const job = application.job;
         const currentUserId = (req.user._id || req.user.id).toString();
         const isOwner = job.postedBy && job.postedBy.toString() === currentUserId;
         const isDelegated = job.delegatedFreelancerId && job.delegatedFreelancerId.toString() === currentUserId;
+        const roleUpper2 = (req.user.role || '').toUpperCase();
+        const isOrgAdmin2 = roleUpper2 === 'ORGANIZATION' || roleUpper2 === 'ORG_ADMIN';
+        const isAdmin2 = roleUpper2 === 'ADMIN';
 
-        if (!isOwner && !isDelegated) {
+        let isOrgAdminOfJob2 = false;
+        if (isOrgAdmin2) {
+            const orgUser = await User.findById(req.user.id);
+            if (orgUser && orgUser.organization) {
+                const poster = await User.findById(job.postedBy);
+                if (poster && poster.organization && poster.organization.toString() === orgUser.organization.toString()) {
+                    isOrgAdminOfJob2 = true;
+                }
+            }
+        }
+
+        if (!isOwner && !isDelegated && !isOrgAdminOfJob2 && !isAdmin2) {
             return res.status(403).json({ message: 'Not authorized to modify this application' });
         }
 
@@ -374,13 +492,14 @@ exports.retryAiAnalysis = async (req, res) => {
         console.log(`[retryAiAnalysis] Resolved resume URL string: ${resumeUrl}`);
         console.log(`[retryAiAnalysis] Populated candidate object exists: ${!!application.candidate}`);
 
-        // 5. Fetch the PDF buffer from the URL
+        // 5. Fetch the PDF buffer from the URL or local file
         let pdfBuffer;
+        let originalName = 'resume.pdf';
         try {
-            const absoluteUrl = resolveResumeUrl(resumeUrl, req);
-            console.log(`[retryAiAnalysis] Absolute URL for fetch: ${absoluteUrl}`);
-            pdfBuffer = await fetchResumeAsBuffer(absoluteUrl);
-            console.log(`[retryAiAnalysis] Successfully fetched resume buffer of size: ${pdfBuffer.length} bytes`);
+            const resData = await getResumeBuffer(resumeUrl, req);
+            pdfBuffer = resData.buffer;
+            originalName = resData.filename;
+            console.log(`[retryAiAnalysis] Successfully fetched resume buffer of size: ${pdfBuffer.length} bytes (${originalName})`);
         } catch (fetchErr) {
             console.error('[retryAiAnalysis] Full error fetching resume PDF:', fetchErr);
             return res.status(500).json({ message: 'Failed to retrieve the candidate CV for analysis' });
@@ -394,10 +513,11 @@ exports.retryAiAnalysis = async (req, res) => {
         ].filter(Boolean).join('\n\n');
 
         // 7. Call AI Service
-        let originalName = 'resume.pdf';
-        const urlParts = resumeUrl.split('/');
-        if (urlParts.length > 0) {
-            originalName = urlParts[urlParts.length - 1];
+        if (!originalName || originalName === 'resume.pdf') {
+            const urlParts = resumeUrl.split('/');
+            if (urlParts.length > 0) {
+                originalName = urlParts[urlParts.length - 1];
+            }
         }
 
         const aiResult = await callAIService(pdfBuffer, originalName, jobDescriptionText);

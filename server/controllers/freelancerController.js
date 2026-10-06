@@ -66,7 +66,7 @@ exports.updateService = async (req, res) => {
     const { title, description, skills, price, durationMinutes, isActive } = req.body;
     if (title !== undefined)           service.title = title.trim();
     if (description !== undefined)     service.description = description.trim();
-    if (skills !== undefined)          service.skills = Array.isArray(skills) ? skills : skills.split(',').map(s => s.trim()).filter(Boolean);
+    if (skills !== undefined)          service.skills = Array.isArray(skills) ? skills : String(skills || '').split(',').map(s => s.trim()).filter(Boolean);
     if (price !== undefined)           service.price = Number(price);
     if (durationMinutes !== undefined) service.durationMinutes = Number(durationMinutes);
     if (isActive !== undefined)        service.isActive = Boolean(isActive);
@@ -118,7 +118,7 @@ exports.acceptRequest = async (req, res) => {
     }
 
     interview.status = 'Scheduled';
-    if (interview.meetingId.startsWith('temp-')) {
+    if (!interview.meetingId || interview.meetingId.startsWith('temp-')) {
         interview.meetingId = uuidv4();
     }
     await interview.save();

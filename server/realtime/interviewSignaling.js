@@ -11,7 +11,7 @@ const registerInterviewSignalingHandlers = (io, socket, state) => {
 
   // --- Join Interview Room ---
   socket.on('join-room', async (payload) => {
-    const interviewId = typeof payload === 'string' ? payload : payload?.roomId;
+    const interviewId = typeof payload === 'string' ? payload : (payload?.roomId || payload?.interviewId);
     if (!interviewId) return;
 
     const joiningUserId = socket.userId;
@@ -22,8 +22,9 @@ const registerInterviewSignalingHandlers = (io, socket, state) => {
       // We do NOT allow client-supplied payload.role to override authenticated role.
     }
 
+    let interview = null;
     try {
-      const interview = await Interview.findOne({
+      interview = await Interview.findOne({
         $or: [
           ...(interviewId.match(/^[0-9a-fA-F]{24}$/) ? [{ _id: interviewId }] : []),
           { meetingId: interviewId },
@@ -58,8 +59,9 @@ const registerInterviewSignalingHandlers = (io, socket, state) => {
 
     const isRecruiter = isHostRole(socket.userRole);
     const hostPresent = Array.from(activeRooms.get(interviewId)).some((u) => isHostRole(u.role));
+    const isCodingRoom = payload?.roomType === 'coding' || payload?.roomType === 'assessment' || payload?.isAssessment || payload?.isCodingTest || !interview;
 
-    if (isRecruiter) {
+    if (isRecruiter || isCodingRoom) {
       socket.join(interviewId);
       activeRooms.get(interviewId).add({
         socketId: socket.id,
@@ -87,7 +89,7 @@ const registerInterviewSignalingHandlers = (io, socket, state) => {
         socket.emit('admission-request', user);
       });
 
-      console.log(`[Socket.IO] Host ${socket.userName} joined room: ${interviewId}`);
+      console.log(`[Socket.IO] User ${socket.userName} (${socket.userRole}) joined room: ${interviewId}`);
     } else {
       if (!hostPresent) {
         waitingRooms.get(interviewId).add({
@@ -139,6 +141,7 @@ const registerInterviewSignalingHandlers = (io, socket, state) => {
       waitingSet.delete(targetUser);
       const targetSocket = io.sockets.sockets.get(targetSocketId);
       if (targetSocket) {
+        targetSocket.currentRoom = interviewId;
         targetSocket.join(interviewId);
         activeRooms.get(interviewId).add(targetUser);
         targetSocket.emit('admitted');
@@ -185,25 +188,28 @@ const registerInterviewSignalingHandlers = (io, socket, state) => {
   });
 
   // --- WebRTC Signaling ---
-  socket.on('offer', ({ offer, to }) => {
-    socket.to(to).emit('offer', {
-      offer,
+  socket.on('offer', (data) => {
+    if (!data?.to || !data?.offer) return;
+    socket.to(data.to).emit('offer', {
+      offer: data.offer,
       from: socket.id,
       userId: socket.userId,
       userName: socket.userName,
     });
   });
 
-  socket.on('answer', ({ answer, to }) => {
-    socket.to(to).emit('answer', {
-      answer,
+  socket.on('answer', (data) => {
+    if (!data?.to || !data?.answer) return;
+    socket.to(data.to).emit('answer', {
+      answer: data.answer,
       from: socket.id,
     });
   });
 
-  socket.on('ice-candidate', ({ candidate, to }) => {
-    socket.to(to).emit('ice-candidate', {
-      candidate,
+  socket.on('ice-candidate', (data) => {
+    if (!data?.to || !data?.candidate) return;
+    socket.to(data.to).emit('ice-candidate', {
+      candidate: data.candidate,
       from: socket.id,
     });
   });
@@ -264,7 +270,7 @@ const registerInterviewSignalingHandlers = (io, socket, state) => {
 
   // --- Adaptive Test Sync ---
   socket.on('adaptive-test-event', (data) => {
-    const interviewId = socket.currentRoom;
+    const interviewId = (typeof data === 'object' && (data?.sessionId || data?.meetingId || data?.roomId || data?.interviewId)) || socket.currentRoom;
     if (!interviewId) return;
     socket.to(interviewId).emit('adaptive-test-sync', data);
   });
@@ -313,8 +319,8 @@ const registerInterviewSignalingHandlers = (io, socket, state) => {
   });
 
   // --- Coding Test Started Event ---
-  socket.on('coding-test-started-event', ({ roomId }) => {
-    const interviewId = roomId || socket.currentRoom;
+  socket.on('coding-test-started-event', (data) => {
+    const interviewId = (typeof data === 'string' ? data : (data?.roomId || data?.meetingId || data?.interviewId || data?.sessionId)) || socket.currentRoom;
     if (!interviewId) return;
     socket.to(interviewId).emit('coding-test-started');
   });

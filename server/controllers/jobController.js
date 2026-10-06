@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Job = require('../models/Job');
 const Application = require('../models/Application');
+const User = require('../models/User');
 
 const escapeRegex = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -70,7 +71,30 @@ exports.getJobById = async (req, res) => {
 // @access  Private
 exports.getMyJobs = async (req, res) => {
     try {
-        const jobs = await Job.find({ postedBy: req.user.id })
+        let posterIds = [req.user.id || req.user._id];
+        const roleUpper = (req.user.role || '').toUpperCase();
+        if (roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN') {
+            const orgUser = await User.findById(req.user.id);
+            if (orgUser && orgUser.organization) {
+                const teamUsers = await User.find({ organization: orgUser.organization }).select('_id');
+                posterIds = teamUsers.map(u => u._id);
+            }
+        } else if (roleUpper === 'ADMIN') {
+            const allJobs = await Job.find({})
+                .populate('applicants', 'name email profilePicture headline skills experience resume')
+                .sort({ createdAt: -1 })
+                .lean();
+            if (!allJobs || allJobs.length === 0) return res.json([]);
+            const jobIds = allJobs.map(j => j._id);
+            const counts = await Application.aggregate([
+                { $match: { job: { $in: jobIds } } },
+                { $group: { _id: '$job', count: { $sum: 1 } } }
+            ]);
+            const countMap = new Map(counts.map(c => [c._id.toString(), c.count]));
+            return res.json(allJobs.map(job => ({ ...job, applicantCount: countMap.get(job._id.toString()) || 0 })));
+        }
+
+        const jobs = await Job.find({ postedBy: { $in: posterIds } })
             .populate('applicants', 'name email profilePicture headline skills experience resume')
             .sort({ createdAt: -1 })
             .lean();
@@ -204,11 +228,14 @@ exports.updateApplicationStatus = async (req, res) => {
         // We assume job was populated. If not, we'd need to fetch it.
         // Wait, I populated it above.
 
-        // Check ownership: Either the Recruiter who posted it, OR the Freelancer who accepted the delegation
+        // Check ownership: Either the Recruiter who posted it, OR the Freelancer who accepted the delegation, OR Org/Admin
         const isRecruiter = application.job.postedBy?.toString() === req.user.id;
         const isDelegatedFreelancer = application.job.delegatedFreelancerId?.toString() === req.user.id && application.job.delegationStatus === 'accepted';
+        const roleUpper = (req.user.role || '').toUpperCase();
+        const isOrgAdmin = roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN';
+        const isAdmin = roleUpper === 'ADMIN';
 
-        if (!isRecruiter && !isDelegatedFreelancer) {
+        if (!isRecruiter && !isDelegatedFreelancer && !isOrgAdmin && !isAdmin) {
             return res.status(401).json({ message: 'Not authorized to update this pipeline' });
         }
 
@@ -224,14 +251,31 @@ exports.updateApplicationStatus = async (req, res) => {
 
 // @desc    Get applications received for jobs posted by current user OR delegated to current user
 // @route   GET /api/jobs/applications/received
-// @access  Private (Recruiter / Interviewer)
+// @access  Private (Recruiter / Interviewer / Organization / Admin)
 exports.getMyReceivedApplications = async (req, res) => {
     try {
         // 1. Branch query based on role
-        const isFreelancer = req.user.role === 'freelancer' || req.user.role === 'INTERVIEWER';
+        const roleUpper = (req.user.role || '').toUpperCase();
+        const isFreelancer = roleUpper === 'FREELANCER' || roleUpper === 'INTERVIEWER';
+        const isOrg = roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN';
+        const isAdmin = roleUpper === 'ADMIN';
+
+        let posterIds = [req.user.id];
+        if (isOrg) {
+            const orgUser = await User.findById(req.user.id);
+            if (orgUser && orgUser.organization) {
+                const teamUsers = await User.find({ organization: orgUser.organization }).select('_id');
+                posterIds = teamUsers.map(u => u._id);
+            }
+        }
+
         const jobQuery = isFreelancer 
             ? { delegatedFreelancerId: req.user.id, delegationStatus: 'accepted' }
-            : { postedBy: req.user.id, status: 'Active' }; // Recruiters only see active (non-closed) jobs
+            : isAdmin
+                ? {}
+                : isOrg
+                    ? { postedBy: { $in: posterIds } }
+                    : { postedBy: req.user.id, status: 'Active' };
 
         const jobs = await Job.find(jobQuery).select('_id');
         const jobIds = jobs.map(job => job._id);
@@ -382,10 +426,24 @@ exports.delegateJobToFreelancer = async (req, res) => {
 // @access  Private (Recruiter)
 exports.getReviewingDelegations = async (req, res) => {
     try {
-        const jobs = await Job.find({
-            postedBy: req.user.id,
-            delegationStatus: 'reviewing'
-        })
+        const roleUpper = (req.user.role || '').toUpperCase();
+        const isOrg = roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN';
+        const isAdmin = roleUpper === 'ADMIN';
+
+        let posterIds = [req.user.id];
+        if (isOrg) {
+            const orgUser = await User.findById(req.user.id);
+            if (orgUser && orgUser.organization) {
+                const teamUsers = await User.find({ organization: orgUser.organization }).select('_id');
+                posterIds = teamUsers.map(u => u._id);
+            }
+        }
+
+        const query = isAdmin
+            ? { delegationStatus: 'reviewing' }
+            : { postedBy: { $in: posterIds }, delegationStatus: 'reviewing' };
+
+        const jobs = await Job.find(query)
             .populate('delegatedFreelancerId', 'name email profilePicture')
             .populate({
                 path: 'proposedCandidateId',
@@ -412,7 +470,24 @@ exports.approveDelegatedHire = async (req, res) => {
             return res.status(404).json({ message: 'Job not found' });
         }
 
-        if (job.postedBy.toString() !== req.user.id) {
+        const currentUserId = (req.user._id || req.user.id).toString();
+        const isOwner = job.postedBy && job.postedBy.toString() === currentUserId;
+        const roleUpper = (req.user.role || '').toUpperCase();
+        const isOrgAdmin = roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN';
+        const isAdmin = roleUpper === 'ADMIN';
+
+        let isOrgAdminOfPoster = false;
+        if (isOrgAdmin) {
+            const orgUser = await User.findById(req.user.id);
+            if (orgUser && orgUser.organization) {
+                const posterUser = await User.findById(job.postedBy);
+                if (posterUser && posterUser.organization && posterUser.organization.toString() === orgUser.organization.toString()) {
+                    isOrgAdminOfPoster = true;
+                }
+            }
+        }
+
+        if (!isOwner && !isAdmin && !isOrgAdminOfPoster) {
             return res.status(403).json({ message: 'Not authorized — you do not own this job' });
         }
 
@@ -461,12 +536,24 @@ exports.approveDelegatedHire = async (req, res) => {
 // @access  Private (Recruiter)
 exports.getNewHirings = async (req, res) => {
     try {
-        // Find closed jobs posted by this recruiter that have a hired candidate
-        const closedJobs = await Job.find({
-            postedBy: req.user.id,
-            status: 'Closed',
-            proposedCandidateId: { $ne: null }
-        })
+        const roleUpper = (req.user.role || '').toUpperCase();
+        const isOrg = roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN';
+        const isAdmin = roleUpper === 'ADMIN';
+
+        let posterIds = [req.user.id];
+        if (isOrg) {
+            const orgUser = await User.findById(req.user.id);
+            if (orgUser && orgUser.organization) {
+                const teamUsers = await User.find({ organization: orgUser.organization }).select('_id');
+                posterIds = teamUsers.map(u => u._id);
+            }
+        }
+
+        const query = isAdmin
+            ? { status: 'Closed', proposedCandidateId: { $ne: null } }
+            : { postedBy: { $in: posterIds }, status: 'Closed', proposedCandidateId: { $ne: null } };
+
+        const closedJobs = await Job.find(query)
             .populate('proposedCandidateId', 'name email profilePicture headline profile')
             .populate('delegatedFreelancerId', 'name email profilePicture')
             .sort({ updatedAt: -1 })
@@ -496,10 +583,24 @@ exports.getNewHirings = async (req, res) => {
 // @access  Private (Recruiter)
 exports.getPastJobs = async (req, res) => {
     try {
-        const jobs = await Job.find({
-            postedBy: req.user.id,
-            status: 'Closed'
-        })
+        const roleUpper = (req.user.role || '').toUpperCase();
+        const isOrg = roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN';
+        const isAdmin = roleUpper === 'ADMIN';
+
+        let posterIds = [req.user.id];
+        if (isOrg) {
+            const orgUser = await User.findById(req.user.id);
+            if (orgUser && orgUser.organization) {
+                const teamUsers = await User.find({ organization: orgUser.organization }).select('_id');
+                posterIds = teamUsers.map(u => u._id);
+            }
+        }
+
+        const query = isAdmin
+            ? { status: 'Closed' }
+            : { postedBy: { $in: posterIds }, status: 'Closed' };
+
+        const jobs = await Job.find(query)
             .populate('proposedCandidateId', 'name email profilePicture')
             .sort({ updatedAt: -1 })
             .lean();
@@ -521,9 +622,22 @@ exports.updateJob = async (req, res) => {
 
         const userId = (req.user._id || req.user.id).toString();
         const isOwner = job.postedBy && job.postedBy.toString() === userId;
-        const isAdmin = req.user.role === 'ADMIN';
+        const roleUpper = (req.user.role || '').toUpperCase();
+        const isOrgAdmin = roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN';
+        const isAdmin = roleUpper === 'ADMIN';
 
-        if (!isOwner && !isAdmin) {
+        let isOrgAdminOfPoster = false;
+        if (isOrgAdmin) {
+            const orgUser = await User.findById(req.user.id);
+            if (orgUser && orgUser.organization) {
+                const posterUser = await User.findById(job.postedBy);
+                if (posterUser && posterUser.organization && posterUser.organization.toString() === orgUser.organization.toString()) {
+                    isOrgAdminOfPoster = true;
+                }
+            }
+        }
+
+        if (!isOwner && !isAdmin && !isOrgAdminOfPoster) {
             return res.status(403).json({ message: 'Not authorized to update this job' });
         }
 

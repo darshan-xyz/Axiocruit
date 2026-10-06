@@ -19,7 +19,7 @@ const CanonicalRoles = Object.freeze({
 const normalizeRole = (role) => {
   if (!role) return CanonicalRoles.CANDIDATE;
   const upper = String(role).trim().toUpperCase();
-  if (upper === 'ORGANIZATION') return CanonicalRoles.ORGANIZATION;
+  if (upper === 'ORGANIZATION' || upper === 'ORG_ADMIN') return CanonicalRoles.ORGANIZATION;
   if (upper === 'FREELANCER') return CanonicalRoles.INTERVIEWER;
   if (upper === 'INTERVIEWER') return CanonicalRoles.INTERVIEWER;
   if (upper === 'RECRUITER') return CanonicalRoles.RECRUITER;

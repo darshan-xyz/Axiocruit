@@ -6,7 +6,7 @@
 const fs            = require('fs');
 const os            = require('os');
 const path          = require('path');
-const { spawn, exec } = require('child_process');
+const { spawn, exec, execFile } = require('child_process');
 
 const TestSession    = require('../models/TestSession');
 const CodingQuestion = require('../models/CodingQuestion');
@@ -167,11 +167,59 @@ const diffLog = (caseLabel, expected, actual, isMatch) => {
  * @returns {'SyntaxError'|'Timeout'|'RuntimeError'}
  */
 const classifyError = (errText = '') => {
-  if (errText.includes('SyntaxError'))      return 'SyntaxError';
-  if (errText.includes('ETIMEDOUT') ||
-      errText.includes('spawnSync') ||
-      errText.includes('SIGTERM'))           return 'Timeout';
+  const text = String(errText || '');
+  if (text.includes('SyntaxError'))      return 'SyntaxError';
+  if (text.includes('ETIMEDOUT') ||
+      text.includes('spawnSync') ||
+      text.includes('SIGTERM') ||
+      text.includes('TimeLimitExceeded') ||
+      text.includes('Execution Timed Out')) return 'Timeout';
   return 'RuntimeError';
+};
+
+/**
+ * Strips host machine paths and internal temp filenames from Python error tracebacks
+ * for security and clean display.
+ * @param {any} errText
+ * @returns {string}
+ */
+const sanitizeErrorOutput = (errText) => {
+  if (!errText) return '';
+  const raw = typeof errText === 'string'
+    ? errText
+    : (errText.stderr || errText.message || String(errText));
+
+  let sanitized = String(raw);
+
+  // 1. Scrub File "..." pattern (standard Python tracebacks)
+  sanitized = sanitized.replace(/File\s+["'].*?\.py["']/gi, 'File "solution.py"');
+
+  // 2. Scrub any direct references to temp axiocruit python files
+  sanitized = sanitized.replace(/[^\s"'`()<>]+axiocruit_[^\s"'`()<>]+\.py/gi, 'solution.py');
+  sanitized = sanitized.replace(/axiocruit_[^\s"'`()<>]+\.py/gi, 'solution.py');
+
+  // 3. Scrub host temp directory and user home directory if present
+  try {
+    const tmpDir = os.tmpdir();
+    if (tmpDir && tmpDir.length > 2) {
+      const escapedTmp = tmpDir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      sanitized = sanitized.replace(new RegExp(escapedTmp, 'gi'), '/tmp');
+      const fwdTmp = tmpDir.replace(/\\/g, '/');
+      const escapedFwdTmp = fwdTmp.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      sanitized = sanitized.replace(new RegExp(escapedFwdTmp, 'gi'), '/tmp');
+    }
+
+    const homeDir = os.homedir();
+    if (homeDir && homeDir.length > 2) {
+      const escapedHome = homeDir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      sanitized = sanitized.replace(new RegExp(escapedHome, 'gi'), '~');
+      const fwdHome = homeDir.replace(/\\/g, '/');
+      const escapedFwdHome = fwdHome.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      sanitized = sanitized.replace(new RegExp(escapedFwdHome, 'gi'), '~');
+    }
+  } catch (_) {}
+
+  return sanitized.trim();
 };
 
 /**
@@ -218,13 +266,14 @@ const runOneCase = (tmpFile, input, expectedOutput) => {
       const errText = stderr + (err.message || '');
       finish({
         passed: false,
-        actualOutput: normalizeOutput(errText || 'Execution process error'),
+        actualOutput: sanitizeErrorOutput(errText || 'Execution process error'),
         errorType: classifyError(errText),
       });
     });
 
     child.on('close', (code, signal) => {
-      if (signal === 'SIGTERM') {
+      const isTimeout = signal === 'SIGTERM' || child.killed;
+      if (isTimeout) {
         return finish({
           passed: false,
           actualOutput: 'Execution Timed Out',
@@ -237,7 +286,7 @@ const runOneCase = (tmpFile, input, expectedOutput) => {
         const errText = (stderr || '').trimEnd() || `Process exited with code ${code}`;
         return finish({
           passed: false,
-          actualOutput: normalizeOutput(errText),
+          actualOutput: sanitizeErrorOutput(errText),
           errorType: classifyError(errText),
         });
       }
@@ -274,13 +323,13 @@ const runAllTestCases = async (code, testCases) => {
     let syntaxErrorText = null;
     try {
       await new Promise((resolve, reject) => {
-        exec(`"${PYTHON_BIN}" -m py_compile "${tmpFile}"`, { timeout: 3000 }, (err, stdout, stderr) => {
+        execFile(PYTHON_BIN, ['-m', 'py_compile', tmpFile], { timeout: 3000 }, (err, stdout, stderr) => {
           if (err) reject(stderr || err.message);
           else resolve();
         });
       });
     } catch (syntaxErr) {
-      syntaxErrorText = String(syntaxErr || '').trimEnd();
+      syntaxErrorText = sanitizeErrorOutput(syntaxErr);
     }
 
     if (syntaxErrorText) {
@@ -291,10 +340,22 @@ const runAllTestCases = async (code, testCases) => {
       }));
     }
 
-    // Run test cases sequentially or in parallel
+    // Run test cases sequentially
     const results = [];
+    let timeoutCount = 0;
     for (const tc of testCases) {
+      if (timeoutCount >= 2) {
+        results.push({
+          passed: false,
+          actualOutput: 'Execution Timed Out',
+          errorType: 'TimeLimitExceeded',
+        });
+        continue;
+      }
       const res = await runOneCase(tmpFile, tc.input, tc.expectedOutput);
+      if (res.errorType === 'TimeLimitExceeded' || res.errorType === 'Timeout') {
+        timeoutCount++;
+      }
       results.push(res);
     }
     return results;
@@ -326,7 +387,7 @@ const executePython = (code, input) => {
       if (writeErr) {
         return finish({
           stdout: '',
-          stderr: 'Failed to write execution script: ' + writeErr.message,
+          stderr: sanitizeErrorOutput('Failed to write execution script: ' + writeErr.message),
           errorType: 'SystemError',
         });
       }
@@ -356,13 +417,13 @@ const executePython = (code, input) => {
       child.on('error', (err) => {
         finish({
           stdout,
-          stderr: err.message || 'Execution error',
+          stderr: sanitizeErrorOutput(err.message || 'Execution error'),
           errorType: classifyError(err.message || ''),
         });
       });
 
       child.on('close', (code, signal) => {
-        const isTimeout = signal === 'SIGTERM';
+        const isTimeout = signal === 'SIGTERM' || child.killed;
         const errText = (stderr || '').trimEnd();
         const hasError = isTimeout || code !== 0 || errText.length > 0;
         const errDescription = isTimeout
@@ -371,7 +432,7 @@ const executePython = (code, input) => {
 
         finish({
           stdout,
-          stderr: errDescription,
+          stderr: sanitizeErrorOutput(errDescription),
           errorType: isTimeout
             ? 'TimeLimitExceeded'
             : (hasError ? classifyError(errDescription) : null),
@@ -463,12 +524,13 @@ const startSession = async (req, res) => {
       candidateId = bodyCandidateId;
     }
 
-    if (!jobId) {
-      return res.status(400).json({ message: 'jobId is required' });
+    const sessionQuery = { candidateId, status: 'in_progress' };
+    if (jobId) {
+      sessionQuery.jobId = jobId;
     }
 
     // Prevent duplicate in-progress sessions for the same candidate + job
-    const existing = await TestSession.findOne({ candidateId, jobId, status: 'in_progress' });
+    const existing = await TestSession.findOne(sessionQuery);
     if (existing) {
       // Rather than erroring, seamlessly resume the test
       const lastQuestionId = existing.questionsAsked[existing.questionsAsked.length - 1];
@@ -489,14 +551,18 @@ const startSession = async (req, res) => {
       return res.status(503).json({ message: 'No questions available. Please contact support.' });
     }
 
-    const session = await TestSession.create({
+    const sessionData = {
       candidateId,
-      jobId,
       currentDifficulty: 'easy',
       questionsAsked: [firstQuestion._id],
       responses: [],
       status: 'in_progress',
-    });
+    };
+    if (jobId) {
+      sessionData.jobId = jobId;
+    }
+
+    const session = await TestSession.create(sessionData);
 
     return res.status(201).json({
       sessionId: session._id,
@@ -521,9 +587,12 @@ const getNextQuestionAuto = async (req, res) => {
     const { jobId } = req.query;
     const candidateId = req.user._id;
 
-    if (!jobId) return res.status(400).json({ message: 'jobId is required' });
+    const sessionQuery = { candidateId, status: 'in_progress' };
+    if (jobId) {
+      sessionQuery.jobId = jobId;
+    }
 
-    let session = await TestSession.findOne({ candidateId, jobId, status: 'in_progress' });
+    let session = await TestSession.findOne(sessionQuery);
 
     if (!session) {
       // Auto-create
@@ -531,14 +600,17 @@ const getNextQuestionAuto = async (req, res) => {
       if (!firstQuestion) {
         return res.status(503).json({ message: 'No questions available.' });
       }
-      session = await TestSession.create({
+      const newSessionData = {
         candidateId,
-        jobId,
         currentDifficulty: 'easy',
         questionsAsked: [firstQuestion._id],
         responses: [],
         status: 'in_progress',
-      });
+      };
+      if (jobId) {
+        newSessionData.jobId = jobId;
+      }
+      session = await TestSession.create(newSessionData);
       return res.json({
         sessionId: session._id,
         questionNumber: 1,
@@ -570,6 +642,17 @@ const getNextQuestionAuto = async (req, res) => {
 
     session.currentDifficulty = targetDifficulty;
     session.currentCategory   = targetCategory;
+
+    if (session.jobId && session.responses.length >= 5) {
+      const totalScore = session.responses.reduce((sum, r) => sum + (r.score || 0), 0);
+      session.finalScore  = session.responses.length > 0
+        ? Math.round(totalScore / session.responses.length)
+        : 0;
+      session.status      = 'completed';
+      session.completedAt = new Date();
+      await session.save();
+      return res.json({ done: true, finalScore: session.finalScore, sessionId: session._id });
+    }
 
     const question = await pickQuestion(targetDifficulty, targetCategory, session.questionsAsked);
 
@@ -622,8 +705,17 @@ const getNextQuestion = async (req, res) => {
       return res.json({ done: true, sessionId: session._id, finalScore: session.finalScore });
     }
 
-    // ── Guard: session already completed (by recruiter or bank exhaustion) ───
-    // (No fixed question limit — the recruiter ends the test manually.)
+    // ── Guard: session already completed or reached question limit ───
+    if (session.jobId && session.responses.length >= 5) {
+      const totalScore = session.responses.reduce((sum, r) => sum + (r.score || 0), 0);
+      session.finalScore  = session.responses.length > 0
+        ? Math.round(totalScore / session.responses.length)
+        : 0;
+      session.status      = 'completed';
+      session.completedAt = new Date();
+      await session.save();
+      return res.json({ done: true, finalScore: session.finalScore, sessionId: session._id });
+    }
 
     // ── Determine the adaptive target ────────────────────────────────────────
     // If no answers yet, Q1 was already served by startSession — this
@@ -735,6 +827,85 @@ const submitAnswer = async (req, res) => {
       `(${question.difficulty}/${question.category}) — ` +
       `${question.visibleTestCases.length} visible, ${question.hiddenTestCases.length} hidden`);
 
+    // ── Pre-flight syntax validation via py_compile ─────────────────────────
+    const tmpSyntaxFile = path.join(
+      os.tmpdir(),
+      `axiocruit_syntax_${Date.now()}_${Math.random().toString(36).slice(2)}.py`,
+    );
+    let syntaxErrorText = null;
+    try {
+      await fs.promises.writeFile(tmpSyntaxFile, submittedCode, 'utf8');
+      await new Promise((resolve, reject) => {
+        execFile(PYTHON_BIN, ['-m', 'py_compile', tmpSyntaxFile], { timeout: 3000 }, (err, stdout, stderr) => {
+          if (err) reject(stderr || err.message);
+          else resolve();
+        });
+      });
+    } catch (syntaxErr) {
+      syntaxErrorText = sanitizeErrorOutput(syntaxErr);
+    } finally {
+      try { await fs.promises.unlink(tmpSyntaxFile); } catch (_) {}
+    }
+
+    if (syntaxErrorText) {
+      console.log(`[CodingTest] Pre-flight syntax error detected: ${syntaxErrorText}`);
+      const visibleResultsForClient = (question.visibleTestCases || []).map((tc, idx) => ({
+        input: tc.input,
+        expectedOutput: tc.expectedOutput,
+        actualOutput: idx === 0 ? syntaxErrorText : 'Syntax error in submitted code',
+        passed: false,
+        errorType: 'SyntaxError',
+      }));
+      const hiddenSummaryForClient = {
+        total: (question.hiddenTestCases || []).length,
+        passed: 0,
+        failed: (question.hiddenTestCases || []).length,
+      };
+
+      session.responses.push({
+        questionId,
+        submittedCode,
+        passed: false,
+        score: 0,
+        aiAnalysis: {
+          logicScore: 0,
+          accuracyFeedback: 'Code contains syntax errors and could not be executed.',
+          efficiencyFeedback: 'SyntaxError',
+        },
+      });
+
+      const nextTarget = getNextTarget(session.currentDifficulty, false);
+      session.currentDifficulty = nextTarget.difficulty;
+      session.currentCategory   = nextTarget.category;
+
+      let finalScore = null;
+      if (session.jobId && session.responses.length >= 5) {
+        const totalScore = session.responses.reduce((sum, r) => sum + (r.score || 0), 0);
+        session.finalScore = Math.round(totalScore / session.responses.length);
+        session.status = 'completed';
+        session.completedAt = new Date();
+        finalScore = session.finalScore;
+      }
+      await session.save();
+
+      return res.json({
+        passed: false,
+        score: 0,
+        aiAnalysis: {
+          logicScore: 0,
+          accuracyFeedback: 'Code contains syntax errors and could not be executed.',
+          efficiencyFeedback: 'SyntaxError',
+        },
+        visibleTestResults: visibleResultsForClient,
+        hiddenTestSummary: hiddenSummaryForClient,
+        nextDifficulty:  nextTarget.difficulty,
+        nextCategory:    nextTarget.category,
+        questionNumber:  session.responses.length,
+        sessionComplete: session.status === 'completed',
+        ...(finalScore !== null ? { finalScore } : {}),
+      });
+    }
+
     // ── Determine execution mode ──────────────────────────────────────
     //   MODE A (function-call): Question has a functionName → append print(fn(input))
     //   MODE B (stdin):         No functionName → pipe tc.input as stdin
@@ -753,6 +924,7 @@ const submitAnswer = async (req, res) => {
     const hiddenTotal = question.hiddenTestCases.length;
     let hiddenPassed = 0;
     let currentIndex = 0;
+    let consecutiveTimeouts = 0;
 
     console.log(`[CodingTest]   Total test cases: ${totalCases} (${question.visibleTestCases.length} visible, ${hiddenTotal} hidden)`);
 
@@ -763,7 +935,13 @@ const submitAnswer = async (req, res) => {
 
         let execResult;
 
-        if (useFunctionMode) {
+        if (consecutiveTimeouts >= 2) {
+            execResult = {
+                stdout: '',
+                stderr: 'Execution Timed Out',
+                errorType: 'TimeLimitExceeded',
+            };
+        } else if (useFunctionMode) {
             // MODE A: Function-call — append print(fn(args)) and run with no stdin
             const functionCall = `print(${question.functionName}(${tc.input}))`;
             const executableCode = `${submittedCode}\n\n${functionCall}`;
@@ -773,6 +951,10 @@ const submitAnswer = async (req, res) => {
             // MODE B: Stdin — run the submitted code as-is, providing tc.input via stdin
             console.log(`[CodingTest]   [${caseLabel}] MODE-B: Running with stdin → "${(tc.input || '').substring(0, 80)}"`);
             execResult = await executePython(submittedCode, tc.input || '');
+        }
+
+        if (execResult.errorType === 'TimeLimitExceeded' || execResult.errorType === 'Timeout') {
+            consecutiveTimeouts++;
         }
 
         // Normalize both sides with the robust normalizer
@@ -845,8 +1027,15 @@ const submitAnswer = async (req, res) => {
     session.currentDifficulty = nextTarget.difficulty;
     session.currentCategory   = nextTarget.category;
 
-    // No auto-complete — the recruiter ends the test manually via POST /:sessionId/end
+    // Auto-complete if job-specific assessment has reached 5 questions
     let finalScore = null;
+    if (session.jobId && session.responses.length >= 5) {
+      const totalScore = session.responses.reduce((sum, r) => sum + (r.score || 0), 0);
+      session.finalScore = Math.round(totalScore / session.responses.length);
+      session.status = 'completed';
+      session.completedAt = new Date();
+      finalScore = session.finalScore;
+    }
 
     await session.save();
 
@@ -1001,4 +1190,5 @@ module.exports = {
   smartCompare,
   normalizeOutput,
   classifyError,
+  sanitizeErrorOutput,
 };

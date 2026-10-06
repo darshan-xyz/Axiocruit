@@ -21,12 +21,12 @@ const upload = multer({
 router.get('/my-applications', protect, authorize('CANDIDATE'), getMyApplications);
 
 // POST /api/applications/:applicationId/retry-ai — Recruiter or delegated freelancer manually retries AI parsing
-router.post('/:applicationId/retry-ai', protect, authorize('RECRUITER', 'INTERVIEWER', 'freelancer'), retryAiAnalysis);
+router.post('/:applicationId/retry-ai', protect, authorize('RECRUITER', 'INTERVIEWER', 'freelancer', 'ORGANIZATION', 'ORG_ADMIN', 'ADMIN'), retryAiAnalysis);
 
 // POST /api/applications/:jobId — Candidate applies with CV upload
 router.post('/:jobId', protect, authorize('CANDIDATE'), upload.single('resume'), applyWithCV);
 
 // GET /api/applications/:jobId/candidates — Recruiter views ranked candidates
-router.get('/:jobId/candidates', protect, authorize('RECRUITER', 'INTERVIEWER', 'freelancer'), getRankedCandidates);
+router.get('/:jobId/candidates', protect, authorize('RECRUITER', 'INTERVIEWER', 'freelancer', 'ORGANIZATION', 'ORG_ADMIN', 'ADMIN'), getRankedCandidates);
 
 module.exports = router;

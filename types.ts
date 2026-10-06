@@ -21,9 +21,9 @@ export const getRoleHome = (role?: string | null): string => {
   const norm = normalizeRole(role);
   switch (norm) {
     case 'ADMIN': return '/admin/dashboard';
-    case 'ORGANIZATION': return '/org/dashboard';
+    case 'ORGANIZATION': return '/organization/dashboard';
     case 'RECRUITER': return '/recruiter/dashboard';
-    case 'INTERVIEWER': return '/interviewer/dashboard';
+    case 'INTERVIEWER': return '/interviewer';
     case 'CANDIDATE':
     default:
       return '/candidate/dashboard';

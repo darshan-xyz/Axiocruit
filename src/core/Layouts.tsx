@@ -256,10 +256,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
   if (!user || userRole !== targetRole) return null;
 
   const adminLinks: SidebarItem[] = [
-    { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+    { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Manage Users', path: '/admin/users', icon: Users },
-    { name: 'System Logs', path: '/admin/logs', icon: FileText },
-    { name: 'Settings', path: '/admin/settings', icon: Settings },
+    { name: 'Jobs', path: '/admin/jobs', icon: Briefcase },
+    { name: 'Approvals', path: '/admin/approvals', icon: Award },
   ];
 
   const recruiterLinks: SidebarItem[] = [
@@ -312,6 +312,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('role');
     navigate('/login');
   };
 

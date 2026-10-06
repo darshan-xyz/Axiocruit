@@ -55,12 +55,49 @@ function buildRedFlagsFromLog(proctorLog = []) {
   return flags;
 }
 
+/**
+ * Helper: Verify if an organization admin has authority over a target user
+ * (e.g. recruiter or interviewer) belonging to the same organization.
+ */
+const isOrgAdminOfTarget = async (reqUser, targetUserId) => {
+  if (!reqUser || !targetUserId) return false;
+  const roleUpper = (reqUser.role || '').toUpperCase();
+  if (roleUpper !== 'ORGANIZATION' && roleUpper !== 'ORG_ADMIN') return false;
+
+  const currentUserId = (reqUser._id || reqUser.id).toString();
+  const targetIdStr = (targetUserId._id || targetUserId).toString();
+  if (currentUserId === targetIdStr) return true;
+
+  const [orgUser, targetUser] = await Promise.all([
+    User.findById(currentUserId).select('organization role'),
+    User.findById(targetIdStr).select('organization'),
+  ]);
+
+  return Boolean(
+    orgUser?.organization &&
+    targetUser?.organization &&
+    orgUser.organization.toString() === targetUser.organization.toString()
+  );
+};
+
 // @desc    Get eligible candidates for scheduling (only those who applied to recruiter's jobs)
 // @route   GET /api/interviews/eligible-candidates
-// @access  Private (Recruiter / Admin)
+// @access  Private (Recruiter / Admin / Org Admin)
 exports.getEligibleCandidates = async (req, res) => {
   try {
-    const recruiterJobs = await Job.find({ postedBy: req.user._id }).select('_id');
+    let recruiterJobQuery = { postedBy: req.user._id };
+    const roleUpper = (req.user.role || '').toUpperCase();
+    if (roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN') {
+      let posterIds = [req.user._id];
+      if (req.user.organization) {
+        const teamUsers = await User.find({ organization: req.user.organization }).select('_id');
+        posterIds = teamUsers.map((u) => u._id);
+      }
+      recruiterJobQuery = { postedBy: { $in: posterIds } };
+    } else if (roleUpper === 'ADMIN') {
+      recruiterJobQuery = {};
+    }
+    const recruiterJobs = await Job.find(recruiterJobQuery).select('_id');
     const jobIds = recruiterJobs.map((job) => job._id);
 
     if (jobIds.length === 0) {
@@ -118,8 +155,9 @@ exports.scheduleInterview = async (req, res) => {
 
       const isOwner = job.postedBy && job.postedBy.toString() === req.user._id.toString();
       const isDelegated = job.delegatedFreelancerId && job.delegatedFreelancerId.toString() === req.user._id.toString();
+      const isOrgAdminOfJob = await isOrgAdminOfTarget(req.user, job.postedBy);
 
-      if (!isOwner && !isDelegated && req.user.role !== 'ADMIN') {
+      if (!isOwner && !isDelegated && !isOrgAdminOfJob && req.user.role !== 'ADMIN') {
         return res.status(403).json({ message: 'Not authorized to schedule for this job' });
       }
 
@@ -179,6 +217,18 @@ exports.getMyInterviews = async (req, res) => {
       query = { recruiterId: req.user._id };
     } else if (role === 'CANDIDATE') {
       query = { candidateId: req.user._id };
+    } else if (role === 'ORGANIZATION' || role === 'ORG_ADMIN') {
+      let posterIds = [req.user._id];
+      if (req.user.organization) {
+        const teamUsers = await User.find({ organization: req.user.organization }).select('_id');
+        posterIds = teamUsers.map((u) => u._id);
+      }
+      query = {
+        $or: [
+          { recruiterId: { $in: posterIds } },
+          { interviewerId: { $in: posterIds } },
+        ],
+      };
     } else {
       query = {
         $or: [
@@ -246,13 +296,14 @@ exports.getInterviewById = async (req, res) => {
     const isRecruiter = interview.recruiterId?._id?.toString() === userId;
     const isCandidate = interview.candidateId?._id?.toString() === userId;
     const isInterviewer = interview.interviewerId?._id?.toString() === userId || interview.interviewerId?.toString() === userId;
-    const isAdmin = req.user.role === 'ADMIN';
+    const isOrgAdminOfInterview = await isOrgAdminOfTarget(req.user, interview.recruiterId?._id || interview.recruiterId);
+    const isAdmin = (req.user.role || '').toUpperCase() === 'ADMIN';
 
-    if (!isRecruiter && !isCandidate && !isInterviewer && !isAdmin) {
+    if (!isRecruiter && !isCandidate && !isInterviewer && !isOrgAdminOfInterview && !isAdmin) {
       return res.status(403).json({ message: 'You are not authorized to join this interview' });
     }
 
-    const isUserHost = isRecruiter || isInterviewer || isAdmin;
+    const isUserHost = isRecruiter || isInterviewer || isOrgAdminOfInterview || isAdmin;
 
     res.json({ ...interview.toObject(), isUserHost });
   } catch (err) {
@@ -282,14 +333,15 @@ exports.updateInterviewStatus = async (req, res) => {
     const isRecruiter = interview.recruiterId.toString() === userId;
     const isCandidate = interview.candidateId.toString() === userId;
     const isInterviewer = interview.interviewerId?.toString() === userId;
+    const isOrgAdminOfInterview = await isOrgAdminOfTarget(req.user, interview.recruiterId);
 
-    if (!isRecruiter && !isCandidate && !isInterviewer && req.user.role !== 'ADMIN') {
+    if (!isRecruiter && !isCandidate && !isInterviewer && !isOrgAdminOfInterview && req.user.role !== 'ADMIN') {
       return res.status(403).json({ message: 'Not authorized to update this interview' });
     }
 
     interview.status = status;
 
-    if (status === 'Accepted' && interview.meetingId?.startsWith('temp-')) {
+    if (status === 'Accepted' && (!interview.meetingId || interview.meetingId.startsWith('temp-'))) {
       interview.status = 'Scheduled';
       interview.meetingId = uuidv4();
     }
@@ -311,7 +363,7 @@ exports.updateInterviewStatus = async (req, res) => {
 
 // @desc    Cancel Interview (Soft Delete)
 // @route   DELETE /api/interviews/:id
-// @access  Private (Recruiter / Admin)
+// @access  Private (Recruiter / Admin / Org Admin)
 exports.cancelInterview = async (req, res) => {
   try {
     const interview = await Interview.findById(req.params.id);
@@ -319,7 +371,10 @@ exports.cancelInterview = async (req, res) => {
       return res.status(404).json({ message: 'Interview not found' });
     }
 
-    if (interview.recruiterId.toString() !== req.user._id.toString() && req.user.role !== 'ADMIN') {
+    const isOwner = interview.recruiterId.toString() === req.user._id.toString();
+    const isOrgAdminOfInterview = await isOrgAdminOfTarget(req.user, interview.recruiterId);
+
+    if (!isOwner && !isOrgAdminOfInterview && req.user.role !== 'ADMIN') {
       return res.status(403).json({ message: 'Not authorized to cancel this interview' });
     }
 
@@ -394,9 +449,10 @@ exports.getProctorLog = async (req, res) => {
     const userId = req.user._id.toString();
     const isRecruiter = interview.recruiterId?._id?.toString() === userId;
     const isInterviewer = interview.interviewerId?.toString() === userId;
-    const isAdmin = req.user.role === 'ADMIN';
+    const isOrgAdminOfInterview = await isOrgAdminOfTarget(req.user, interview.recruiterId?._id || interview.recruiterId);
+    const isAdmin = (req.user.role || '').toUpperCase() === 'ADMIN';
 
-    if (!isRecruiter && !isInterviewer && !isAdmin) {
+    if (!isRecruiter && !isInterviewer && !isOrgAdminOfInterview && !isAdmin) {
       return res.status(403).json({ message: 'Only the recruiter, interviewer, or admin may view proctor logs' });
     }
 
@@ -482,9 +538,10 @@ exports.completeInterview = async (req, res) => {
     const userId = req.user._id.toString();
     const isRecruiter = interview.recruiterId?._id?.toString() === userId;
     const isInterviewer = interview.interviewerId?._id?.toString() === userId;
-    const isAdmin = req.user.role === 'ADMIN';
+    const isOrgAdminOfInterview = await isOrgAdminOfTarget(req.user, interview.recruiterId?._id || interview.recruiterId);
+    const isAdmin = (req.user.role || '').toUpperCase() === 'ADMIN';
 
-    if (!isRecruiter && !isInterviewer && !isAdmin) {
+    if (!isRecruiter && !isInterviewer && !isOrgAdminOfInterview && !isAdmin) {
       return res.status(403).json({ message: 'Only the host (recruiter/interviewer) can complete this interview' });
     }
 

@@ -149,6 +149,11 @@ export const CandidateProfileView: React.FC = () => {
     const handleSave = async () => {
         setSaving(true);
         try {
+            if (!formData.firstName.trim()) {
+                alert('First Name is required.');
+                setSaving(false);
+                return;
+            }
             const nameRegex = /^[a-zA-Z\s]*$/;
             if (!nameRegex.test(formData.firstName) || !nameRegex.test(formData.lastName)) {
                 alert('First Name and Last Name can only contain letters and spaces.');
@@ -161,7 +166,8 @@ export const CandidateProfileView: React.FC = () => {
                 ...formData,
                 skills: skillsArray,
                 experience: experience,
-                education: education
+                education: education,
+                resume: resumeUrl || undefined,
             });
             alert('Profile updated successfully!');
         } catch (error) {
@@ -188,7 +194,14 @@ export const CandidateProfileView: React.FC = () => {
                     const data = await apiRequest('/users/resume', 'POST', uploadFormData);
                     setResumeName(file.name);
                     setResumeUrl(data.resumeUrl);
-                    alert('Resume updated successfully!');
+                    if (data?.parsedData?.skills && data.parsedData.skills.length > 0) {
+                        const existingSkills = formData.skills.split(',').map(s => s.trim()).filter(Boolean);
+                        const mergedSkills = Array.from(new Set([...existingSkills, ...data.parsedData.skills]));
+                        setFormData(prev => ({ ...prev, skills: mergedSkills.join(', ') }));
+                        alert('Resume uploaded and skills parsed successfully!');
+                    } else {
+                        alert('Resume updated successfully!');
+                    }
 
                 } else {
                     const uploadFormData = new FormData();

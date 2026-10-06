@@ -181,8 +181,8 @@ export const InterviewRoomContainer: React.FC = () => {
         try {
             signaling.setEvaluating(true);
             const res = await apiRequest('/coding-test/start', 'POST', {
-                jobId: interview.jobId?._id,
-                candidateId: interview.candidateId._id,
+                jobId: interview.jobId?._id || interview.jobId,
+                candidateId: interview.candidateId?._id || interview.candidateId,
             });
             const sessionData = {
                 sessionId: res.sessionId,

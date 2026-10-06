@@ -37,10 +37,12 @@ env/
 Thumbs.db
 server/public/uploads/*
 !server/public/uploads/.gitkeep
-!server/public/uploads/resumes/
+server/public/uploads/resumes/*
 !server/public/uploads/resumes/.gitkeep
+!server/public/uploads/resumes/sample-resume.pdf
 !server/public/uploads/sample-resume.pdf
 
 # Agent artifacts & test reports
 .agents/
+scratch/
 *.local

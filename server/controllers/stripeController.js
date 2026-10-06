@@ -23,8 +23,24 @@ const createCheckoutSession = async (req, res) => {
             return res.status(404).json({ message: 'Interview not found' });
         }
 
-        // 2. Ensure only the Recruiter who made the booking can pay
-        if (interview.recruiterId.toString() !== req.user._id.toString()) {
+        // 2. Ensure only the Recruiter, their Org Admin, or Admin can pay
+        const isOwner = interview.recruiterId.toString() === req.user._id.toString();
+        const roleUpper = (req.user.role || '').toUpperCase();
+        const isOrgAdmin = roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN';
+        const isAdmin = roleUpper === 'ADMIN';
+
+        let isOrgAdminOfPoster = false;
+        if (isOrgAdmin) {
+            const orgUser = await User.findById(req.user.id);
+            if (orgUser && orgUser.organization) {
+                const posterUser = await User.findById(interview.recruiterId);
+                if (posterUser && posterUser.organization && posterUser.organization.toString() === orgUser.organization.toString()) {
+                    isOrgAdminOfPoster = true;
+                }
+            }
+        }
+
+        if (!isOwner && !isAdmin && !isOrgAdminOfPoster) {
             return res.status(403).json({ message: 'Not authorized to pay for this interview' });
         }
 

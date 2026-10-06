@@ -9,15 +9,32 @@ export const CandidatePortal: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
     const [interviews, setInterviews] = useState<Interview[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
+    const [applications, setApplications] = useState<any[]>([]);
 
     useEffect(() => {
         apiRequest('/users/profile').then(setUser).catch(console.error);
-        apiRequest('/jobs').then(data => setRecommendedJobs(data.slice(0, 3))).catch(console.error);
+        apiRequest('/jobs').then(data => setRecommendedJobs(Array.isArray(data) ? data.slice(0, 3) : [])).catch(console.error);
         apiRequest('/interviews/my-interviews').then(data => setInterviews(Array.isArray(data) ? data : [...(data.activeInterviews || []), ...(data.pastInterviews || [])])).catch(console.error);
-        apiRequest('/interviews/my-messages').then(setMessages).catch(console.error);
+        apiRequest('/interviews/my-messages').then(data => setMessages(Array.isArray(data) ? data : [])).catch(console.error);
+        apiRequest('/applications/my-applications').then(data => setApplications(Array.isArray(data) ? data : [])).catch(console.error);
     }, []);
 
     const candidateName = user?.firstName || user?.name || 'Candidate';
+
+    let strength = 20;
+    if (user?.email) strength += 15;
+    if ((user as any)?.skills && (user as any).skills.length > 0) strength += 25;
+    if ((user as any)?.headline || (user as any)?.bio) strength += 20;
+    if ((user as any)?.resumeUrl) strength += 20;
+    const profileStrength = Math.min(100, strength);
+
+    const scored = applications.filter((a: any) => a.aiScore !== null && a.aiScore !== undefined);
+    const hasScored = scored.length > 0;
+    const avgScoreVal = hasScored
+        ? Math.round(scored.reduce((sum: number, a: any) => sum + Number(a.aiScore), 0) / scored.length)
+        : null;
+    const displayAiScore = hasScored ? `${avgScoreVal}%` : (applications.length > 0 ? 'Evaluating' : 'Ready');
+    const displayAiTrend = hasScored ? 'Rubric score match' : (applications.length > 0 ? 'Pending AI parse' : 'Submit CV to evaluate');
 
     return (
         <div className="space-y-6 animate-in fade-in duration-300">
@@ -56,7 +73,7 @@ export const CandidatePortal: React.FC = () => {
                 {/* Readiness Gauge Widget */}
                 <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 self-start md:self-auto">
                     <CircularProgressGauge
-                        percentage={85}
+                        percentage={profileStrength}
                         size={76}
                         strokeWidth={7}
                         color="#2563EB"
@@ -64,8 +81,8 @@ export const CandidatePortal: React.FC = () => {
                     />
                     <div>
                         <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Profile Strength</span>
-                        <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">AI Verified</h4>
-                        <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">Ready for Matching</p>
+                        <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">{profileStrength >= 80 ? 'AI Verified' : 'In Progress'}</h4>
+                        <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">{profileStrength >= 80 ? 'Ready for Matching' : 'Complete Profile'}</p>
                     </div>
                 </div>
             </div>
@@ -101,8 +118,8 @@ export const CandidatePortal: React.FC = () => {
                 />
                 <MetricStatCard
                     label="AI Match Precision"
-                    value="92%"
-                    trend="Top percentile"
+                    value={displayAiScore}
+                    trend={displayAiTrend}
                     positive={true}
                     colorVariant="white"
                     icon={TrendingUp}

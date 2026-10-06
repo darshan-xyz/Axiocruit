@@ -93,24 +93,23 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
   const cand: SakromeCandidate = normalizeToSakromeCandidate(candidate);
   const dept = getDepartmentMeta(cand.candidate?.department || cand.candidate?.headline);
   const DeptIcon = dept.icon;
-  const stage = getStageMeta(cand.status);
-  const score = cand.aiScore ?? 83;
-  const matchLabel = cand.matchLabel || (score >= 80 ? 'Strong match' : 'Good match');
+  const hasScore = cand.aiScore !== null && cand.aiScore !== undefined;
+  const score = hasScore ? cand.aiScore : null;
+  const matchLabel = cand.matchLabel || (hasScore ? ((score ?? 0) >= 80 ? 'Strong match' : (score ?? 0) >= 60 ? 'Good match' : 'Fair match') : 'Pending AI');
 
   // SVG Gauge calculations
   const gaugeRadius = 18;
   const gaugeCircumference = 2 * Math.PI * gaugeRadius; // ~113.1
-  const gaugeOffset = gaugeCircumference - (Math.min(100, Math.max(0, score)) / 100) * gaugeCircumference;
+  const gaugeOffset = hasScore
+    ? gaugeCircumference - (Math.min(100, Math.max(0, score ?? 0)) / 100) * gaugeCircumference
+    : gaugeCircumference;
+
+  const userStr = localStorage.getItem('user');
+  const loggedInUser = userStr ? JSON.parse(userStr) : null;
+  const currentAuthorName = loggedInUser?.name || (role === 'INTERVIEWER' ? 'Interviewer' : 'Recruiter');
 
   // Active notes for candidate isolated by candidateId
-  const defaultNotes: SakromeNote[] = cand.candidate?.notes || [
-    {
-      id: 'note-1',
-      author: 'Kevin Nunez',
-      date: cand.appliedDateFormatted || '14 Sep 2026',
-      content: 'Excellent communication and systematic thinking during screening. Recommended for technical round.'
-    }
-  ];
+  const defaultNotes: SakromeNote[] = (cand.candidate?.notes && cand.candidate.notes.length > 0) ? cand.candidate.notes : [];
   const currentNotes = (candidateId && notesByCandidate[candidateId]) ? notesByCandidate[candidateId] : defaultNotes;
 
   const handleAddNote = (e: React.FormEvent) => {
@@ -118,8 +117,8 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
     if (!newNoteText.trim() || !candidateId) return;
     const newNote: SakromeNote = {
       id: `note-${Date.now()}`,
-      author: role === 'INTERVIEWER' ? 'Interviewer' : 'Kevin Nunez',
-      date: 'Just now',
+      author: currentAuthorName,
+      date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
       content: newNoteText.trim()
     };
     const updated = [newNote, ...currentNotes];
@@ -207,7 +206,7 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
                 />
               </svg>
               <span className="absolute text-[11px] font-black text-slate-900 dark:text-white">
-                {score}%
+                {hasScore ? `${score}%` : '—'}
               </span>
             </div>
             <div>
@@ -248,23 +247,23 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
               <div className="space-y-2 text-slate-600 dark:text-slate-300 min-w-0">
                 <div className="flex items-center gap-2">
                   <Briefcase size={13} className="text-slate-400 flex-shrink-0" />
-                  <span className="truncate">{cand.candidate?.yearsOfExperience || 5} Years experience</span>
+                  <span className="truncate">{cand.candidate?.yearsOfExperience ? `${cand.candidate.yearsOfExperience} Years experience` : 'Experience verified'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin size={13} className="text-slate-400 flex-shrink-0" />
-                  <span className="truncate">{cand.candidate?.location || 'San Francisco, CA'}</span>
+                  <span className="truncate">{cand.candidate?.location || 'Remote'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock size={13} className="text-slate-400 flex-shrink-0" />
-                  <span className="truncate">{cand.candidate?.availability || 'Available in 2 weeks'}</span>
+                  <span className="truncate">{cand.candidate?.availability || 'Available'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail size={13} className="text-slate-400 flex-shrink-0" />
-                  <span className="truncate" title={cand.candidate?.email}>{cand.candidate?.email}</span>
+                  <span className="truncate" title={cand.candidate?.email}>{cand.candidate?.email || 'No email provided'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone size={13} className="text-slate-400 flex-shrink-0" />
-                  <span className="truncate">{cand.candidate?.phone || '+1 (415) 555-0134'}</span>
+                  <span className="truncate">{cand.candidate?.phone || 'Not specified'}</span>
                 </div>
               </div>
 
@@ -273,19 +272,19 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
                 <div>
                   <span className="text-[10px] text-slate-400 block font-medium">Source</span>
                   <span className="font-bold text-slate-900 dark:text-white truncate block">
-                    {cand.candidate?.source || 'LinkedIn'}
+                    {cand.candidate?.source || 'Direct Application'}
                   </span>
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 block font-medium">Applied</span>
                   <span className="font-bold text-slate-900 dark:text-white truncate block">
-                    {cand.appliedDateFormatted || '14 Sep 2026'}
+                    {cand.appliedDateFormatted || 'Recently'}
                   </span>
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 block font-medium">Salary Expected</span>
                   <span className="font-bold text-slate-900 dark:text-white truncate block">
-                    {cand.candidate?.salaryExpected || '$140k - $160k'}
+                    {cand.candidate?.salaryExpected || 'Negotiable'}
                   </span>
                 </div>
               </div>
@@ -323,40 +322,61 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
               <span>✦ AI Summary</span>
             </div>
             <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
-              {cand.aiSummary || 'Strong product design background with excellent experience in design systems, user research, and cross-functional collaboration.'}
+              {cand.aiSummary || 'Applicant profile evaluated against role requirements.'}
             </p>
           </div>
 
-          {/* Next Interview Slot Card (Requirement R2 / F14) */}
-          <div className="p-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 flex items-center justify-between">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center flex-shrink-0">
-                <Calendar size={15} />
+          {/* Next Interview Slot Card */}
+          {cand.nextInterviewSlot ? (
+            <div className="p-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 flex items-center justify-between">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center flex-shrink-0">
+                  <Calendar size={15} />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[10px] text-slate-400 font-medium block">Next Interview Slot</span>
+                  <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    {cand.nextInterviewSlot.date} • {cand.nextInterviewSlot.time}
+                  </p>
+                  <span className="text-[10px] text-slate-500 truncate block">
+                    Interviewer: {cand.nextInterviewSlot.interviewer}
+                  </span>
+                </div>
               </div>
-              <div className="min-w-0">
-                <span className="text-[10px] text-slate-400 font-medium block">Next Interview Slot</span>
-                <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                  {cand.nextInterviewSlot?.date || 'Tomorrow, 15 Sep 2026'} • {cand.nextInterviewSlot?.time || '10:30 AM – 11:15 AM EST'}
-                </p>
-                <span className="text-[10px] text-slate-500 truncate block">
-                  Interviewer: {cand.nextInterviewSlot?.interviewer || 'Kevin Nunez'}
-                </span>
-              </div>
+              <a
+                href={cand.nextInterviewSlot.roomLink || '#/recruiter/schedule'}
+                className="px-2.5 py-1 rounded-lg bg-blue-600 text-white font-bold text-[11px] shadow-2xs hover:bg-blue-700 transition-colors whitespace-nowrap flex-shrink-0"
+              >
+                Join Room
+              </a>
             </div>
-            <a
-              href={cand.nextInterviewSlot?.roomLink || '#/recruiter/schedule'}
-              className="px-2.5 py-1 rounded-lg bg-blue-600 text-white font-bold text-[11px] shadow-2xs hover:bg-blue-700 transition-colors whitespace-nowrap flex-shrink-0"
-            >
-              Join Room
-            </a>
-          </div>
+          ) : (
+            <div className="p-3 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/20 flex items-center justify-between">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center flex-shrink-0">
+                  <Calendar size={15} />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[10px] text-slate-400 font-medium block">Interview Scheduling</span>
+                  <p className="text-xs font-medium text-slate-600 dark:text-slate-400">No active interview session</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={onSchedule}
+                className="px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-700 dark:text-slate-300 font-bold text-[11px] transition-colors whitespace-nowrap flex-shrink-0 cursor-pointer"
+              >
+                Schedule Now
+              </button>
+            </div>
+          )}
 
           {/* Actions Deck (Requirement R2 / F15) */}
           <div className="pt-2 space-y-2">
             <div className="flex items-center gap-2">
               <button
                 onClick={onSchedule}
-                className="flex-1 py-2 px-3 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 font-bold text-xs text-slate-800 dark:text-slate-100 flex items-center justify-center gap-1.5 transition-all shadow-2xs"
+                className="flex-1 py-2 px-3 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 font-bold text-xs text-slate-800 dark:text-slate-100 flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
               >
                 <Calendar size={13} className="text-blue-600" />
                 <span>Schedule Interview</span>
@@ -365,7 +385,7 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
               {onViewFullProfile && (
                 <button
                   onClick={onViewFullProfile}
-                  className="flex-1 py-2 px-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-blue-500/25"
+                  className="flex-1 py-2 px-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-blue-500/25 cursor-pointer"
                 >
                   <span>View Full Profile</span>
                   <span>→</span>
@@ -374,20 +394,30 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
             </div>
 
             <div className="flex items-center gap-2">
-              <a
-                href={cand.resumeUrl || '#'}
-                target="_blank"
-                rel="noreferrer"
-                className="flex-1 py-2 px-3 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 font-bold text-xs flex items-center justify-center gap-1.5 transition-all"
-              >
-                <FileText size={13} />
-                <span>View Resume</span>
-              </a>
+              {cand.resumeUrl && cand.resumeUrl !== '#' ? (
+                <a
+                  href={cand.resumeUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 py-2 px-3 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 font-bold text-xs flex items-center justify-center gap-1.5 transition-all"
+                >
+                  <FileText size={13} />
+                  <span>View Resume</span>
+                </a>
+              ) : (
+                <button
+                  disabled
+                  className="flex-1 py-2 px-3 rounded-full border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 text-slate-400 font-bold text-xs flex items-center justify-center gap-1.5 cursor-not-allowed opacity-60"
+                >
+                  <FileText size={13} />
+                  <span>No Resume Attached</span>
+                </button>
+              )}
 
               {onSendMessage && (
                 <button
                   onClick={onSendMessage}
-                  className="px-3 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center gap-1.5 hover:text-blue-600 transition-all"
+                  className="px-3 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center gap-1.5 hover:text-blue-600 transition-all cursor-pointer"
                   title="Send message"
                 >
                   <Send size={12} />
@@ -398,7 +428,7 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
               {role === 'INTERVIEWER' && onProposeHire && (
                 <button
                   onClick={() => onProposeHire(cand)}
-                  className="flex-1 py-2 px-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-emerald-500/20"
+                  className="flex-1 py-2 px-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-emerald-500/20 cursor-pointer"
                 >
                   <Award size={13} />
                   <span>Propose Final Hire</span>
@@ -415,35 +445,43 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
           <div>
             <h4 className="text-xs font-black text-slate-900 dark:text-white mb-1.5">Executive Bio</h4>
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50/50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
-              {cand.candidate?.bio}
+              {cand.candidate?.bio || 'No bio provided.'}
             </p>
           </div>
 
           <div>
             <h4 className="text-xs font-black text-slate-900 dark:text-white mb-2">Work Experience</h4>
             <div className="space-y-2.5">
-              {(cand.candidate?.experience || []).map((exp, idx) => (
-                <div key={idx} className="p-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/30">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-slate-900 dark:text-white">{exp.role}</span>
-                    <span className="text-[10px] text-slate-400">{exp.period}</span>
+              {(cand.candidate?.experience || []).length === 0 ? (
+                <p className="text-slate-400 italic py-2">No work experience listed.</p>
+              ) : (
+                cand.candidate.experience.map((exp, idx) => (
+                  <div key={idx} className="p-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/30">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-bold text-slate-900 dark:text-white">{exp.role}</span>
+                      <span className="text-[10px] text-slate-400">{exp.period}</span>
+                    </div>
+                    <span className="text-[11px] text-blue-600 dark:text-blue-400 font-medium block mb-1">{exp.company}</span>
+                    <p className="text-[11px] text-slate-500 leading-normal">{exp.description}</p>
                   </div>
-                  <span className="text-[11px] text-blue-600 dark:text-blue-400 font-medium block mb-1">{exp.company}</span>
-                  <p className="text-[11px] text-slate-500 leading-normal">{exp.description}</p>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
           <div>
             <h4 className="text-xs font-black text-slate-900 dark:text-white mb-2">Education</h4>
             <div className="space-y-2">
-              {(cand.candidate?.education || []).map((edu, idx) => (
-                <div key={idx} className="p-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/30">
-                  <p className="font-bold text-slate-900 dark:text-white">{edu.degree}</p>
-                  <p className="text-[11px] text-slate-500">{edu.institution} • {edu.year}</p>
-                </div>
-              ))}
+              {(cand.candidate?.education || []).length === 0 ? (
+                <p className="text-slate-400 italic py-2">No education history listed.</p>
+              ) : (
+                cand.candidate.education.map((edu, idx) => (
+                  <div key={idx} className="p-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/30">
+                    <p className="font-bold text-slate-900 dark:text-white">{edu.degree}</p>
+                    <p className="text-[11px] text-slate-500">{edu.institution} {edu.year ? `• ${edu.year}` : ''}</p>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -457,17 +495,19 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
             <div className="relative">
               <span className="absolute -left-6 top-0.5 w-3 h-3 rounded-full bg-blue-600 ring-4 ring-white dark:ring-slate-900" />
               <p className="font-bold text-slate-900 dark:text-white">Application Received</p>
-              <span className="text-[10px] text-slate-400">{cand.appliedDateFormatted || '14 Sep 2026'} • Self-service portal</span>
+              <span className="text-[10px] text-slate-400">{cand.appliedDateFormatted || 'Recently'} • Axiocruit Portal</span>
             </div>
-            <div className="relative">
-              <span className="absolute -left-6 top-0.5 w-3 h-3 rounded-full bg-purple-600 ring-4 ring-white dark:ring-slate-900" />
-              <p className="font-bold text-slate-900 dark:text-white">AI ATS Rubric Evaluation</p>
-              <span className="text-[10px] text-slate-400">Score: {score}% • {matchLabel}</span>
-            </div>
+            {cand.aiScore !== null && (
+              <div className="relative">
+                <span className="absolute -left-6 top-0.5 w-3 h-3 rounded-full bg-purple-600 ring-4 ring-white dark:ring-slate-900" />
+                <p className="font-bold text-slate-900 dark:text-white">AI ATS Rubric Evaluation</p>
+                <span className="text-[10px] text-slate-400">Score: {score}% • {matchLabel}</span>
+              </div>
+            )}
             <div className="relative">
               <span className="absolute -left-6 top-0.5 w-3 h-3 rounded-full bg-amber-500 ring-4 ring-white dark:ring-slate-900" />
               <p className="font-bold text-slate-900 dark:text-white">Pipeline Stage: {cand.status}</p>
-              <span className="text-[10px] text-slate-400">Active recruiter evaluation</span>
+              <span className="text-[10px] text-slate-400">Active evaluation</span>
             </div>
             {cand.nextInterviewSlot && (
               <div className="relative">
@@ -494,7 +534,7 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="px-3.5 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-2xs"
+                className="px-3.5 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
               >
                 <Plus size={12} />
                 <span>Save Note</span>
@@ -503,15 +543,19 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
           </form>
 
           <div className="space-y-2.5 pt-2">
-            {currentNotes.map(note => (
-              <div key={note.id} className="p-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-bold text-slate-900 dark:text-white">{note.author}</span>
-                  <span className="text-[10px] text-slate-400">{note.date}</span>
+            {currentNotes.length === 0 ? (
+              <p className="text-slate-400 italic text-center py-4">No notes added yet for this candidate.</p>
+            ) : (
+              currentNotes.map(note => (
+                <div key={note.id} className="p-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-bold text-slate-900 dark:text-white">{note.author}</span>
+                    <span className="text-[10px] text-slate-400">{note.date}</span>
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-normal">{note.content}</p>
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-normal">{note.content}</p>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       )}
@@ -521,38 +565,38 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
         <div className="space-y-3 text-xs">
           <h4 className="text-xs font-black text-slate-900 dark:text-white mb-2">Attached Documents</h4>
           <div className="space-y-2">
-            {(cand.candidate?.files || [
-              {
-                name: `${(cand.candidate?.name || 'Candidate').replace(/\s+/g, '_')}_Resume_2026.pdf`,
-                size: '1.8 MB',
-                type: 'PDF Document',
-                url: cand.resumeUrl || '#'
-              }
-            ]).map((file, idx) => (
-              <div
-                key={idx}
-                className="p-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 flex items-center justify-between gap-2"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center flex-shrink-0">
-                    <FileText size={16} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-bold text-slate-900 dark:text-white truncate">{file.name}</p>
-                    <span className="text-[10px] text-slate-400">{file.size} • {file.type}</span>
-                  </div>
-                </div>
-                <a
-                  href={file.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-blue-600 transition-colors flex-shrink-0"
-                  title="View / Download"
-                >
-                  <ExternalLink size={13} />
-                </a>
+            {(cand.candidate?.files || []).filter(f => f.url && f.url !== '#').length === 0 ? (
+              <div className="p-6 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 text-center text-slate-400">
+                <FileText size={24} className="mx-auto mb-1 text-slate-300 dark:text-slate-600" />
+                <p>No documents attached for this applicant.</p>
               </div>
-            ))}
+            ) : (
+              (cand.candidate?.files || []).filter(f => f.url && f.url !== '#').map((file, idx) => (
+                <div
+                  key={idx}
+                  className="p-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 flex items-center justify-between gap-2"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center flex-shrink-0">
+                      <FileText size={16} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-bold text-slate-900 dark:text-white truncate">{file.name}</p>
+                      <span className="text-[10px] text-slate-400">{file.size} • {file.type}</span>
+                    </div>
+                  </div>
+                  <a
+                    href={file.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-blue-600 transition-colors flex-shrink-0"
+                    title="View / Download"
+                  >
+                    <ExternalLink size={13} />
+                  </a>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}

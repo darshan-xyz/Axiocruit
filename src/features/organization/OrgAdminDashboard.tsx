@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Input, Modal } from '@/ui';
-import { Users, Building, Plus } from 'lucide-react';
+import { Users, Building, Plus, Briefcase, AlertCircle } from 'lucide-react';
 import { apiRequest } from '@/core/api';
 
 export const OrgAdminDashboard: React.FC = () => {
@@ -8,10 +8,26 @@ export const OrgAdminDashboard: React.FC = () => {
   const [stats, setStats] = useState({ totalRecruiters: 0, activeJobs: 0 });
   const [showAddRecruiter, setShowAddRecruiter] = useState(false);
   const [newRecruiter, setNewRecruiter] = useState({ name: '', email: '', password: '' });
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState('');
 
   useEffect(() => {
     fetchRecruiters();
+    fetchJobs();
   }, []);
+
+  const fetchJobs = () => {
+    apiRequest('/organization/jobs')
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const active = data.filter((j: any) => j.status === 'Active').length;
+          setStats((prev) => ({ ...prev, activeJobs: active }));
+        }
+      })
+      .catch((err) => {
+        console.error('[OrgAdminDashboard] Failed to fetch org jobs:', err);
+      });
+  };
 
   const fetchRecruiters = () => {
     apiRequest('/organization/recruiters')
@@ -27,7 +43,17 @@ export const OrgAdminDashboard: React.FC = () => {
   };
 
   const handleAddRecruiter = async () => {
+    setAddError('');
+    if (!newRecruiter.name || !newRecruiter.email || !newRecruiter.password) {
+      setAddError('All fields are required.');
+      return;
+    }
+    if (newRecruiter.password.length < 8) {
+      setAddError('Password must be at least 8 characters long.');
+      return;
+    }
     try {
+      setAddLoading(true);
       await apiRequest('/auth/register-recruiter', 'POST', {
         ...newRecruiter,
         email: newRecruiter.email.toLowerCase().trim(),
@@ -35,8 +61,11 @@ export const OrgAdminDashboard: React.FC = () => {
       setShowAddRecruiter(false);
       setNewRecruiter({ name: '', email: '', password: '' });
       fetchRecruiters();
-    } catch (error) {
+    } catch (error: any) {
+      setAddError(error.message || 'Failed to add recruiter');
       console.error('[OrgAdminDashboard] Failed to add recruiter:', error);
+    } finally {
+      setAddLoading(false);
     }
   };
 
@@ -52,6 +81,15 @@ export const OrgAdminDashboard: React.FC = () => {
           <div>
             <p className="text-slate-500 dark:text-neutral-400 text-sm">Total Recruiters</p>
             <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{stats.totalRecruiters}</h3>
+          </div>
+        </Card>
+        <Card className="p-6 flex items-center gap-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
+          <div className="p-3 bg-purple-500/10 rounded-xl text-purple-600 dark:text-purple-400">
+            <Briefcase size={24} />
+          </div>
+          <div>
+            <p className="text-slate-500 dark:text-neutral-400 text-sm">Active Jobs</p>
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{stats.activeJobs}</h3>
           </div>
         </Card>
         <Card className="p-6 flex items-center gap-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
@@ -115,11 +153,19 @@ export const OrgAdminDashboard: React.FC = () => {
             value={newRecruiter.password}
             onChange={(e) => setNewRecruiter({ ...newRecruiter, password: e.target.value })}
           />
+          {addError && (
+            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 dark:text-red-400 text-xs flex items-center gap-2">
+              <AlertCircle size={14} className="flex-shrink-0" />
+              <span>{addError}</span>
+            </div>
+          )}
           <div className="flex justify-end gap-3 mt-4">
-            <Button variant="ghost" onClick={() => setShowAddRecruiter(false)}>
+            <Button variant="ghost" onClick={() => { setShowAddRecruiter(false); setAddError(''); }}>
               Cancel
             </Button>
-            <Button onClick={handleAddRecruiter}>Create Account</Button>
+            <Button onClick={handleAddRecruiter} disabled={addLoading}>
+              {addLoading ? 'Creating...' : 'Create Account'}
+            </Button>
           </div>
         </div>
       </Modal>

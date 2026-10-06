@@ -7,6 +7,7 @@ import {
   ArrowRight, RefreshCw, Eye, EyeOff
 } from 'lucide-react';
 import { apiRequest } from '@/core/api';
+import { io } from 'socket.io-client';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface TestCase {
@@ -21,6 +22,7 @@ interface Question {
   difficulty: 'very_easy' | 'easy' | 'medium' | 'hard';
   category: 'basics' | 'oop' | 'dsa';
   visibleTestCases: TestCase[];
+  starterCode?: string;
 }
 
 interface VisibleCaseResult {
@@ -146,6 +148,58 @@ export const CodingTestPage: React.FC = () => {
   // Track question IDs we've already submitted (for UX guard)
   const submittedIds = useRef<Set<string>>(new Set());
 
+  // Real-time Socket.IO sync ref
+  const socketRef = useRef<any>(null);
+
+  // ── Socket.IO Real-time Connection for Assessment Sync ────────────────────────
+  useEffect(() => {
+    if (!sessionId) return;
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+
+    try {
+      const socket = io('/', {
+        auth: { token, userName: user?.name || 'Candidate' },
+        transports: ['websocket', 'polling'],
+      });
+      socketRef.current = socket;
+
+      socket.on('connect', () => {
+        socket.emit('join-room', {
+          roomId: sessionId,
+          interviewId: sessionId,
+          roomType: 'coding',
+          isRecruiter: false,
+        });
+      });
+
+      socket.on('code-change', ({ code: incomingCode }: { code?: string }) => {
+        if (incomingCode !== undefined) {
+          setCode(incomingCode);
+        }
+      });
+
+      return () => {
+        socket.disconnect();
+      };
+    } catch (e) {
+      console.warn('[CodingTestPage] Socket connection error:', e);
+    }
+  }, [sessionId]);
+
+  const handleCodeChange = (val: string | undefined) => {
+    const newCode = val ?? '';
+    setCode(newCode);
+    if (socketRef.current && sessionId) {
+      socketRef.current.emit('code-change', {
+        roomId: sessionId,
+        code: newCode,
+        language: 'python',
+      });
+    }
+  };
+
   // ── Start session on mount ───────────────────────────────────────────────────
   useEffect(() => {
     if (!jobId) { setErrorMsg('No job ID provided.'); setPhase('error'); return; }
@@ -159,7 +213,7 @@ export const CodingTestPage: React.FC = () => {
       setSessionId(res.sessionId);
       setQuestion(res.question);
       setQuestionNumber(1);
-      setCode(STARTER_CODE);
+      setCode(res.question?.starterCode || STARTER_CODE);
       setPhase('question');
     } catch (err: any) {
       // If an in-progress session already exists, try to resume it
@@ -179,7 +233,7 @@ export const CodingTestPage: React.FC = () => {
       if (res.done) { setFinalScore(res.finalScore ?? 0); setPhase('completed'); return; }
       setQuestion(res.question);
       setQuestionNumber(res.questionNumber);
-      setCode(STARTER_CODE);
+      setCode(res.question?.starterCode || STARTER_CODE);
       setPhase('question');
     } catch {
       setErrorMsg('Failed to resume session.');
@@ -203,6 +257,18 @@ export const CodingTestPage: React.FC = () => {
       submittedIds.current.add(question._id);
       setSubmitResponse(res);
 
+      // Emit real-time adaptive test event via Socket.IO
+      if (socketRef.current && sessionId) {
+        socketRef.current.emit('adaptive-test-event', {
+          sessionId,
+          score: res.score,
+          passed: res.passed,
+          sessionComplete: res.sessionComplete,
+          questionNumber,
+          nextDifficulty: res.nextDifficulty,
+        });
+      }
+
       if (res.sessionComplete) {
         setFinalScore(res.finalScore ?? res.score);
         setPhase('completed');
@@ -214,7 +280,7 @@ export const CodingTestPage: React.FC = () => {
     } finally {
       setSubmitting(false);
     }
-  }, [sessionId, question, code, submitting]);
+  }, [sessionId, question, code, submitting, questionNumber]);
 
   // ── Fetch next question ───────────────────────────────────────────────────────
   const handleNext = async () => {
@@ -228,7 +294,7 @@ export const CodingTestPage: React.FC = () => {
       } else {
         setQuestion(res.question);
         setQuestionNumber(res.questionNumber);
-        setCode(STARTER_CODE);
+        setCode(res.question?.starterCode || STARTER_CODE);
         setSubmitResponse(null);
         setPhase('question');
       }
@@ -613,7 +679,7 @@ export const CodingTestPage: React.FC = () => {
               height="100%"
               defaultLanguage="python"
               value={code}
-              onChange={val => setCode(val ?? '')}
+              onChange={handleCodeChange}
               theme="vs-dark"
               options={{
                 fontSize: 14,

@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, Briefcase, CheckCircle, LogOut, Sun, Moon, ChevronRight, Shield } from 'lucide-react';
 import { useTheme } from './ThemeContext';
+import { normalizeRole, getRoleHome } from '@/types';
 
 // ThemeToggle (pill style)
 const ThemeToggle: React.FC = () => {
@@ -24,11 +25,28 @@ export const AdminLayout: React.FC = () => {
     const location = useLocation();
     const { isDark } = useTheme();
 
+    const userString = localStorage.getItem('user');
+    const user = userString ? JSON.parse(userString) : null;
+    const userRole = normalizeRole(user?.role);
+
+    React.useEffect(() => {
+        if (!user) {
+            navigate('/login');
+            return;
+        }
+        if (userRole !== 'ADMIN') {
+            navigate(getRoleHome(userRole));
+        }
+    }, [user, userRole, navigate]);
+
     const handleLogout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         localStorage.removeItem('role');
         navigate('/login');
     };
+
+    if (!user || userRole !== 'ADMIN') return null;
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Overview', path: '/admin/dashboard' },
@@ -51,8 +69,6 @@ export const AdminLayout: React.FC = () => {
     const pageTitle = currentItem?.label || 'Admin Panel';
 
     const adminRole = localStorage.getItem('role') || 'Admin';
-    const userString = localStorage.getItem('user');
-    const user = userString ? JSON.parse(userString) : null;
     const userInitial = (user?.name || user?.email || 'A').charAt(0).toUpperCase();
 
     return (

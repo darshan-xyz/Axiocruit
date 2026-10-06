@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Clock, Pause, Play, RotateCcw, Tag, X, Calendar, ChevronRight, CheckCircle2 } from 'lucide-react';
 
 export const TimeTrackingStopwatch: React.FC = () => {
-  const [seconds, setSeconds] = useState(5058); // 01:24:18 initial
-  const [isRunning, setIsRunning] = useState(true);
+  const [seconds, setSeconds] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
     let timer: any;
@@ -33,7 +33,7 @@ export const TimeTrackingStopwatch: React.FC = () => {
             </h3>
           </div>
           <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300">
-            {isRunning ? '● Live Recording' : 'Paused'}
+            {isRunning ? '● Live Recording' : seconds > 0 ? 'Paused' : 'Ready'}
           </span>
         </div>
 
@@ -46,7 +46,7 @@ export const TimeTrackingStopwatch: React.FC = () => {
             {formatTime(seconds)}
           </div>
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mt-1">
-            Current Session • Senior Design Screen
+            Active Evaluation Session
           </span>
         </div>
       </div>
@@ -60,7 +60,7 @@ export const TimeTrackingStopwatch: React.FC = () => {
               : 'bg-emerald-600 hover:bg-emerald-700 text-white'
           }`}
         >
-          {isRunning ? <><Pause size={13} /> Pause Timer</> : <><Play size={13} /> Resume Timer</>}
+          {isRunning ? <><Pause size={13} /> Pause Timer</> : <><Play size={13} /> {seconds > 0 ? 'Resume Timer' : 'Start Timer'}</>}
         </button>
         <button
           onClick={() => { setSeconds(0); setIsRunning(false); }}
@@ -75,12 +75,23 @@ export const TimeTrackingStopwatch: React.FC = () => {
 };
 
 export const TagNotesWidget: React.FC = () => {
-  const [notes, setNotes] = useState<string[]>([
-    'Debrief with Engineering committee at 4:00 PM',
-    'Follow up on offer letter for Sarah Miller (83% match)',
-    'Calibrate AI semantic rubric for Staff Frontend position'
-  ]);
+  const [notes, setNotes] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('axiocruit_recruiter_notes');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return [
+      'Debrief candidate pipeline with hiring committee',
+      'Calibrate AI semantic rubric for active requisitions'
+    ];
+  });
   const [newNote, setNewNote] = useState('');
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('axiocruit_recruiter_notes', JSON.stringify(notes));
+    } catch (e) {}
+  }, [notes]);
 
   const handleAddNote = (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,21 +114,27 @@ export const TagNotesWidget: React.FC = () => {
         </div>
 
         <div className="space-y-2 mb-4 max-h-[170px] overflow-y-auto pr-1">
-          {notes.map((note, idx) => (
-            <div
-              key={idx}
-              className="p-2.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200/50 dark:border-purple-800/30 flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5 flex-shrink-0" />
-              <span className="flex-1 leading-snug">{note}</span>
-              <button
-                onClick={() => setNotes(prev => prev.filter((_, i) => i !== idx))}
-                className="text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
-              >
-                <X size={12} />
-              </button>
+          {notes.length === 0 ? (
+            <div className="py-6 text-center text-xs text-slate-400 italic">
+              No notes saved. Add one below.
             </div>
-          ))}
+          ) : (
+            notes.map((note, idx) => (
+              <div
+                key={idx}
+                className="p-2.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200/50 dark:border-purple-800/30 flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5 flex-shrink-0" />
+                <span className="flex-1 leading-snug">{note}</span>
+                <button
+                  onClick={() => setNotes(prev => prev.filter((_, i) => i !== idx))}
+                  className="text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
@@ -139,17 +156,41 @@ export const TagNotesWidget: React.FC = () => {
   );
 };
 
-export const MiniCalendarWidget: React.FC = () => {
+export const MiniCalendarWidget: React.FC<{ interviews?: any[] }> = ({ interviews = [] }) => {
+  const now = new Date();
+  const currentMonthName = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+  const currentDay = now.getDate();
+  const totalDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const firstDayOfWeek = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+
   const daysOfWeek = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-  const daysInMonth = Array.from({ length: 30 }, (_, i) => i + 1);
-  const interviewDays = [12, 14, 18, 22, 25];
+  const daysInMonth = Array.from({ length: totalDays }, (_, i) => i + 1);
+
+  // Extract interview days in this month
+  const interviewDays = new Set(
+    interviews
+      .map(item => {
+        const d = new Date(item.scheduledTime || item.date);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() ? d.getDate() : null;
+      })
+      .filter(Boolean)
+  );
+
+  const todayCount = interviews.filter(item => {
+    const d = new Date(item.scheduledTime || item.date);
+    return (
+      d.getDate() === now.getDate() &&
+      d.getMonth() === now.getMonth() &&
+      d.getFullYear() === now.getFullYear()
+    );
+  }).length;
 
   return (
     <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
-            September 2026
+            {currentMonthName}
           </h3>
           <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400">Axiocruit Live ATS</span>
         </div>
@@ -161,11 +202,12 @@ export const MiniCalendarWidget: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-7 gap-1 text-center text-xs">
-          <div />
-          <div />
+          {Array.from({ length: firstDayOfWeek }).map((_, i) => (
+            <div key={`empty-${i}`} />
+          ))}
           {daysInMonth.map(day => {
-            const isToday = day === 14;
-            const hasInterview = interviewDays.includes(day);
+            const isToday = day === currentDay;
+            const hasInterview = interviewDays.has(day);
 
             return (
               <div
@@ -191,10 +233,10 @@ export const MiniCalendarWidget: React.FC = () => {
 
       <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 flex items-center justify-between">
         <span className="flex items-center gap-1.5 font-bold text-blue-600 dark:text-blue-400">
-          <span className="w-2 h-2 rounded-full bg-blue-600" /> Today: 3 Interviews
+          <span className="w-2 h-2 rounded-full bg-blue-600" /> Today: {todayCount} {todayCount === 1 ? 'Interview' : 'Interviews'}
         </span>
         <button
-          onClick={() => window.location.href = '#/recruiter/schedule'}
+          onClick={() => (window.location.href = '#/recruiter/schedule')}
           className="hover:underline font-bold text-slate-600 dark:text-slate-300 cursor-pointer"
         >
           View Calendar →
@@ -204,13 +246,58 @@ export const MiniCalendarWidget: React.FC = () => {
   );
 };
 
-export const MyTaskScheduleList: React.FC = () => {
-  const [tasks, setTasks] = useState([
-    { id: '101', interviewTitle: 'System Architecture Assessment', candidate: { name: 'Sarah Miller' }, scheduledTime: '09.00 – 10.00 AM', time: '09.00 – 10.00 AM', color: 'border-l-4 border-l-blue-600', done: true },
-    { id: '102', interviewTitle: 'Distributed Systems & Coding Round', candidate: { name: 'Alex Rivera' }, scheduledTime: '10.30 – 12.00 AM', time: '10.30 – 12.00 AM', color: 'border-l-4 border-l-[#FF5D8F]', done: true },
-    { id: '103', interviewTitle: 'Product Design Technical Review', candidate: { name: 'Elena Rostova' }, scheduledTime: '13.30 – 14.00 PM', time: '13.30 – 14.00 PM', color: 'border-l-4 border-l-emerald-500', done: false },
-    { id: '104', interviewTitle: 'Full-Stack Portfolio Deep Dive', candidate: { name: 'Marcus Chen' }, scheduledTime: '14.00 – 16.00 PM', time: '14.00 – 16.00 PM', color: 'border-l-4 border-l-amber-500', done: false },
-  ]);
+interface TaskItem {
+  id: string;
+  interviewTitle: string;
+  candidateName: string;
+  time: string;
+  meetingId?: string;
+  color: string;
+  done: boolean;
+}
+
+export const MyTaskScheduleList: React.FC<{ interviews?: any[] }> = ({ interviews }) => {
+  const [completedMap, setCompletedMap] = useState<Record<string, boolean>>({});
+
+  const colorVariants = [
+    'border-l-4 border-l-blue-600',
+    'border-l-4 border-l-[#FF5D8F]',
+    'border-l-4 border-l-emerald-500',
+    'border-l-4 border-l-amber-500',
+  ];
+
+  const formatInterviewTime = (scheduledTime?: string) => {
+    if (!scheduledTime) return 'Scheduled Today';
+    try {
+      const d = new Date(scheduledTime);
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return scheduledTime;
+    }
+  };
+
+  const tasks: TaskItem[] = (interviews || []).map((item, idx) => {
+    const id = item._id || item.id || `task-${idx}`;
+    const candidateObj = typeof item.candidate === 'object' && item.candidate !== null ? item.candidate : item.candidateId;
+    const candidateName = candidateObj?.name || candidateObj?.firstName || 'Candidate';
+    const interviewTitle = item.title || item.job?.title || 'Technical Assessment Round';
+    const time = formatInterviewTime(item.scheduledTime);
+    const meetingId = item.meetingId || item._id;
+
+    return {
+      id,
+      interviewTitle,
+      candidateName,
+      time,
+      meetingId,
+      color: colorVariants[idx % colorVariants.length],
+      done: completedMap[id] !== undefined ? completedMap[id] : item.status === 'Completed',
+    };
+  });
+
+  const toggleDone = (id: string) => {
+    setCompletedMap(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   return (
     <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between h-full">
@@ -220,60 +307,77 @@ export const MyTaskScheduleList: React.FC = () => {
             <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
               My Task
             </h3>
-            <button className="px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 flex items-center gap-1.5 shadow-2xs">
+            <span className="px-2.5 py-0.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 flex items-center gap-1.5 shadow-2xs">
               <span>Today</span>
-              <ChevronRight size={12} className="rotate-90 text-slate-400" />
-            </button>
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300">
-              <Calendar size={13} className="text-slate-400" />
-              <span>Feb 18 – Nov 18</span>
-            </div>
+            </span>
           </div>
           <button
-            onClick={() => window.location.href = '#/recruiter/schedule'}
+            onClick={() => (window.location.href = '#/recruiter/schedule')}
             className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-black text-slate-800 dark:text-slate-200 hover:bg-slate-50 flex items-center gap-1 shadow-2xs cursor-pointer"
           >
             + ADD TASK
           </button>
         </div>
 
-        <div className="space-y-2.5">
-          {tasks.map(t => (
-            <div
-              key={t.id}
-              onClick={() => setTasks(prev => prev.map(item => item.id === t.id ? { ...item, done: !item.done } : item))}
-              className={`p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/80 ${t.color} flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-100/60 dark:hover:bg-slate-850/60 transition-colors`}
+        {tasks.length === 0 ? (
+          <div className="py-8 px-4 text-center rounded-2xl bg-slate-50/60 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 space-y-2">
+            <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              No live interview tasks scheduled for today
+            </p>
+            <p className="text-[11px] text-slate-400">
+              All candidate evaluations are up to date.
+            </p>
+            <button
+              onClick={() => (window.location.href = '#/recruiter/schedule')}
+              className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline pt-1 cursor-pointer"
             >
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold whitespace-nowrap min-w-[125px]">
-                  <Clock size={12} />
-                  <span>{t.time || t.scheduledTime}</span>
+              Open Interview Scheduler <ChevronRight size={13} />
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            {tasks.map(t => (
+              <div
+                key={t.id}
+                onClick={() => toggleDone(t.id)}
+                className={`p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/80 ${t.color} flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-100/60 dark:hover:bg-slate-850/60 transition-colors`}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold whitespace-nowrap min-w-[90px]">
+                    <Clock size={12} />
+                    <span>{t.time}</span>
+                  </div>
+                  <div className="truncate">
+                    <p className={`text-xs font-bold truncate ${t.done ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200'}`}>
+                      {t.interviewTitle}
+                    </p>
+                    <p className="text-[10px] text-slate-500 truncate">
+                      {t.candidateName}
+                    </p>
+                  </div>
                 </div>
-                <div className="truncate">
-                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
-                    {t.interviewTitle}
-                  </p>
-                  <p className="text-[10px] text-slate-500 truncate">
-                    {t.candidate?.name}
-                  </p>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {t.meetingId && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.location.href = `#/interview/room/${t.meetingId}`;
+                      }}
+                      className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-blue-600 hover:bg-blue-500 text-white shadow-xs transition cursor-pointer"
+                    >
+                      Join Room
+                    </button>
+                  )}
+                  <CheckCircle2
+                    size={16}
+                    className={t.done ? 'text-emerald-500 flex-shrink-0' : 'text-slate-300 dark:text-slate-600 flex-shrink-0'}
+                  />
                 </div>
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.location.href = `#/interview/room/${t.id}`;
-                  }}
-                  className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-blue-600 hover:bg-blue-500 text-white shadow-xs transition cursor-pointer"
-                >
-                  Join Room
-                </button>
-                <CheckCircle2 size={16} className={t.done ? 'text-slate-700 dark:text-slate-300 flex-shrink-0' : 'text-slate-300 flex-shrink-0'} />
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -83,7 +83,51 @@ export const TALENT_PIPELINE_MATRIX_ROWS = [
   },
 ];
 
-export const HiringMatrixGrid: React.FC = () => {
+export interface HiringMatrixGridProps {
+  jobs?: any[];
+  applications?: any[];
+}
+
+export const HiringMatrixGrid: React.FC<HiringMatrixGridProps> = ({ jobs, applications }) => {
+  // If jobs is explicitly provided, compute real dynamic rows from jobs and applications
+  const rows = React.useMemo(() => {
+    if (jobs === undefined) {
+      return TALENT_PIPELINE_MATRIX_ROWS;
+    }
+    if (!jobs || jobs.length === 0) {
+      return [];
+    }
+
+    const appList = applications || [];
+    return jobs.slice(0, 6).map((job: any) => {
+      const jobApps = appList.filter((a: any) => {
+        const aJobId = a.job?._id || a.job;
+        return aJobId && aJobId.toString() === job._id?.toString();
+      });
+
+      const appliedCount = jobApps.filter((a: any) => a.status === 'Applied').length;
+      const screeningCount = jobApps.filter((a: any) => a.status === 'Screening').length;
+      const interviewCount = jobApps.filter((a: any) => a.status === 'Interview').length;
+      const testCount = jobApps.filter((a: any) => a.status === 'Assessment' || a.status === 'Shortlisted').length;
+      const hiredCount = jobApps.filter((a: any) => a.status === 'Offer' || a.status === 'Hired').length;
+
+      return {
+        jobTitle: job.title || 'Technical Role',
+        totalApplications: jobApps.length,
+        newApplied: appliedCount > 0 ? `${appliedCount} Candidates` : null,
+        appliedColor: 'bg-[#FFE4E6] text-[#BE123C] dark:bg-rose-950/60 dark:text-rose-300',
+        screening: screeningCount > 0 ? `${screeningCount} Candidates` : null,
+        screeningColor: 'bg-[#EDE9FE] text-[#6D28D9] dark:bg-purple-950/60 dark:text-purple-300',
+        interview: interviewCount > 0 ? `${interviewCount} Candidates` : null,
+        interviewColor: 'bg-[#FBCFE8] text-[#9D174D] dark:bg-pink-950/60 dark:text-pink-300',
+        test: testCount > 0 ? `${testCount} In Test` : null,
+        testColor: 'bg-[#FEF08A] text-[#854D0E] dark:bg-amber-950/60 dark:text-amber-300',
+        hired: hiredCount > 0 ? `${hiredCount} Hired` : null,
+        hiredColor: 'bg-[#DCFCE7] text-[#15803D] dark:bg-emerald-950/60 dark:text-emerald-300',
+      };
+    });
+  }, [jobs, applications]);
+
   return (
     <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
@@ -117,59 +161,67 @@ export const HiringMatrixGrid: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
-            {TALENT_PIPELINE_MATRIX_ROWS.map(row => (
-              <tr key={row.jobTitle} className="hover:bg-slate-50/70 dark:hover:bg-slate-850/40 transition-colors">
-                <td className="py-3.5 pr-4 font-bold text-slate-900 dark:text-white min-w-[170px]">
-                  <div className="font-bold text-xs">{row.jobTitle}</div>
-                  <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider">TOTAL CANDIDATES {row.totalApplications}</span>
-                </td>
-                <td className="py-3.5 px-3 text-center min-w-[120px]">
-                  {row.newApplied ? (
-                    <span className={`inline-block px-3 py-1.5 rounded-xl font-bold text-xs shadow-2xs ${row.appliedColor}`}>
-                      {row.newApplied}
-                    </span>
-                  ) : (
-                    <div className="h-7 w-20 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 mx-auto" />
-                  )}
-                </td>
-                <td className="py-3.5 px-3 text-center min-w-[120px]">
-                  {row.screening ? (
-                    <span className={`inline-block px-3 py-1.5 rounded-xl font-bold text-xs shadow-2xs ${row.screeningColor}`}>
-                      {row.screening}
-                    </span>
-                  ) : (
-                    <div className="h-7 w-20 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 mx-auto" />
-                  )}
-                </td>
-                <td className="py-3.5 px-3 text-center min-w-[120px]">
-                  {row.interview ? (
-                    <span className={`inline-block px-3 py-1.5 rounded-xl font-bold text-xs shadow-2xs ${row.interviewColor}`}>
-                      {row.interview}
-                    </span>
-                  ) : (
-                    <div className="h-7 w-20 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 mx-auto" />
-                  )}
-                </td>
-                <td className="py-3.5 px-3 text-center min-w-[100px]">
-                  {row.test ? (
-                    <span className={`inline-block px-3 py-1.5 rounded-xl font-bold text-xs shadow-2xs ${row.testColor}`}>
-                      {row.test}
-                    </span>
-                  ) : (
-                    <div className="h-7 w-20 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 mx-auto" />
-                  )}
-                </td>
-                <td className="py-3.5 pl-3 text-center min-w-[100px]">
-                  {row.hired ? (
-                    <span className={`inline-block px-3 py-1.5 rounded-xl font-bold text-xs shadow-2xs ${row.hiredColor}`}>
-                      {row.hired}
-                    </span>
-                  ) : (
-                    <div className="h-7 w-20 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 mx-auto" />
-                  )}
+            {rows.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="py-8 text-center text-slate-400 dark:text-neutral-500 font-medium">
+                  No active job requisitions. Post a new job to start tracking candidate pipeline stages.
                 </td>
               </tr>
-            ))}
+            ) : (
+              rows.map((row: any) => (
+                <tr key={row.jobTitle} className="hover:bg-slate-50/70 dark:hover:bg-slate-850/40 transition-colors">
+                  <td className="py-3.5 pr-4 font-bold text-slate-900 dark:text-white min-w-[170px]">
+                    <div className="font-bold text-xs">{row.jobTitle}</div>
+                    <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider">TOTAL CANDIDATES {row.totalApplications}</span>
+                  </td>
+                  <td className="py-3.5 px-3 text-center min-w-[120px]">
+                    {row.newApplied ? (
+                      <span className={`inline-block px-3 py-1.5 rounded-xl font-bold text-xs shadow-2xs ${row.appliedColor}`}>
+                        {row.newApplied}
+                      </span>
+                    ) : (
+                      <div className="h-7 w-20 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 mx-auto" />
+                    )}
+                  </td>
+                  <td className="py-3.5 px-3 text-center min-w-[120px]">
+                    {row.screening ? (
+                      <span className={`inline-block px-3 py-1.5 rounded-xl font-bold text-xs shadow-2xs ${row.screeningColor}`}>
+                        {row.screening}
+                      </span>
+                    ) : (
+                      <div className="h-7 w-20 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 mx-auto" />
+                    )}
+                  </td>
+                  <td className="py-3.5 px-3 text-center min-w-[120px]">
+                    {row.interview ? (
+                      <span className={`inline-block px-3 py-1.5 rounded-xl font-bold text-xs shadow-2xs ${row.interviewColor}`}>
+                        {row.interview}
+                      </span>
+                    ) : (
+                      <div className="h-7 w-20 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 mx-auto" />
+                    )}
+                  </td>
+                  <td className="py-3.5 px-3 text-center min-w-[100px]">
+                    {row.test ? (
+                      <span className={`inline-block px-3 py-1.5 rounded-xl font-bold text-xs shadow-2xs ${row.testColor}`}>
+                        {row.test}
+                      </span>
+                    ) : (
+                      <div className="h-7 w-20 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 mx-auto" />
+                    )}
+                  </td>
+                  <td className="py-3.5 pl-3 text-center min-w-[100px]">
+                    {row.hired ? (
+                      <span className={`inline-block px-3 py-1.5 rounded-xl font-bold text-xs shadow-2xs ${row.hiredColor}`}>
+                        {row.hired}
+                      </span>
+                    ) : (
+                      <div className="h-7 w-20 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 mx-auto" />
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

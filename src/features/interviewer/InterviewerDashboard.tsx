@@ -84,21 +84,21 @@ export const InterviewerDashboard: React.FC = () => {
                 />
                 <MetricStatCard
                     label="Interviewer Rating"
-                    value="5.0"
-                    trend="★ 100% positive"
+                    value={(user as any)?.rating ? Number((user as any).rating).toFixed(1) : (user as any)?.averageRating ? Number((user as any).averageRating).toFixed(1) : '5.0'}
+                    trend="Client feedback avg"
                     positive={true}
                     colorVariant="blue"
                     icon={Star}
-                    subtext="Client feedback avg"
+                    subtext="Verified rubric evaluations"
                 />
                 <MetricStatCard
                     label="Punctuality Score"
-                    value="99.4%"
-                    trend="Gold status"
+                    value={interviews.length > 0 ? `${Math.min(100, Math.round((completedCount / interviews.length) * 100))}%` : '100%'}
+                    trend={completedCount > 0 ? `${completedCount} sessions completed` : 'Awaiting sessions'}
                     positive={true}
                     colorVariant="white"
                     icon={TrendingUp}
-                    subtext="On-time attendance"
+                    subtext="Session completion rate"
                 />
             </div>
 

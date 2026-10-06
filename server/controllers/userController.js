@@ -4,6 +4,7 @@
  */
 
 const mongoose = require('mongoose');
+const fs = require('fs');
 const User = require('../models/User');
 const Profile = require('../models/Profile');
 const Organization = require('../models/Organization');
@@ -14,8 +15,27 @@ const Organization = require('../models/Organization');
 exports.getProfile = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
-    const user = await User.findById(userId).select('-password').populate('profile');
+    let user = await User.findById(userId).select('-password').populate('profile');
     if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (!user.profile) {
+      let profileDoc = await Profile.findOne({ user: user._id });
+      if (!profileDoc) {
+        profileDoc = new Profile({ user: user._id, resume: user.resumeUrl || '' });
+        await profileDoc.save();
+      }
+      user.profile = profileDoc;
+      await User.findByIdAndUpdate(user._id, { $set: { profile: profileDoc._id } });
+    } else {
+      if (user.resumeUrl && !user.profile.resume) {
+        user.profile.resume = user.resumeUrl;
+        await Profile.findByIdAndUpdate(user.profile._id, { $set: { resume: user.resumeUrl } });
+      } else if (!user.resumeUrl && user.profile.resume) {
+        user.resumeUrl = user.profile.resume;
+        await User.findByIdAndUpdate(user._id, { $set: { resumeUrl: user.profile.resume } });
+      }
+    }
+
     res.json(user);
   } catch (error) {
     console.error('[UserController][getProfile] Error:', error.message);
@@ -57,13 +77,22 @@ exports.updateProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // 2. Update Profile Fields (auto-create if missing)
-    let profileId = user.profile ? user.profile._id : null;
+    // 2. Update Profile Fields (auto-create/link safely if missing)
+    let profileId = user.profile ? (user.profile._id || user.profile) : null;
+    let existingProfile = null;
 
-    if (!profileId) {
-      const newProfile = new Profile({ user: user._id });
-      await newProfile.save();
-      profileId = newProfile._id;
+    if (profileId) {
+      existingProfile = await Profile.findById(profileId);
+    }
+    if (!existingProfile) {
+      existingProfile = await Profile.findOne({ user: user._id });
+    }
+    if (!existingProfile) {
+      existingProfile = new Profile({ user: user._id, resume: resume || user.resumeUrl || '' });
+      await existingProfile.save();
+    }
+    profileId = existingProfile._id;
+    if (!user.profile || user.profile.toString() !== profileId.toString()) {
       await User.findByIdAndUpdate(user._id, { $set: { profile: profileId } }, { runValidators: false });
     }
 
@@ -73,7 +102,10 @@ exports.updateProfile = async (req, res) => {
     if (skills !== undefined) profileUpdate.skills = skills;
     if (experience !== undefined) profileUpdate.experience = experience;
     if (education !== undefined) profileUpdate.education = education;
-    if (resume !== undefined) profileUpdate.resume = resume;
+    if (resume !== undefined) {
+      profileUpdate.resume = resume;
+      await User.findByIdAndUpdate(user._id, { $set: { resumeUrl: resume } });
+    }
     if (hourlyRate !== undefined) profileUpdate.hourlyRate = hourlyRate;
     if (yearsOfExperience !== undefined) profileUpdate.yearsOfExperience = yearsOfExperience;
     if (availability !== undefined) profileUpdate.availability = availability;
@@ -227,13 +259,119 @@ exports.uploadResume = async (req, res) => {
 
     const resumeUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
-    const user = await User.findByIdAndUpdate(req.user.id, { resumeUrl }, { new: true });
-
-    if (user && user.profile) {
-      await Profile.findByIdAndUpdate(user.profile, { resume: resumeUrl });
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json({ resumeUrl });
+    user.resumeUrl = resumeUrl;
+
+    let profileId = user.profile ? (user.profile._id || user.profile) : null;
+    let profile = null;
+    if (profileId) {
+      profile = await Profile.findById(profileId);
+    }
+    if (!profile) {
+      profile = await Profile.findOne({ user: user._id });
+    }
+    if (!profile) {
+      profile = new Profile({ user: user._id, resume: resumeUrl });
+      await profile.save();
+      user.profile = profile._id;
+    } else {
+      profile.resume = resumeUrl;
+      await profile.save();
+      if (!user.profile) {
+        user.profile = profile._id;
+      }
+    }
+    await user.save();
+
+    // Optional: Attempt AI CV parse if AI service is online
+    let parsedData = null;
+    try {
+      const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8002';
+      const fetch = require('node-fetch');
+      const FormData = require('form-data');
+
+      if (fs.existsSync(req.file.path)) {
+        const fileBuffer = await fs.promises.readFile(req.file.path);
+        const form = new FormData();
+        form.append('file', fileBuffer, {
+          filename: req.file.originalname || 'resume.pdf',
+          contentType: 'application/pdf',
+        });
+        form.append('job_description', '');
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+        const aiRes = await fetch(`${AI_SERVICE_URL}/api/ai/parse-cv`, {
+          method: 'POST',
+          body: form,
+          headers: form.getHeaders(),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+
+        if (aiRes.ok) {
+          parsedData = await aiRes.json();
+          if (parsedData?.skills && parsedData.skills.length > 0 && profile) {
+            const mergedSkills = Array.from(new Set([...(profile.skills || []), ...parsedData.skills]));
+            profile.skills = mergedSkills;
+            await profile.save();
+            user.skills = mergedSkills;
+            await user.save();
+          }
+        }
+      }
+    } catch (aiErr) {
+      console.log('[UserController][uploadResume] AI service optional parse note:', aiErr.message);
+    }
+
+    // Fallback: If AI service was unavailable, extract skills from PDF content locally
+    if (!parsedData && req.file && fs.existsSync(req.file.path)) {
+      try {
+        const fileBuffer = await fs.promises.readFile(req.file.path);
+        const rawContent = fileBuffer.toString('latin1');
+        const COMMON_SKILLS = [
+          'JavaScript', 'TypeScript', 'Python', 'React', 'Node.js', 'Express',
+          'MongoDB', 'SQL', 'PostgreSQL', 'Docker', 'Kubernetes', 'AWS',
+          'Git', 'HTML', 'CSS', 'Redux', 'GraphQL', 'Next.js', 'Vue', 'Angular',
+          'Java', 'C++', 'C#', 'Go', 'Rust', 'Tailwind', 'REST', 'Linux'
+        ];
+        const extracted = COMMON_SKILLS.filter(skill => {
+          const escaped = skill.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+          return new RegExp(`\\b${escaped}\\b`, 'i').test(rawContent);
+        });
+        if (extracted.length > 0) {
+          parsedData = { skills: extracted };
+          if (profile) {
+            const mergedSkills = Array.from(new Set([...(profile.skills || []), ...extracted]));
+            profile.skills = mergedSkills;
+            await profile.save();
+            user.skills = mergedSkills;
+            await user.save();
+          }
+        }
+      } catch (localExtractErr) {
+        console.warn('[UserController][uploadResume] Local fallback parse note:', localExtractErr.message);
+      }
+    }
+
+    res.json({
+      resumeUrl,
+      parsedData,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        resumeUrl: user.resumeUrl,
+        skills: user.skills,
+        profile,
+      }
+    });
   } catch (error) {
     console.error('[UserController][uploadResume] Error:', error.message);
     res.status(500).json({ message: 'Server Error' });

@@ -98,7 +98,18 @@ export const CodingAssessment: React.FC = () => {
     socketRef.current = socket;
 
     socket.on('connect', () => {
-      socket.emit('join-room', { interviewId: activeId, isRecruiter: false });
+      socket.emit('join-room', {
+        interviewId: activeId,
+        roomId: activeId,
+        roomType: 'coding',
+        isRecruiter: false,
+      });
+    });
+
+    socket.on('code-change', ({ code: incomingCode }: any) => {
+      if (incomingCode !== undefined) {
+        setCode(incomingCode);
+      }
     });
 
     return () => {

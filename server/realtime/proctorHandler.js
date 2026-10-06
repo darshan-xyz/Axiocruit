@@ -8,7 +8,11 @@ const PROCTOR_THROTTLE_MS = 3000;
 const registerProctorHandlers = (io, socket, proctorThrottles) => {
   // Relay candidate proctor events to recruiters/interviewers
   socket.on('proctor-event', (eventData) => {
-    const interviewId = socket.currentRoom;
+    if (!eventData || typeof eventData !== 'object') {
+      return;
+    }
+
+    const interviewId = eventData.roomId || eventData.meetingId || eventData.interviewId || socket.currentRoom;
     if (!interviewId) {
       return;
     }
@@ -36,7 +40,8 @@ const registerProctorHandlers = (io, socket, proctorThrottles) => {
   });
 
   socket.on('proctor-status-toggle', (data) => {
-    const interviewId = socket.currentRoom;
+    if (!data) return;
+    const interviewId = data?.roomId || data?.meetingId || data?.interviewId || socket.currentRoom;
     if (interviewId) {
       socket.to(interviewId).emit('proctor-status-updated', data);
     }

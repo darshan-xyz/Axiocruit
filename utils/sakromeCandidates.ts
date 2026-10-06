@@ -683,18 +683,18 @@ export const getStageMeta = (status?: string): StageMeta => {
 
 export const normalizeToSakromeCandidate = (app: any): SakromeCandidate => {
   if (!app) return SAKROME_SARAH_MILLER;
-  if (app.candidate?.department && app.appliedDateFormatted && app.candidate?.name) {
+  if (app.candidate?.department && app.appliedDateFormatted && app.candidate?.name && !app._id?.startsWith?.('cand-')) {
     return app as SakromeCandidate;
   }
   const candUser = app.candidate || {};
   const profile = candUser.profile || {};
-  const headline = candUser.headline || profile.headline || 'Senior Specialist';
-  const deptMeta = getDepartmentMeta(candUser.department || profile.department || headline);
+  const headline = candUser.headline || profile.headline || 'Applicant';
+  const deptMeta = getDepartmentMeta(candUser.department || profile.department || headline || app.job?.department);
   
   const score = typeof app.aiScore === 'number' ? app.aiScore : (app.aiScore ? Number(app.aiScore) : null);
-  const matchLabel = score !== null ? (score >= 80 ? 'Strong match' : score >= 60 ? 'Good match' : 'Review fit') : 'Evaluating';
+  const matchLabel = score !== null ? (score >= 80 ? 'Strong match' : score >= 60 ? 'Good match' : 'Fair match') : 'Evaluating';
 
-  let appliedDateStr = '14 Sep 2026';
+  let appliedDateStr = '';
   if (app.appliedDateFormatted) {
     appliedDateStr = app.appliedDateFormatted;
   } else if (app.appliedAt) {
@@ -703,71 +703,68 @@ export const normalizeToSakromeCandidate = (app: any): SakromeCandidate => {
       appliedDateStr = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     }
   }
+  if (!appliedDateStr) {
+    appliedDateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  const rawExp = app.experience?.length ? app.experience : (profile.experience?.length ? profile.experience : (candUser.experience || []));
+  const mappedExp = (rawExp || []).map((e: any) => ({
+    role: e.role || e.designation || headline || 'Role',
+    company: e.company || 'Organization',
+    period: e.period || (e.from ? `${e.from} – ${e.to || 'Present'}` : ''),
+    description: e.description || e.work || ''
+  }));
+
+  const rawEdu = app.education?.length ? app.education : (profile.education?.length ? profile.education : (candUser.education || []));
+  const mappedEdu = (rawEdu || []).map((e: any) => ({
+    degree: e.degree || (e.fieldOfStudy ? `${e.fieldOfStudy} Degree` : 'Degree'),
+    institution: e.institution || 'University',
+    year: e.year || (e.from ? `${e.from} – ${e.to || 'Present'}` : '')
+  }));
+
+  const realResumeUrl = app.resumeUrl || app.resume || candUser.resumeUrl || profile.resume || '';
+
+  const mappedFiles: SakromeFile[] = realResumeUrl ? [
+    {
+      name: `${(candUser.name || 'Candidate').replace(/\s+/g, '_')}_Resume.pdf`,
+      size: '1.2 MB',
+      type: 'PDF Document',
+      url: realResumeUrl
+    }
+  ] : [];
 
   return {
     _id: app._id || ('cand-' + (candUser._id || 'generic')),
     candidate: {
       _id: candUser._id || 'user-generic',
-      name: candUser.name || 'Candidate',
-      email: candUser.email || 'candidate@axiocruit.enterprise',
+      name: candUser.name || 'Applicant',
+      email: candUser.email || '',
       headline: headline,
       department: deptMeta.name,
-      location: candUser.location || profile.location || 'San Francisco, CA',
-      yearsOfExperience: candUser.yearsOfExperience || profile.yearsOfExperience || 5,
-      phone: candUser.phone || profile.phone || '+1 (415) 555-0134',
+      location: candUser.location || profile.location || 'Remote',
+      yearsOfExperience: candUser.yearsOfExperience || (profile.yearsOfExperience ? parseInt(profile.yearsOfExperience) : 0) || mappedExp.length || 1,
+      phone: candUser.phone || profile.phone || '',
       profilePicture: candUser.profilePicture || profile.profilePicture || '',
-      availability: candUser.availability || profile.availability || 'Available in 2 weeks',
-      salaryExpected: candUser.salaryExpected || profile.salaryExpected || ' - ',
+      availability: candUser.availability || (Array.isArray(profile.availability) ? profile.availability.join(', ') : profile.availability) || 'Available',
+      salaryExpected: candUser.salaryExpected || profile.salaryExpected || (profile.hourlyRate ? `$${profile.hourlyRate}/hr` : ''),
       source: candUser.source || 'Direct Application',
-      bio: candUser.bio || profile.bio || 'Experienced professional with demonstrated track record of project execution and team leadership.',
-      skills: app.skills && app.skills.length ? app.skills : (profile.skills || candUser.skills || ['Figma', 'TypeScript', 'React']),
-      experience: app.experience && app.experience.length ? app.experience : (profile.experience || candUser.experience || [
-        {
-          role: headline,
-          company: 'Technology Corp',
-          period: '2022 – Present',
-          description: 'Key technical contributor delivering core platform features.'
-        }
-      ]),
-      education: app.education && app.education.length ? app.education : (profile.education || candUser.education || [
-        {
-          degree: 'B.S. Computer Science',
-          institution: 'University of Science & Technology',
-          year: '2016 – 2020'
-        }
-      ]),
-      notes: app.notes || candUser.notes || [
-        {
-          id: 'note-default-1',
-          author: 'Lead Recruiter',
-          date: appliedDateStr,
-          content: 'Application received and screened for technical and cultural fit.'
-        }
-      ],
-      files: app.files || candUser.files || [
-        {
-          name: ((candUser.name || 'Candidate').replace(/\\s+/g, '_') + '_Resume.pdf'),
-          size: '1.2 MB',
-          type: 'PDF Document',
-          url: app.resume || app.resumeUrl || '#'
-        }
-      ]
+      bio: candUser.bio || profile.bio || 'Applicant profile in review.',
+      skills: app.skills && app.skills.length ? app.skills : (profile.skills && profile.skills.length ? profile.skills : (candUser.skills || [])),
+      experience: mappedExp,
+      education: mappedEdu,
+      notes: app.notes || candUser.notes || [],
+      files: app.files || candUser.files || mappedFiles
     },
     aiScore: score,
     matchLabel,
-    matchedKeywords: app.matchedKeywords || ['Core Competencies', 'System Design'],
+    matchedKeywords: app.matchedKeywords || [],
     missingKeywords: app.missingKeywords || [],
-    status: app.status || 'Screening',
+    status: app.status || 'Applied',
     appliedAt: app.appliedAt || new Date().toISOString(),
     appliedDateFormatted: appliedDateStr,
-    aiSummary: app.aiSummary || 'Strong relevant background matching core role requirements with verified candidate profile credentials.',
-    nextInterviewSlot: app.nextInterviewSlot || (app.status === 'Interview' ? {
-      date: 'Tomorrow, 15 Sep 2026',
-      time: '10:30 AM – 11:15 AM EST',
-      interviewer: 'Kevin Nunez',
-      roomLink: ('#/interview/room/' + (app._id || 'session-1'))
-    } : undefined),
-    resumeUrl: app.resume || app.resumeUrl || '#',
-    jobTitle: app.job && app.job.title ? app.job.title : app.jobTitle
+    aiSummary: app.aiSummary || (score !== null ? `Evaluated applicant with AI match score of ${score}%.` : 'Pending evaluation.'),
+    nextInterviewSlot: app.nextInterviewSlot || undefined,
+    resumeUrl: realResumeUrl,
+    jobTitle: app.job?.title || app.jobTitle || ''
   };
 };

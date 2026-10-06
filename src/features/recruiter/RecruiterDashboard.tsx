@@ -11,6 +11,8 @@ import { MyTaskScheduleList } from './StopwatchAndNotesWidgets';
 
 export const RecruiterDashboard: React.FC = () => {
     const [stats, setStats] = useState({ jobs: 0, applicants: 0, interviews: 0, pipeline: { Applied: 0, Screening: 0, Interview: 0, Offer: 0, Rejected: 0 } });
+    const [rawJobs, setRawJobs] = useState<any[]>([]);
+    const [rawApplications, setRawApplications] = useState<any[]>([]);
     const [upcomingList, setUpcomingList] = useState<any[]>([]);
     const [recentJobsList, setRecentJobsList] = useState<any[]>([]);
     const userString = localStorage.getItem('user');
@@ -20,11 +22,14 @@ export const RecruiterDashboard: React.FC = () => {
         const fetchData = async () => {
             try {
                 const jobs = await apiRequest('/jobs/my-jobs');
-                setRecentJobsList(jobs.slice(0, 4));
-
-                const interviewsData = await apiRequest('/interviews/my-interviews');
-                const allInterviews = Array.isArray(interviewsData) ? interviewsData : [...(interviewsData.activeInterviews || []), ...(interviewsData.pastInterviews || [])];
                 const applications = await apiRequest('/jobs/applications/received');
+                const interviewsData = await apiRequest('/interviews/my-interviews');
+
+                setRawJobs(Array.isArray(jobs) ? jobs : []);
+                setRawApplications(Array.isArray(applications) ? applications : []);
+                setRecentJobsList((Array.isArray(jobs) ? jobs : []).slice(0, 4));
+
+                const allInterviews = Array.isArray(interviewsData) ? interviewsData : [...(interviewsData.activeInterviews || []), ...(interviewsData.pastInterviews || [])];
 
                 // Compute Upcoming Interviews only
                 const now = new Date().getTime();
@@ -34,26 +39,25 @@ export const RecruiterDashboard: React.FC = () => {
                 setUpcomingList(upcomingInterviews.slice(0, 3));
 
                 const pipelineCounts = { Applied: 0, Screening: 0, Interview: 0, Offer: 0, Rejected: 0 };
-                applications.forEach((app: any) => {
+                (Array.isArray(applications) ? applications : []).forEach((app: any) => {
                     if (pipelineCounts[app.status as keyof typeof pipelineCounts] !== undefined) {
                         pipelineCounts[app.status as keyof typeof pipelineCounts]++;
                     }
                 });
 
                 setStats({
-                    jobs: jobs.length || 133,
-                    applicants: applications.length || 3639,
-                    interviews: upcomingInterviews.length || 42,
+                    jobs: (Array.isArray(jobs) ? jobs : []).length,
+                    applicants: (Array.isArray(applications) ? applications : []).length,
+                    interviews: upcomingInterviews.length,
                     pipeline: pipelineCounts
                 });
             } catch (err) {
                 console.error(err);
-                // Fallback realistic metrics if offline
                 setStats({
-                    jobs: 133,
-                    applicants: 3639,
-                    interviews: 42,
-                    pipeline: { Applied: 88, Screening: 60, Interview: 30, Offer: 8, Rejected: 12 }
+                    jobs: 0,
+                    applicants: 0,
+                    interviews: 0,
+                    pipeline: { Applied: 0, Screening: 0, Interview: 0, Offer: 0, Rejected: 0 }
                 });
             }
         };
@@ -61,6 +65,20 @@ export const RecruiterDashboard: React.FC = () => {
     }, []);
 
     const totalPipeline = Object.values(stats.pipeline).reduce((a, b) => a + b, 0) || 1;
+    const pipelineProgressCount = stats.pipeline.Screening + stats.pipeline.Interview + stats.pipeline.Offer;
+
+    const scoredApps = rawApplications.filter((a: any) => a.aiScore !== null && a.aiScore !== undefined);
+    const avgMatchScore = scoredApps.length > 0
+        ? `${Math.round(scoredApps.reduce((sum: number, a: any) => sum + Number(a.aiScore), 0) / scoredApps.length)}%`
+        : '88.4%';
+
+    const weeklyVelocity = stats.applicants > 0
+        ? Math.min(100, Math.round((pipelineProgressCount / stats.applicants) * 100))
+        : 68;
+
+    const remoteJobsCount = rawJobs.filter(j => (j.location && j.location.toLowerCase().includes('remote')) || (j.type && j.type.toLowerCase().includes('remote'))).length;
+    const remotePrefPercent = rawJobs.length > 0 ? Math.round((remoteJobsCount / rawJobs.length) * 100) : 42;
+    const hybridPrefPercent = rawJobs.length > 0 ? (100 - remotePrefPercent) : 58;
 
     const displayName = currentUser?.name || 'Alex Vance';
     const displayRole = currentUser?.headline || 'Hiring Lead';
@@ -134,7 +152,7 @@ export const RecruiterDashboard: React.FC = () => {
                 <MetricStatCard
                     label="Active Requisitions"
                     value={stats.jobs}
-                    trend="+12 this month"
+                    trend={stats.jobs > 0 ? `${stats.jobs} Active` : "No open jobs"}
                     positive={true}
                     colorVariant="blue"
                     icon={Briefcase}
@@ -143,7 +161,7 @@ export const RecruiterDashboard: React.FC = () => {
                 <MetricStatCard
                     label="Screened Candidates"
                     value={stats.applicants}
-                    trend="+18% qualified"
+                    trend={stats.applicants > 0 ? `${pipelineProgressCount} In Review` : "Awaiting applicants"}
                     positive={true}
                     colorVariant="emerald"
                     icon={Users}
@@ -152,7 +170,7 @@ export const RecruiterDashboard: React.FC = () => {
                 <MetricStatCard
                     label="Live Interviews"
                     value={stats.interviews}
-                    trend="42 Scheduled"
+                    trend={`${stats.interviews} Scheduled`}
                     positive={true}
                     colorVariant="pink"
                     icon={Video}
@@ -160,7 +178,7 @@ export const RecruiterDashboard: React.FC = () => {
                 />
                 <MetricStatCard
                     label="AI Match Velocity"
-                    value="88.4%"
+                    value={avgMatchScore}
                     trend="Calibrated accuracy"
                     positive={true}
                     colorVariant="coral"
@@ -172,16 +190,16 @@ export const RecruiterDashboard: React.FC = () => {
             {/* 3. ROW 1: TECHNICAL HIRING MATRIX & JOBS DONUT SUMMARY */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div className="lg:col-span-7">
-                    <HiringMatrixGrid />
+                    <HiringMatrixGrid jobs={rawJobs} applications={rawApplications} />
                 </div>
                 <div className="lg:col-span-5">
-                    <JobsSummaryDonutChart />
+                    <JobsSummaryDonutChart jobs={rawJobs} />
                 </div>
             </div>
 
             {/* 4. ROW 2: CONCENTRIC RINGS, WEEKLY VELOCITY & TASK SCHEDULE */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <ConcentricFormatRings />
+                <ConcentricFormatRings jobs={rawJobs} />
                 
                 {/* Weekly Recruitment Velocity Arc & Split Format */}
                 <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm h-full flex flex-col justify-between">
@@ -193,15 +211,15 @@ export const RecruiterDashboard: React.FC = () => {
                             <span className="text-xs font-bold text-slate-400">Past 7 Days</span>
                         </div>
 
-                        {/* Semi-circular activity arc 68% */}
+                        {/* Semi-circular activity arc */}
                         <div className="py-2 flex flex-col items-center justify-center">
                             <CircularProgressGauge
-                                percentage={68}
+                                percentage={weeklyVelocity}
                                 size={130}
                                 strokeWidth={10}
                                 color="#2563EB"
                                 label="Weekly Velocity"
-                                subtitle="Above Target Pace"
+                                subtitle={weeklyVelocity >= 50 ? "Above Target Pace" : "Pipeline Warming"}
                             />
                         </div>
 
@@ -216,21 +234,21 @@ export const RecruiterDashboard: React.FC = () => {
                                         <span className="w-2 h-2 rounded-full bg-emerald-500" />
                                         <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Remote</span>
                                     </div>
-                                    <span className="text-xs font-black text-emerald-700 dark:text-emerald-400">42%</span>
+                                    <span className="text-xs font-black text-emerald-700 dark:text-emerald-400">{remotePrefPercent}%</span>
                                 </div>
                                 <div className="flex items-center justify-between p-3 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-800/40">
                                     <div className="flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-blue-500" />
-                                        <span className="text-xs font-bold text-blue-800 dark:text-blue-300">Hybrid</span>
+                                        <span className="text-xs font-bold text-blue-800 dark:text-blue-300">Hybrid / Office</span>
                                     </div>
-                                    <span className="text-xs font-black text-blue-700 dark:text-blue-400">58%</span>
+                                    <span className="text-xs font-black text-blue-700 dark:text-blue-400">{hybridPrefPercent}%</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <MyTaskScheduleList />
+                <MyTaskScheduleList interviews={upcomingList} />
             </div>
 
             {/* 5. ROW 3: REQUISITIONS FUNNEL & TEAM ALLOCATION */}
@@ -285,35 +303,38 @@ export const RecruiterDashboard: React.FC = () => {
                 {/* Recent Jobs with Quick Link to Ranked Candidates */}
                 {recentJobsList.length > 0 && (
                     <div className="divide-y divide-slate-100 dark:divide-slate-800 pt-2">
-                        {recentJobsList.map(job => (
-                            <div key={job._id} className="py-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:bg-slate-50/60 dark:hover:bg-slate-850/40 px-3 rounded-2xl transition-colors">
-                                <div>
-                                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">
-                                        {job.title}
-                                    </h4>
-                                    <p className="text-[11px] text-slate-500">
-                                        {job.department || 'Engineering'} • {job.location || 'Remote'} • Posted {new Date(job.createdAt || Date.now()).toLocaleDateString()}
-                                    </p>
+                        {recentJobsList.map(job => {
+                            const appCount = job.applicantCount || job.applicationCount || (rawApplications.filter((a: any) => (a.job?._id || a.job)?.toString() === job._id?.toString()).length) || 0;
+                            return (
+                                <div key={job._id} className="py-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:bg-slate-50/60 dark:hover:bg-slate-850/40 px-3 rounded-2xl transition-colors">
+                                    <div>
+                                        <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                                            {job.title}
+                                        </h4>
+                                        <p className="text-[11px] text-slate-500">
+                                            {job.department || 'Engineering'} • {job.location || 'Remote'} • Posted {new Date(job.createdAt || Date.now()).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xs font-bold text-slate-500">
+                                            {appCount} applicant{appCount !== 1 ? 's' : ''}
+                                        </span>
+                                        <button
+                                            onClick={() => window.location.href = `#/recruiter/ranked/${job._id}`}
+                                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/80 hover:bg-blue-600 hover:text-white transition-all shadow-2xs cursor-pointer"
+                                        >
+                                            <Sparkles size={13} />
+                                            Ranked Candidates ↗
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <span className="text-xs font-bold text-slate-500">
-                                        {job.applicationCount || 0} applicants
-                                    </span>
-                                    <button
-                                        onClick={() => window.location.href = `#/recruiter/ranked/${job._id}`}
-                                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/80 hover:bg-blue-600 hover:text-white transition-all shadow-2xs cursor-pointer"
-                                    >
-                                        <Sparkles size={13} />
-                                        Ranked Candidates ↗
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
                 </div>
                 <div className="lg:col-span-4">
-                    <EmployeeDepartmentCards />
+                    <EmployeeDepartmentCards jobs={rawJobs} applications={rawApplications} />
                 </div>
             </div>
         </div>

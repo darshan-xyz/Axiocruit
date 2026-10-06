@@ -24,7 +24,8 @@ const testSessionSchema = new mongoose.Schema({
     jobId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Job',
-        required: true,
+        required: false,
+        default: null,
     },
     // All question IDs that have already been presented — prevents repeats
     questionsAsked: [

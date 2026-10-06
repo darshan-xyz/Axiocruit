@@ -18,6 +18,8 @@ export const Applicants: React.FC = () => {
     const [scheduleData, setScheduleData] = useState({ date: '', time: '' });
     const [messageData, setMessageData] = useState({ content: '' });
 
+    const [searchQuery, setSearchQuery] = useState('');
+
     const fetchApplications = async () => {
         try {
             const data = await apiRequest('/jobs/applications/received');
@@ -109,6 +111,17 @@ export const Applicants: React.FC = () => {
         };
     };
 
+    const filteredApps = applications.filter((app) => {
+        if (!searchQuery.trim()) return true;
+        const q = searchQuery.toLowerCase();
+        const data = getCandidateData(app);
+        const jobTitle = (app.job?.title || '').toLowerCase();
+        const nameMatch = data.name.toLowerCase().includes(q);
+        const headlineMatch = data.headline.toLowerCase().includes(q);
+        const skillMatch = data.skills?.some((s: string) => s.toLowerCase().includes(q));
+        return nameMatch || headlineMatch || skillMatch || jobTitle.includes(q);
+    });
+
     const nowLocal = new Date();
     const minDateLocal = nowLocal.getFullYear() + '-' + String(nowLocal.getMonth() + 1).padStart(2, '0') + '-' + String(nowLocal.getDate()).padStart(2, '0');
     const minTimeLocal = scheduleData.date === minDateLocal ? String(nowLocal.getHours()).padStart(2, '0') + ':' + String(nowLocal.getMinutes()).padStart(2, '0') : undefined;
@@ -120,14 +133,23 @@ export const Applicants: React.FC = () => {
             <div className="flex gap-4 mb-6">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-2.5 text-neutral-500 w-5 h-5" />
-                    <Input placeholder="Search candidates..." className="pl-10" />
+                    <Input
+                        placeholder="Search candidates by name, headline, skills, or job..."
+                        className="pl-10"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                 </div>
             </div>
 
             {loading ? <p>Loading...</p> : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {applications.length === 0 && <p className="text-neutral-500 col-span-3">No applicants found yet.</p>}
-                    {applications.map((app) => {
+                    {filteredApps.length === 0 && (
+                        <p className="text-neutral-500 col-span-3">
+                            {applications.length === 0 ? 'No applicants found yet.' : 'No candidates match your search.'}
+                        </p>
+                    )}
+                    {filteredApps.map((app) => {
                         const data = getCandidateData(app);
                         const jobTitle = app.job?.title || 'General Application';
                         return (

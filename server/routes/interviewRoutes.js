@@ -17,18 +17,18 @@ const messageController = require('../controllers/messageController');
 router.post(
   '/schedule',
   protect,
-  authorize('RECRUITER', 'INTERVIEWER', 'freelancer', 'ADMIN'),
+  authorize('RECRUITER', 'INTERVIEWER', 'freelancer', 'ADMIN', 'ORGANIZATION', 'ORG_ADMIN'),
   interviewController.scheduleInterview
 );
 
 // My Interviews Listing
 router.get('/my-interviews', protect, interviewController.getMyInterviews);
 
-// Eligible Candidates (Recruiter / Admin only)
+// Eligible Candidates (Recruiter / Admin / Org Admin)
 router.get(
   '/eligible-candidates',
   protect,
-  authorize('RECRUITER', 'ADMIN'),
+  authorize('RECRUITER', 'ADMIN', 'ORGANIZATION', 'ORG_ADMIN'),
   interviewController.getEligibleCandidates
 );
 
@@ -53,7 +53,7 @@ router.patch('/:id/status', protect, interviewController.updateInterviewStatus);
 router.delete(
   '/:id',
   protect,
-  authorize('RECRUITER', 'ADMIN'),
+  authorize('RECRUITER', 'ADMIN', 'ORGANIZATION', 'ORG_ADMIN'),
   interviewController.cancelInterview
 );
 

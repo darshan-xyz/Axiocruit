@@ -16,6 +16,17 @@ export const MyJobs: React.FC = () => {
         }
     }, [isCreatingJob]);
 
+    const toggleJobStatus = async (jobId: string, currentStatus: string) => {
+        const newStatus = currentStatus === 'Active' ? 'Closed' : 'Active';
+        try {
+            await apiRequest(`/jobs/${jobId}`, 'PUT', { status: newStatus });
+            setJobs(prev => prev.map(j => j._id === jobId ? { ...j, status: newStatus } : j));
+        } catch (err) {
+            console.error('Failed to update job status:', err);
+            alert('Failed to update job status');
+        }
+    };
+
     if (loading) return <div>Loading jobs...</div>;
 
     if (isCreatingJob) {
@@ -59,6 +70,14 @@ export const MyJobs: React.FC = () => {
                                 <Badge variant={job.status === 'Active' ? 'completed' : 'outline'}>
                                     {job.status}
                                 </Badge>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                                    onClick={() => toggleJobStatus(job._id, job.status)}
+                                >
+                                    {job.status === 'Active' ? 'Close Job' : 'Reopen'}
+                                </Button>
                                 <Button variant="outline" size="sm" onClick={() => window.location.href = `#/recruiter/ranked/${job._id}`}>
                                     <Sparkles className="w-4 h-4 mr-1.5 text-blue-500" />AI Rankings
                                 </Button>

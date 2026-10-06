@@ -94,6 +94,8 @@ export const App: React.FC = () => {
                   </Route>
 
                   {/* Org Admin Routes */}
+                  <Route path="/org" element={<Navigate to="/organization/dashboard" replace />} />
+                  <Route path="/org/*" element={<Navigate to="/organization/dashboard" replace />} />
                   <Route path="/organization" element={<DashboardLayout role="ORGANIZATION" />}>
                     <Route index element={<Navigate to="dashboard" replace />} />
                     <Route path="dashboard" element={<OrgAdminDashboard />} />
@@ -137,6 +139,7 @@ export const App: React.FC = () => {
                   {/* Interviewer Routes */}
                   <Route path="/interviewer" element={<DashboardLayout role="INTERVIEWER" />}>
                     <Route index element={<InterviewerDashboard />} />
+                    <Route path="dashboard" element={<Navigate to="/interviewer" replace />} />
                     <Route path="gigs" element={<FreelancerGigBoard />} />
                     <Route path="services" element={<FreelancerServiceManager />} />
                     <Route path="projects" element={<DelegatedProjects />} />
