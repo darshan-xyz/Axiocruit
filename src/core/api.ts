@@ -2,14 +2,65 @@ export const API_URL = '/api';
 
 export interface ApiRequestOptions {
   timeoutMs?: number;
+  _isRetry?: boolean;
 }
+
+let refreshPromise: Promise<string | null> | null = null;
+
+/**
+ * Attempts silent token refresh via HTTP-only cookie or fallback bearer/localStorage token.
+ * Deduplicates in-flight calls to prevent concurrent storm on refresh endpoint.
+ */
+export const silentRefreshToken = async (): Promise<string | null> => {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    try {
+      const fallbackRefreshToken = localStorage.getItem('refreshToken');
+      const res = await fetch(`${API_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: fallbackRefreshToken ? JSON.stringify({ refreshToken: fallbackRefreshToken }) : undefined,
+      });
+
+      if (!res.ok) {
+        return null;
+      }
+
+      const data = await res.json();
+      const newToken = data.token || data.accessToken;
+      if (newToken) {
+        localStorage.setItem('token', newToken);
+        if (data.refreshToken) {
+          localStorage.setItem('refreshToken', data.refreshToken);
+        }
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+          if (data.user.role) {
+            localStorage.setItem('role', data.user.role);
+          }
+        }
+        return newToken;
+      }
+      return null;
+    } catch (err) {
+      console.warn('[API] Silent token refresh failed:', err);
+      return null;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+};
 
 export const apiRequest = async (
   endpoint: string,
   method: string = 'GET',
   body?: any,
   options: ApiRequestOptions = {}
-) => {
+): Promise<any> => {
   const token = localStorage.getItem('token');
   const headers: any = {};
 
@@ -33,18 +84,32 @@ export const apiRequest = async (
     const res = await fetch(targetUrl, {
       method,
       headers,
+      credentials: 'include',
       body: body instanceof FormData ? body : (body ? JSON.stringify(body) : undefined),
       signal: controller.signal,
     });
 
     clearTimeout(timeoutId);
 
-    // If unauthorized, clear stale credentials
+    // Silent refresh on 401 Unauthorized
     if (res.status === 401) {
-      console.warn(`[API] 401 Unauthorized encountered on ${normalizedEndpoint}. Session expired.`);
-      // If we had a token that is now rejected, wipe it so user is redirected cleanly
+      const isAuthEndpoint = normalizedEndpoint.includes('/auth/login') ||
+                             normalizedEndpoint.includes('/auth/refresh') ||
+                             normalizedEndpoint.includes('/auth/register');
+
+      if (!options._isRetry && !isAuthEndpoint) {
+        console.info(`[API] 401 on ${normalizedEndpoint}. Initiating silent token refresh...`);
+        const newToken = await silentRefreshToken();
+        if (newToken) {
+          console.info(`[API] Silent refresh succeeded. Retrying request to ${normalizedEndpoint}`);
+          return apiRequest(endpoint, method, body, { ...options, _isRetry: true });
+        }
+      }
+
+      console.warn(`[API] Session expired or refresh rejected on ${normalizedEndpoint}.`);
       if (token && !window.location.hash.includes('/login')) {
         localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
         localStorage.removeItem('role');
         window.dispatchEvent(new Event('auth:logout'));

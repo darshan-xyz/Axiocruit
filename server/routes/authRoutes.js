@@ -5,21 +5,28 @@ const {
   addRecruiter,
   registerFreelancer,
   registerCandidate,
-  login
+  login,
+  refresh,
+  logout,
+  getMe,
 } = require('../controllers/authController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, optionalAuth } = require('../middleware/authMiddleware');
 const { checkRole } = require('../middleware/roleMiddleware');
 
-// Public Routes
+// Public Authentication & Dual-Token Routes
 router.post('/register-org', registerOrg);
 router.post('/register-freelancer', registerFreelancer);
 router.post('/register-candidate', registerCandidate);
 router.post('/login', login);
+router.post('/refresh', refresh);
+router.post('/logout', optionalAuth, logout);
 
-// Protected Routes
-// Only Org Admin can add recruiters
+// Protected Identity & Management Routes
+router.get('/me', protect, getMe);
+router.post('/change-password', protect, require('../controllers/authController').changePassword);
+
+// Organization Admin Routes
 router.post('/register-recruiter', protect, checkRole('ORGANIZATION'), addRecruiter);
 router.get('/recruiters', protect, checkRole('ORGANIZATION'), require('../controllers/authController').getRecruiters);
-router.post('/change-password', protect, require('../controllers/authController').changePassword);
 
 module.exports = router;

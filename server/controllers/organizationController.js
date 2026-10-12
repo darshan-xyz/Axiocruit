@@ -8,6 +8,7 @@ const Message = require('../models/Message');
 const InterviewGig = require('../models/InterviewGig');
 const TestSession = require('../models/TestSession');
 const bcrypt = require('bcryptjs');
+const { logAuditEvent } = require('../utils/auditLogger');
 
 // @desc    Get all recruiters for the logged-in organization
 // @route   GET /api/organization/recruiters
@@ -148,6 +149,13 @@ exports.removeRecruiter = async (req, res) => {
         // Delete the recruiter user
         await User.findByIdAndDelete(recruiter._id);
 
+        await logAuditEvent({
+            req,
+            action: 'RECRUITER_REMOVE',
+            resource: { type: 'RECRUITER', id: recruiter._id },
+            details: { recruiterEmail: recruiter.email, organizationId: orgUser.organization }
+        });
+
         res.json({ message: 'Recruiter removed successfully' });
     } catch (err) {
         console.error('removeRecruiter error:', err);
@@ -277,6 +285,13 @@ exports.updateOrganizationDetails = async (req, res) => {
             orgUser.companyName = name;
             await orgUser.save();
         }
+
+        await logAuditEvent({
+            req,
+            action: 'ORGANIZATION_UPDATE',
+            resource: { type: 'ORGANIZATION', id: organization._id },
+            details: { name: organization.name, website: organization.website }
+        });
 
         res.json({ message: 'Organization details updated successfully', organization });
     } catch (err) {

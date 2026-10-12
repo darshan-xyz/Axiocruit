@@ -9,6 +9,8 @@ const FreelancerService = require('../models/FreelancerService');
 const Availability = require('../models/Availability');
 const TestSession = require('../models/TestSession');
 const InterviewGig = require('../models/InterviewGig');
+const AuditLog = require('../models/AuditLog');
+const { logAuditEvent } = require('../utils/auditLogger');
 
 // @desc    Get dashboard stats
 // @route   GET /api/admin/stats
@@ -184,6 +186,13 @@ exports.deleteUser = async (req, res) => {
         // Finally, delete the user
         await User.findByIdAndDelete(req.params.id);
 
+        await logAuditEvent({
+            req,
+            action: 'USER_DELETE',
+            resource: { type: 'USER', id: user._id },
+            details: { deletedEmail: user.email, deletedRole: user.role }
+        });
+
         res.json({ message: 'User deleted successfully' });
     } catch (err) {
         console.error(err);
@@ -260,5 +269,33 @@ exports.approveFreelancer = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Get system audit logs
+// @route   GET /api/admin/audit-logs
+// @access  Private (Admin only)
+exports.getAuditLogs = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 50;
+        const skip = (page - 1) * limit;
+
+        const total = await AuditLog.countDocuments();
+        const logs = await AuditLog.find()
+            .sort({ timestamp: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        res.status(200).json({
+            success: true,
+            total,
+            page,
+            limit,
+            logs,
+        });
+    } catch (err) {
+        console.error('getAuditLogs error:', err);
+        res.status(500).json({ message: 'Server Error fetching audit logs' });
     }
 };

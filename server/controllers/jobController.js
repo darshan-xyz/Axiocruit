@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Job = require('../models/Job');
 const Application = require('../models/Application');
 const User = require('../models/User');
+const { logAuditEvent } = require('../utils/auditLogger');
 
 const escapeRegex = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -523,6 +524,17 @@ exports.approveDelegatedHire = async (req, res) => {
                 content: `Great news! The recruiter approved your proposed candidate for the "${job.title}" role. The project is now complete.`
             });
         }
+
+        await logAuditEvent({
+            req,
+            action: 'DELEGATED_HIRE_APPROVE',
+            resource: { type: 'JOB', id: job._id },
+            details: {
+                jobTitle: job.title,
+                proposedCandidateId: job.proposedCandidateId,
+                delegatedFreelancerId: job.delegatedFreelancerId
+            }
+        });
 
         res.json({ message: 'Hire approved successfully. Job closed.', job });
     } catch (err) {

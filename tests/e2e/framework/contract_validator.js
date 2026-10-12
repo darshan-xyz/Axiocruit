@@ -11,11 +11,14 @@ export const EXPECTED_REST_ENDPOINTS = [
   { method: 'GET', path: '/api/health', auth: false, module: 'healthRoutes' },
   { method: 'GET', path: '/api/ready', auth: false, module: 'healthRoutes' },
 
-  // Auth Routes (7)
+  // Auth Routes (10)
   { method: 'POST', path: '/api/auth/register-org', auth: false, module: 'authRoutes' },
   { method: 'POST', path: '/api/auth/register-freelancer', auth: false, module: 'authRoutes' },
   { method: 'POST', path: '/api/auth/register-candidate', auth: false, module: 'authRoutes' },
   { method: 'POST', path: '/api/auth/login', auth: false, module: 'authRoutes' },
+  { method: 'POST', path: '/api/auth/refresh', auth: false, module: 'authRoutes' },
+  { method: 'POST', path: '/api/auth/logout', auth: false, module: 'authRoutes' },
+  { method: 'GET', path: '/api/auth/me', auth: true, module: 'authRoutes' },
   { method: 'POST', path: '/api/auth/register-recruiter', auth: true, module: 'authRoutes' },
   { method: 'GET', path: '/api/auth/recruiters', auth: true, module: 'authRoutes' },
   { method: 'POST', path: '/api/auth/change-password', auth: true, module: 'authRoutes' },
@@ -98,7 +101,7 @@ export const EXPECTED_REST_ENDPOINTS = [
   { method: 'GET', path: '/api/recruiter/freelancers/:id', auth: true, module: 'recruiterServiceRoutes' },
   { method: 'POST', path: '/api/recruiter/services/:serviceId/book', auth: true, module: 'recruiterServiceRoutes' },
 
-  // Admin Routes (7)
+  // Admin Routes (8)
   { method: 'GET', path: '/api/admin/stats', auth: true, module: 'adminRoutes' },
   { method: 'GET', path: '/api/admin/users', auth: true, module: 'adminRoutes' },
   { method: 'DELETE', path: '/api/admin/users/:id', auth: true, module: 'adminRoutes' },
@@ -106,6 +109,7 @@ export const EXPECTED_REST_ENDPOINTS = [
   { method: 'DELETE', path: '/api/admin/jobs/:id', auth: true, module: 'adminRoutes' },
   { method: 'GET', path: '/api/admin/freelancers/pending', auth: true, module: 'adminRoutes' },
   { method: 'PATCH', path: '/api/admin/freelancers/:id/approve', auth: true, module: 'adminRoutes' },
+  { method: 'GET', path: '/api/admin/audit-logs', auth: true, module: 'adminRoutes' },
 
   // Organization Routes (4)
   { method: 'GET', path: '/api/organization/jobs', auth: true, module: 'organizationRoutes' },

@@ -59,6 +59,29 @@ const createApp = () => {
   );
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+  // Lightweight Cookie Parsing Middleware
+  app.use((req, res, next) => {
+    if (!req.cookies) {
+      req.cookies = {};
+      const cookieHeader = req.headers.cookie;
+      if (cookieHeader) {
+        cookieHeader.split(';').forEach((cookie) => {
+          const idx = cookie.indexOf('=');
+          if (idx > 0) {
+            const key = cookie.substring(0, idx).trim();
+            const val = cookie.substring(idx + 1).trim();
+            try {
+              req.cookies[key] = decodeURIComponent(val);
+            } catch (_) {
+              req.cookies[key] = val;
+            }
+          }
+        });
+      }
+    }
+    next();
+  });
+
   // Serve static uploads
   app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 

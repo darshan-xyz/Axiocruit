@@ -23,4 +23,7 @@ router.delete('/jobs/:id', adminController.deleteJob);
 router.get('/freelancers/pending', adminController.getPendingFreelancers);
 router.patch('/freelancers/:id/approve', adminController.approveFreelancer);
 
+// Audit Logging
+router.get('/audit-logs', adminController.getAuditLogs);
+
 module.exports = router;

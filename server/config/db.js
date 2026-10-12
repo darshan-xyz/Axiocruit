@@ -34,6 +34,13 @@ const connectDB = async () => {
     } catch (seedReqErr) {
       console.warn('[Axiocruit Database] Seed module load warning:', seedReqErr.message);
     }
+    try {
+      require('../bootstrap/migrateRoles')().catch((err) => {
+        console.warn('[Axiocruit Database] Role migration execution warning:', err.message);
+      });
+    } catch (migErr) {
+      console.warn('[Axiocruit Database] Role migration module load warning:', migErr.message);
+    }
     return conn;
   } catch (error) {
     console.warn(`[Axiocruit Database] Local/remote MongoDB at ${uri} is not reachable (${error.message}).`);
@@ -55,6 +62,13 @@ const connectDB = async () => {
           });
         } catch (seedReqErr) {
           console.warn('[Axiocruit Database] Embedded seed module load warning:', seedReqErr.message);
+        }
+        try {
+          require('../bootstrap/migrateRoles')().catch((err) => {
+            console.warn('[Axiocruit Database] Embedded role migration execution warning:', err.message);
+          });
+        } catch (migErr) {
+          console.warn('[Axiocruit Database] Embedded role migration module load warning:', migErr.message);
         }
         return conn;
       } catch (memErr) {
