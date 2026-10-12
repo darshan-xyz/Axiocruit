@@ -80,7 +80,7 @@ export const InterviewerRequests: React.FC = () => {
                                     className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                                     onClick={async () => {
                                         try {
-                                            await apiRequest(`/interviews/${inv._id}/status`, 'PATCH', { status: 'Accepted' });
+                                            await apiRequest(`/freelancers/requests/${inv._id}/accept`, 'PUT');
                                             alert("Interview accepted!");
                                             apiRequest('/interviews/my-interviews').then(data => {
                                                 setInterviews(Array.isArray(data) ? data : [...(data?.activeInterviews || []), ...(data?.pastInterviews || [])]);
@@ -95,7 +95,7 @@ export const InterviewerRequests: React.FC = () => {
                                     className="flex-1 border-red-900/50 text-red-500 hover:bg-red-900/20 hover:text-red-400"
                                     onClick={async () => {
                                         try {
-                                            await apiRequest(`/interviews/${inv._id}/status`, 'PATCH', { status: 'Rejected' });
+                                            await apiRequest(`/freelancers/requests/${inv._id}/reject`, 'PUT');
                                             alert("Interview rejected");
                                             apiRequest('/interviews/my-interviews').then(data => {
                                                 setInterviews(Array.isArray(data) ? data : [...(data?.activeInterviews || []), ...(data?.pastInterviews || [])]);

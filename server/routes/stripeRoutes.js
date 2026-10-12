@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createCheckoutSession, stripeWebhook } = require('../controllers/stripeController');
+const { createCheckoutSession, stripeWebhook, verifySession } = require('../controllers/stripeController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 // Stripe Webhook needs the raw body to verify signature. We need to handle this in server.js or isolate it here.
@@ -9,5 +9,6 @@ router.post('/webhook', express.raw({ type: 'application/json' }), stripeWebhook
 
 // Protect checkout session creation - Recruiters, Organizations, and Admins can buy interviews
 router.post('/create-checkout-session', protect, authorize('RECRUITER', 'ORGANIZATION', 'ADMIN'), createCheckoutSession);
+router.post('/verify-session', protect, authorize('RECRUITER', 'ORGANIZATION', 'ADMIN'), verifySession);
 
 module.exports = router;

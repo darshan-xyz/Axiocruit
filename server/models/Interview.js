@@ -20,7 +20,7 @@ const interviewSchema = new mongoose.Schema({
   },
   notes: { type: String, default: '' },
   proctorLog: [{
-    type: { type: String, enum: ['tab_switch', 'copy', 'paste', 'gaze', 'face_lost', 'screenshot'] },
+    type: { type: String, enum: ['tab_switch', 'copy', 'paste', 'gaze', 'face_lost', 'multiple_faces', 'screenshot'] },
     detail: String,
     timestamp: Date,
   }],

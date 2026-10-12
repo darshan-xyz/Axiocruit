@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { apiRequest } from '@/core/api';
-import { Card, Badge, Button } from '@/ui';
-import { Trash2 } from 'lucide-react';
+import { Card, Badge, Button, Input } from '@/ui';
+import { Trash2, Search } from 'lucide-react';
 
 export const AdminUsers: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [filter, setFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchUsers = async () => {
     try {
@@ -34,20 +35,40 @@ export const AdminUsers: React.FC = () => {
     }
   };
 
+  const filteredUsers = users.filter((u) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    const nameMatch = (u.name || '').toLowerCase().includes(q);
+    const emailMatch = (u.email || '').toLowerCase().includes(q);
+    const orgMatch = (u.organization?.name || '').toLowerCase().includes(q);
+    const roleMatch = (u.role || '').toLowerCase().includes(q);
+    return nameMatch || emailMatch || orgMatch || roleMatch;
+  });
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-slate-900 dark:text-white">User Management</h2>
-      <div className="flex flex-wrap gap-2 mb-6">
-        {['', 'CANDIDATE', 'RECRUITER', 'ORGANIZATION', 'INTERVIEWER'].map((role) => (
-          <Button
-            key={role}
-            size="sm"
-            variant={filter === role ? 'secondary' : 'outline'}
-            onClick={() => setFilter(role)}
-          >
-            {role || 'All'}
-          </Button>
-        ))}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">
+        <div className="flex flex-wrap gap-2">
+          {['', 'CANDIDATE', 'RECRUITER', 'ORGANIZATION', 'INTERVIEWER'].map((role) => (
+            <Button
+              key={role}
+              size="sm"
+              variant={filter === role ? 'secondary' : 'outline'}
+              onClick={() => setFilter(role)}
+            >
+              {role || 'All'}
+            </Button>
+          ))}
+        </div>
+        <div className="w-full sm:w-64">
+          <Input
+            placeholder="Search users by name, email..."
+            icon={Search}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
       <Card className="overflow-hidden bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
         <div className="overflow-x-auto">
@@ -63,7 +84,7 @@ export const AdminUsers: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-neutral-800">
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <tr key={user._id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                   <td className="p-4 font-medium text-slate-900 dark:text-white">{user.name}</td>
                   <td className="p-4">
@@ -85,10 +106,10 @@ export const AdminUsers: React.FC = () => {
                   </td>
                 </tr>
               ))}
-              {users.length === 0 && (
+              {filteredUsers.length === 0 && (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-slate-400 dark:text-neutral-500">
-                    No users found matching the selected filter.
+                    {searchQuery ? 'No users found matching your search.' : 'No users found matching the selected filter.'}
                   </td>
                 </tr>
               )}

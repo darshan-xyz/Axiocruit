@@ -118,6 +118,17 @@ exports.updateProfile = async (req, res) => {
 
     user.profile = updatedProfile;
 
+    // Synchronize common profile attributes directly onto the User model
+    const userDirectUpdate = {};
+    if (skills !== undefined) userDirectUpdate.skills = skills;
+    if (bio !== undefined) userDirectUpdate.bio = bio;
+    if (hourlyRate !== undefined) userDirectUpdate.hourlyRate = hourlyRate;
+    if (experience !== undefined && Array.isArray(experience)) userDirectUpdate.experience = experience;
+    if (Object.keys(userDirectUpdate).length > 0) {
+      await User.findByIdAndUpdate(user._id, { $set: userDirectUpdate });
+      Object.assign(user, userDirectUpdate);
+    }
+
     // 3. Update Organization Fields (if user has Organization privileges)
     if ((user.role === 'ADMIN' || user.role === 'ORGANIZATION') && user.organization) {
       const orgUpdate = {};
@@ -233,13 +244,13 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// @desc    Get public profile by email
+// @desc    Get profile by email
 // @route   GET /api/users/:email
-// @access  Public
+// @access  Private
 exports.getUserByEmail = async (req, res) => {
   try {
     const email = (req.params.email || '').toLowerCase().trim();
-    const user = await User.findOne({ email }).select('-password -email');
+    const user = await User.findOne({ email }).select('-password');
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (error) {

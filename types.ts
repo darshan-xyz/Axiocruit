@@ -93,7 +93,7 @@ export interface Job {
   // Delegated Interviewer / Freelancer
   delegatedFreelancerId?: string | User;
   freelancerFee?: number;
-  delegationStatus?: 'none' | 'pending' | 'accepted' | 'completed';
+  delegationStatus?: 'none' | 'pending' | 'accepted' | 'reviewing' | 'completed';
   assignedAt?: string;
   completedAt?: string;
   paymentStatus?: 'unpaid' | 'paid';

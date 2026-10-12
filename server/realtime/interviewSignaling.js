@@ -35,6 +35,14 @@ const registerInterviewSignalingHandlers = (io, socket, state) => {
         const isRecruiter = interview.recruiterId && joiningUserId === interview.recruiterId.toString();
         const isInterviewer = interview.interviewerId && joiningUserId === interview.interviewerId.toString();
         const isCandidate = interview.candidateId && joiningUserId === interview.candidateId.toString();
+        const isAdmin = socket.userRole === CanonicalRoles.ADMIN;
+
+        // Verify that joining user is an authorized participant or admin
+        const isAuthorizedParticipant = isRecruiter || isInterviewer || isCandidate || isAdmin;
+        if (!isAuthorizedParticipant) {
+          socket.emit('error-message', { message: 'Unauthorized: You are not an assigned participant in this interview' });
+          return;
+        }
 
         if (isRecruiter) {
           socket.userRole = CanonicalRoles.RECRUITER;
@@ -59,7 +67,7 @@ const registerInterviewSignalingHandlers = (io, socket, state) => {
 
     const isRecruiter = isHostRole(socket.userRole);
     const hostPresent = Array.from(activeRooms.get(interviewId)).some((u) => isHostRole(u.role));
-    const isCodingRoom = payload?.roomType === 'coding' || payload?.roomType === 'assessment' || payload?.isAssessment || payload?.isCodingTest || !interview;
+    const isCodingRoom = !interview && Boolean(payload?.roomType === 'coding' || payload?.roomType === 'assessment' || payload?.isAssessment || payload?.isCodingTest);
 
     if (isRecruiter || isCodingRoom) {
       socket.join(interviewId);

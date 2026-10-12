@@ -737,7 +737,7 @@ export const normalizeToSakromeCandidate = (app: any): SakromeCandidate => {
     _id: app._id || ('cand-' + (candUser._id || 'generic')),
     candidate: {
       _id: candUser._id || 'user-generic',
-      name: candUser.name || 'Applicant',
+      name: candUser.name || 'Candidate',
       email: candUser.email || '',
       headline: headline,
       department: deptMeta.name,
@@ -749,11 +749,11 @@ export const normalizeToSakromeCandidate = (app: any): SakromeCandidate => {
       salaryExpected: candUser.salaryExpected || profile.salaryExpected || (profile.hourlyRate ? `$${profile.hourlyRate}/hr` : ''),
       source: candUser.source || 'Direct Application',
       bio: candUser.bio || profile.bio || 'Applicant profile in review.',
-      skills: app.skills && app.skills.length ? app.skills : (profile.skills && profile.skills.length ? profile.skills : (candUser.skills || [])),
-      experience: mappedExp,
-      education: mappedEdu,
-      notes: app.notes || candUser.notes || [],
-      files: app.files || candUser.files || mappedFiles
+      skills: Array.isArray(app.skills) && app.skills.length ? app.skills : (Array.isArray(profile.skills) && profile.skills.length ? profile.skills : (Array.isArray(candUser.skills) ? candUser.skills : [])),
+      experience: Array.isArray(mappedExp) ? mappedExp : [],
+      education: Array.isArray(mappedEdu) ? mappedEdu : [],
+      notes: Array.isArray(app.notes) ? app.notes : (Array.isArray(candUser.notes) ? candUser.notes : []),
+      files: Array.isArray(app.files) ? app.files : (Array.isArray(candUser.files) ? candUser.files : (mappedFiles || []))
     },
     aiScore: score,
     matchLabel,

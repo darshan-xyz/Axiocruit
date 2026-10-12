@@ -334,7 +334,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
 
           {/* Next Page button (>) */}
           <button
-            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, Math.min(46, prev + 1)))}
             disabled={currentPage >= totalPages}
             className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center transition-colors shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label="Next page"

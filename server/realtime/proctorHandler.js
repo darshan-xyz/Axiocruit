@@ -17,6 +17,12 @@ const registerProctorHandlers = (io, socket, proctorThrottles) => {
       return;
     }
 
+    // Verify room membership
+    if (!socket.rooms.has(interviewId) && socket.currentRoom !== interviewId) {
+      console.warn(`[Socket.IO][Proctor] Rejected proctor-event: socket ${socket.id} not in room ${interviewId}`);
+      return;
+    }
+
     // Rate-limit per socket per event type
     const evType = eventData.type || 'unknown';
     if (!proctorThrottles.has(socket.id)) {
@@ -42,9 +48,11 @@ const registerProctorHandlers = (io, socket, proctorThrottles) => {
   socket.on('proctor-status-toggle', (data) => {
     if (!data) return;
     const interviewId = data?.roomId || data?.meetingId || data?.interviewId || socket.currentRoom;
-    if (interviewId) {
-      socket.to(interviewId).emit('proctor-status-updated', data);
+    if (!interviewId) return;
+    if (!socket.rooms.has(interviewId) && socket.currentRoom !== interviewId) {
+      return;
     }
+    socket.to(interviewId).emit('proctor-status-updated', data);
   });
 };
 

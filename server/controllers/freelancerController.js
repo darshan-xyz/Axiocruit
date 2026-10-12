@@ -7,6 +7,7 @@ const User = require('../models/User');
 const Availability = require('../models/Availability');
 const Job = require('../models/Job');
 const Application = require('../models/Application');
+const Profile = require('../models/Profile');
 const { v4: uuidv4 } = require('uuid');
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -308,6 +309,21 @@ exports.updateProfile = async (req, res) => {
       updateFields,
       { new: true }
     ).select('-password');
+
+    // Also sync to Profile document
+    const profileFields = {};
+    if (bio !== undefined) profileFields.bio = bio;
+    if (skills !== undefined) profileFields.skills = skills;
+    if (hourlyRate !== undefined) profileFields.hourlyRate = hourlyRate;
+    if (experience !== undefined) profileFields.experience = experience;
+    if (Object.keys(profileFields).length > 0) {
+      await Profile.findOneAndUpdate(
+        { user: req.user._id },
+        { $set: profileFields },
+        { upsert: true, new: true, runValidators: false }
+      );
+    }
+
     res.json({ message: 'Profile updated successfully', user });
   } catch (error) {
     console.error('updateProfile error:', error);

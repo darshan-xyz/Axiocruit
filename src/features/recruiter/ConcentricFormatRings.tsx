@@ -11,6 +11,7 @@ export const ConcentricFormatRings: React.FC<ConcentricFormatRingsProps> = ({ jo
 
   const { officePct, hybridPct, remotePct, hasData } = React.useMemo(() => {
     if (jobs === undefined) {
+      // Benchmark allocation: 0.60 Office, 0.30 Hybrid, 0.10 Remote
       return { officePct: 60, hybridPct: 30, remotePct: 10, hasData: true };
     }
     const total = jobs.length;

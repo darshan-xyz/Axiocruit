@@ -292,6 +292,7 @@ export const FindInterviewers: React.FC = () => {
 };
 
 export const ServiceMarketplace: React.FC = () => {
+    const [marketplaceMode, setMarketplaceMode] = useState<'delegation' | 'single'>('delegation');
     const [services, setServices] = useState<FreelancerService[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -367,11 +368,46 @@ export const ServiceMarketplace: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            {/* Header */}
-            <div>
-                <h2 className="text-2xl font-bold">Freelancer Marketplace</h2>
-                <p className="text-neutral-400 text-sm mt-1">Delegate your hiring pipeline to expert freelancers — they'll find the perfect candidate for you.</p>
+            {/* Header & Segmented Mode Switcher */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 className="text-2xl font-bold">Interviewer & Freelancer Marketplace</h2>
+                    <p className="text-neutral-400 text-sm mt-1">
+                        {marketplaceMode === 'delegation'
+                            ? "Delegate your hiring pipeline to expert freelancers — they'll find the perfect candidate for you."
+                            : 'Browse verified technical interviewers and book a single interview session.'}
+                    </p>
+                </div>
+                <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200 dark:border-slate-700/60 self-start md:self-auto">
+                    <button
+                        type="button"
+                        onClick={() => setMarketplaceMode('delegation')}
+                        className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                            marketplaceMode === 'delegation'
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                    >
+                        Delegate Job Pipeline
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setMarketplaceMode('single')}
+                        className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                            marketplaceMode === 'single'
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                    >
+                        Book Single Interview
+                    </button>
+                </div>
             </div>
+
+            {marketplaceMode === 'single' ? (
+                <FindInterviewers />
+            ) : (
+                <>
 
             {/* Filter Bar */}
             <div className="flex flex-col md:flex-row gap-4 bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-sm p-5 items-end">
@@ -641,6 +677,8 @@ export const ServiceMarketplace: React.FC = () => {
                 freelancerId={viewProfileId} 
                 onClose={() => setViewProfileId(null)} 
             />
+            </>
+            )}
         </div>
     );
 };

@@ -90,6 +90,9 @@ export const useInterviewSignaling = ({
     const isHostRef = useRef(isRecruiter);
     isHostRef.current = isRecruiter;
 
+    const flushLogsRef = useRef(flushLogs);
+    useEffect(() => { flushLogsRef.current = flushLogs; }, [flushLogs]);
+
     // User info
     const userString = localStorage.getItem('user');
     const user = userString ? JSON.parse(userString) : null;
@@ -398,8 +401,8 @@ export const useInterviewSignaling = ({
                 if (!isMounted) return;
                 addToast('error', 'You have been removed from the session by the host.');
 
-                if (!isHostRef.current && flushLogs) {
-                    try { await flushLogs(); } catch (e) { console.error('Failed to flush logs on kick', e); }
+                if (!isHostRef.current && flushLogsRef.current) {
+                    try { await flushLogsRef.current(); } catch (e) { console.error('Failed to flush logs on kick', e); }
                 }
 
                 peerConnectionsRef.current.forEach((pc) => pc.close());
@@ -418,8 +421,8 @@ export const useInterviewSignaling = ({
                 if (!isMounted) return;
                 addToast('info', `✅ ${message || 'This interview has been completed.'}`);
 
-                if (!isHostRef.current && flushLogs) {
-                    try { await flushLogs(); } catch (e) { console.error('Failed to flush logs on end', e); }
+                if (!isHostRef.current && flushLogsRef.current) {
+                    try { await flushLogsRef.current(); } catch (e) { console.error('Failed to flush logs on end', e); }
                 }
 
                 peerConnectionsRef.current.forEach((pc) => pc.close());

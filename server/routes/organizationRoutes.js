@@ -5,12 +5,16 @@ const {
     getRecruiters,
     inviteRecruiter,
     removeRecruiter,
-    getOrgJobs
+    getOrgJobs,
+    getOrganizationDetails,
+    updateOrganizationDetails
 } = require('../controllers/organizationController');
 
 // All routes require authentication + organization role
 router.use(protect, authorize('ORGANIZATION', 'ADMIN'));
 
+router.get('/details', getOrganizationDetails);
+router.put('/details', updateOrganizationDetails);
 router.get('/jobs', getOrgJobs);
 router.get('/recruiters', getRecruiters);
 router.post('/recruiters/invite', inviteRecruiter);

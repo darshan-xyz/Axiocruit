@@ -14,7 +14,12 @@ export const CandidatePortal: React.FC = () => {
     useEffect(() => {
         apiRequest('/users/profile').then(setUser).catch(console.error);
         apiRequest('/jobs').then(data => setRecommendedJobs(Array.isArray(data) ? data.slice(0, 3) : [])).catch(console.error);
-        apiRequest('/interviews/my-interviews').then(data => setInterviews(Array.isArray(data) ? data : [...(data.activeInterviews || []), ...(data.pastInterviews || [])])).catch(console.error);
+        apiRequest('/interviews/my-interviews').then(data => {
+            const raw = Array.isArray(data) ? data : [...(data.activeInterviews || []), ...(data.pastInterviews || [])];
+            const terminalStatuses = ['Completed', 'Cancelled', 'Rejected'];
+            const active = raw.filter((inv: any) => !terminalStatuses.includes(inv.status));
+            setInterviews(active);
+        }).catch(console.error);
         apiRequest('/interviews/my-messages').then(data => setMessages(Array.isArray(data) ? data : [])).catch(console.error);
         apiRequest('/applications/my-applications').then(data => setApplications(Array.isArray(data) ? data : [])).catch(console.error);
     }, []);
@@ -22,10 +27,13 @@ export const CandidatePortal: React.FC = () => {
     const candidateName = user?.firstName || user?.name || 'Candidate';
 
     let strength = 20;
+    const skills = (user as any)?.skills || (user as any)?.profile?.skills;
+    const bio = (user as any)?.bio || (user as any)?.headline || (user as any)?.profile?.bio;
+    const resume = (user as any)?.resumeUrl || (user as any)?.profile?.resume || (user as any)?.resume;
     if (user?.email) strength += 15;
-    if ((user as any)?.skills && (user as any).skills.length > 0) strength += 25;
-    if ((user as any)?.headline || (user as any)?.bio) strength += 20;
-    if ((user as any)?.resumeUrl) strength += 20;
+    if (skills && (Array.isArray(skills) ? skills.length > 0 : Boolean(skills))) strength += 25;
+    if (bio) strength += 20;
+    if (resume) strength += 20;
     const profileStrength = Math.min(100, strength);
 
     const scored = applications.filter((a: any) => a.aiScore !== null && a.aiScore !== undefined);
@@ -207,26 +215,34 @@ export const CandidatePortal: React.FC = () => {
                             </div>
                         ) : (
                             <div className="space-y-3">
-                                {interviews.map(inv => (
-                                    <div key={inv._id} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-xs font-bold text-slate-900 dark:text-white">Interview Session</span>
-                                            <span className="text-[10px] font-semibold text-cobalt-600 dark:text-cobalt-400">{inv.date}</span>
+                                {interviews.map(inv => {
+                                    const dateStr = inv.scheduledTime
+                                        ? new Date(inv.scheduledTime).toLocaleDateString()
+                                        : (inv.date || 'TBD');
+                                    const timeStr = inv.scheduledTime
+                                        ? new Date(inv.scheduledTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                        : (inv.time || 'Scheduled');
+                                    const meetingUrl = inv.meetingLink || (inv.meetingId ? `#/interview/room/${inv.meetingId}` : undefined);
+
+                                    return (
+                                        <div key={inv._id} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs font-bold text-slate-900 dark:text-white">Interview Session</span>
+                                                <span className="text-[10px] font-semibold text-cobalt-600 dark:text-cobalt-400">{dateStr}</span>
+                                            </div>
+                                            <p className="text-xs text-slate-500">With: {(inv.recruiterId as any)?.name || 'Technical Team'}</p>
+                                            <p className="text-[11px] text-slate-400 flex items-center gap-1"><Clock size={12} /> {timeStr}</p>
+                                            {meetingUrl && (
+                                                <a
+                                                    href={meetingUrl}
+                                                    className="inline-flex items-center justify-center gap-1.5 w-full py-1.5 mt-1 rounded-full bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-colors shadow-sm"
+                                                >
+                                                    <Video size={13} /> Join Live Room
+                                                </a>
+                                            )}
                                         </div>
-                                        <p className="text-xs text-slate-500">With: {(inv.recruiterId as any)?.name || 'Technical Team'}</p>
-                                        <p className="text-[11px] text-slate-400 flex items-center gap-1"><Clock size={12} /> {inv.time}</p>
-                                        {inv.meetingLink && (
-                                            <a
-                                                href={inv.meetingLink}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center justify-center gap-1.5 w-full py-1.5 mt-1 rounded-full bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-colors shadow-sm"
-                                            >
-                                                <Video size={13} /> Join Live Room
-                                            </a>
-                                        )}
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </Card>

@@ -3,10 +3,11 @@ const Organization = require('../models/Organization');
 const Profile = require('../models/Profile'); // For future use when profile data is sent
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { getJwtSecret } = require('../config/jwt');
 
 // Generate JWT — includes name so socket middleware can read it via decoded.name
 const generateToken = (id, role, name) => {
-    return jwt.sign({ id, role, name }, process.env.JWT_SECRET || 'secret123', {
+    return jwt.sign({ id, role, name }, getJwtSecret(), {
         expiresIn: '30d',
     });
 };
@@ -98,7 +99,7 @@ exports.addRecruiter = async (req, res) => {
     try {
         // Ensure requester is an Admin and has an organization
         // req.user is set by authMiddleware
-        const adminUser = await User.findById(req.user.id);
+        const adminUser = await User.findById(req.user.id || req.user._id);
         if (!adminUser || !adminUser.organization) {
             return res.status(400).json({ message: 'Admin does not belong to an organization' });
         }

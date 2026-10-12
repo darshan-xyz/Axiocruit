@@ -30,7 +30,7 @@ import { apiRequest } from '../utils/api';
 
 /** A single proctoring event recorded during an interview. */
 export interface ProctoringEvent {
-    type: 'tab_switch' | 'copy' | 'paste' | 'gaze' | 'face_lost' | 'screenshot';
+    type: 'tab_switch' | 'copy' | 'paste' | 'gaze' | 'face_lost' | 'multiple_faces' | 'screenshot';
     detail: string;
     timestamp: string; // ISO 8601
 }
@@ -40,6 +40,9 @@ interface GazeResult {
     type: 'gaze_result';
     gaze: 'center' | 'left' | 'right' | 'up' | 'down' | 'away' | 'unknown';
     face_detected: boolean;
+    multiple_faces?: boolean;
+    faces_detected?: number;
+    alerts?: string[];
     h_ratio: number | null;
     v_ratio: number | null;
     timestamp: number;
@@ -157,6 +160,7 @@ export function useProctoring(config: UseProctoringProps): ProctoringReturn {
     const lastFaceLostTime = useRef<number>(0);
     const faceLostGraceStart = useRef<number | null>(null); // when face was first lost (grace timer)
     const faceLostCooldownActive = useRef(false); // hard lock — true = ignore all face_lost
+    const lastMultipleFacesTime = useRef<number>(0);
 
     // ── Helper: add an event to the log ──────────────────────────────
     const addEvent = useCallback((type: ProctoringEvent['type'], detail: string) => {
@@ -267,6 +271,15 @@ export function useProctoring(config: UseProctoringProps): ProctoringReturn {
                                     addEvent('gaze', `Sustained gaze: looking ${data.gaze} for ${(elapsed / 1000).toFixed(1)}s (h=${data.h_ratio}, v=${data.v_ratio})`);
                                     console.log(`[Proctor] 🚨 Sustained off-center gaze detected: ${data.gaze} for ${elapsed}ms`);
                                 }
+                            }
+                        }
+
+                        // ── MULTIPLE FACES DETECTION ──
+                        if (data.multiple_faces || (Array.isArray(data.alerts) && data.alerts.includes('multiple_faces')) || (data.faces_detected && data.faces_detected > 1)) {
+                            if (now - lastMultipleFacesTime.current >= 10000) {
+                                lastMultipleFacesTime.current = now;
+                                addEvent('multiple_faces', 'Multiple faces detected in camera frame');
+                                console.log('[Proctor] 🚨 Multiple faces detected in camera frame');
                             }
                         }
                     }

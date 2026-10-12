@@ -137,7 +137,7 @@ exports.createJob = async (req, res) => {
             location,
             type,
             salary,
-            skills,
+            skills: Array.isArray(skills) ? skills : (typeof skills === 'string' ? skills.split(',').map(s => s.trim()).filter(Boolean) : []),
             postedBy: req.user._id || req.user.id // Ensure this is matching the Recruiter's ID
         });
 
@@ -270,7 +270,7 @@ exports.getMyReceivedApplications = async (req, res) => {
         }
 
         const jobQuery = isFreelancer 
-            ? { delegatedFreelancerId: req.user.id, delegationStatus: 'accepted' }
+            ? { delegatedFreelancerId: req.user.id, delegationStatus: { $in: ['accepted', 'reviewing'] } }
             : isAdmin
                 ? {}
                 : isOrg
@@ -518,7 +518,7 @@ exports.approveDelegatedHire = async (req, res) => {
         const Message = require('../models/Message');
         if (job.delegatedFreelancerId) {
             await Message.create({
-                senderId: req.user._id,
+                senderId: req.user._id || req.user.id,
                 receiverId: job.delegatedFreelancerId,
                 content: `Great news! The recruiter approved your proposed candidate for the "${job.title}" role. The project is now complete.`
             });
@@ -641,7 +641,7 @@ exports.updateJob = async (req, res) => {
             return res.status(403).json({ message: 'Not authorized to update this job' });
         }
 
-        const { title, description, requirements, company, location, type, salary, skills, status } = req.body;
+        const { title, description, requirements, company, location, type, salary, skills, status, delegationStatus, delegatedFreelancerId } = req.body;
         if (title !== undefined) job.title = title;
         if (description !== undefined) job.description = description;
         if (requirements !== undefined) job.requirements = requirements;
@@ -649,8 +649,10 @@ exports.updateJob = async (req, res) => {
         if (location !== undefined) job.location = location;
         if (type !== undefined) job.type = type;
         if (salary !== undefined) job.salary = salary;
-        if (skills !== undefined) job.skills = skills;
+        if (skills !== undefined) job.skills = Array.isArray(skills) ? skills : (typeof skills === 'string' ? skills.split(',').map(s => s.trim()).filter(Boolean) : []);
         if (status !== undefined && ['Active', 'Closed', 'Draft'].includes(status)) job.status = status;
+        if (delegationStatus !== undefined && ['none', 'pending', 'accepted', 'reviewing', 'completed'].includes(delegationStatus)) job.delegationStatus = delegationStatus;
+        if (delegatedFreelancerId !== undefined) job.delegatedFreelancerId = delegatedFreelancerId;
 
         await job.save();
         res.json(job);

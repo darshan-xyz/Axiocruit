@@ -9,6 +9,7 @@ export const JobsSummaryDonutChart: React.FC<JobsSummaryDonutChartProps> = ({ jo
 
   const { total, published, onHold, internal, closed } = React.useMemo(() => {
     if (jobs === undefined) {
+      // Benchmark distribution fractions: 80 / 133, 20 / 133, 18 / 133, 15 / 133
       return { total: 133, published: 80, onHold: 20, internal: 18, closed: 15 };
     }
     const tot = jobs.length;

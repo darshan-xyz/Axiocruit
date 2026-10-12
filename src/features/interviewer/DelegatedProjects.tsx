@@ -15,7 +15,7 @@ export interface DelegatedJob {
     type: string;
     skills: string[];
     salary?: string;
-    delegationStatus: 'pending' | 'accepted' | 'completed';
+    delegationStatus: 'pending' | 'accepted' | 'completed' | 'reviewing';
     applicants: string[];
     postedBy: {
         _id: string;
@@ -30,6 +30,7 @@ export interface DelegatedJob {
 const STATUS_STYLES: Record<string, { bg: string; text: string; border: string; label: string }> = {
     pending:   { bg: 'bg-amber-500/10',   text: 'text-amber-400',   border: 'border-amber-500/20',   label: 'Pending Approval' },
     accepted:  { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20', label: 'Active Project' },
+    reviewing: { bg: 'bg-purple-500/10',  text: 'text-purple-400',  border: 'border-purple-500/20',  label: 'Reviewing Proposed Hire' },
     completed: { bg: 'bg-blue-500/10',    text: 'text-blue-400',    border: 'border-blue-500/20',    label: 'Completed' },
 };
 
@@ -82,6 +83,7 @@ export const DelegatedProjects: React.FC = () => {
 
     const pendingCount = jobs.filter(j => j.delegationStatus === 'pending').length;
     const activeCount = jobs.filter(j => j.delegationStatus === 'accepted').length;
+    const reviewingCount = jobs.filter(j => j.delegationStatus === 'reviewing').length;
     const completedCount = jobs.filter(j => j.delegationStatus === 'completed').length;
 
     return (
@@ -95,7 +97,7 @@ export const DelegatedProjects: React.FC = () => {
             </div>
 
             {/* Stats Bar */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-xl text-center">
                     <p className="text-2xl font-bold text-amber-400">{pendingCount}</p>
                     <p className="text-xs text-neutral-400 mt-1">Pending</p>
@@ -103,6 +105,10 @@ export const DelegatedProjects: React.FC = () => {
                 <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-xl text-center">
                     <p className="text-2xl font-bold text-emerald-400">{activeCount}</p>
                     <p className="text-xs text-neutral-400 mt-1">Active</p>
+                </div>
+                <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-xl text-center">
+                    <p className="text-2xl font-bold text-purple-400">{reviewingCount}</p>
+                    <p className="text-xs text-neutral-400 mt-1">Under Review</p>
                 </div>
                 <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-xl text-center">
                     <p className="text-2xl font-bold text-blue-400">{completedCount}</p>
@@ -272,6 +278,25 @@ export const DelegatedProjects: React.FC = () => {
                                             >
                                                 <Star className="w-4 h-4" />
                                                 Review AI Rankings
+                                            </Link>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {job.delegationStatus === 'reviewing' && (
+                                    <div className="px-5 pb-5">
+                                        <div className="flex items-center gap-2.5 p-3 bg-purple-500/10 rounded-lg border border-purple-500/20 mb-3">
+                                            <Shield size={16} className="text-purple-400 flex-shrink-0" />
+                                            <p className="text-xs text-neutral-300 leading-relaxed">
+                                                Candidate proposed for hire. The recruiter is currently reviewing your hiring recommendation.
+                                            </p>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <Link 
+                                                to="/interviewer/pipeline" 
+                                                className="flex-1 flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg text-sm font-semibold transition-colors"
+                                            >
+                                                View Pipeline &rarr;
                                             </Link>
                                         </div>
                                     </div>

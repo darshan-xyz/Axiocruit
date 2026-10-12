@@ -8,6 +8,7 @@ import { DEFAULT_AVATAR } from '@/utils/defaultAvatar';
 export const InterviewerApplicants: React.FC = () => {
     const [selectedApp, setSelectedApp] = useState<any | null>(null);
     const [applications, setApplications] = useState<any[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
 
     // Modals
@@ -140,6 +141,17 @@ export const InterviewerApplicants: React.FC = () => {
     const minDateLocal = nowLocal.getFullYear() + '-' + String(nowLocal.getMonth() + 1).padStart(2, '0') + '-' + String(nowLocal.getDate()).padStart(2, '0');
     const minTimeLocal = scheduleData.date === minDateLocal ? String(nowLocal.getHours()).padStart(2, '0') + ':' + String(nowLocal.getMinutes()).padStart(2, '0') : undefined;
 
+    const filteredApplications = applications.filter((app) => {
+        if (!searchQuery.trim()) return true;
+        const data = getCandidateData(app);
+        const q = searchQuery.toLowerCase();
+        const nameMatch = data.name.toLowerCase().includes(q);
+        const headlineMatch = data.headline.toLowerCase().includes(q);
+        const skillsMatch = Array.isArray(data.skills) && data.skills.some((s: string) => typeof s === 'string' && s.toLowerCase().includes(q));
+        const jobMatch = (app.job?.title || '').toLowerCase().includes(q);
+        return nameMatch || headlineMatch || skillsMatch || jobMatch;
+    });
+
     return (
         <div className="space-y-6">
             <div>
@@ -152,14 +164,23 @@ export const InterviewerApplicants: React.FC = () => {
             <div className="flex gap-4 mb-6">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-2.5 text-neutral-500 w-5 h-5" />
-                    <Input placeholder="Search candidates..." className="pl-10" />
+                    <Input
+                        placeholder="Search candidates by name, skills, headline, or job..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10"
+                    />
                 </div>
             </div>
 
             {loading ? <p>Loading pipeline...</p> : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {applications.length === 0 && <p className="text-neutral-500 col-span-3">No applicants found for your delegated projects yet.</p>}
-                    {applications.map((app) => {
+                    {filteredApplications.length === 0 && (
+                        <p className="text-neutral-500 col-span-3">
+                            {searchQuery ? 'No applicants found matching your search.' : 'No applicants found for your delegated projects yet.'}
+                        </p>
+                    )}
+                    {filteredApplications.map((app) => {
                         const data = getCandidateData(app);
                         const jobTitle = app.job?.title || 'Delegated Project';
                         return (

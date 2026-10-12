@@ -41,6 +41,11 @@ function buildRedFlagsFromLog(proctorLog = []) {
       `Camera presence lost ${counts.face_lost} time(s) — candidate may have left the screen or covered the webcam.`
     );
   }
+  if (counts.multiple_faces > 0) {
+    flags.push(
+      `Multiple faces detected ${counts.multiple_faces} time(s) — candidate may not have been alone during interview.`
+    );
+  }
   if (counts.gaze > 0) {
     flags.push(
       `Off-screen gaze detected ${counts.gaze} time(s) — candidate's attention appeared to divert from the screen.`
@@ -493,7 +498,7 @@ exports.saveProctorLog = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized for this interview' });
     }
 
-    const ALLOWED_PROCTOR_TYPES = ['tab_switch', 'copy', 'paste', 'gaze', 'face_lost', 'screenshot'];
+    const ALLOWED_PROCTOR_TYPES = ['tab_switch', 'copy', 'paste', 'gaze', 'face_lost', 'multiple_faces', 'screenshot'];
     const validEvents = events.filter((e) => e && ALLOWED_PROCTOR_TYPES.includes(e.type));
     if (validEvents.length === 0) {
       return res.status(400).json({ message: 'No valid proctoring events provided' });
@@ -520,7 +525,7 @@ exports.saveProctorLog = async (req, res) => {
 // @access  Private (Host)
 exports.completeInterview = async (req, res) => {
   try {
-    const { interviewerRemarks, codingTestSessionId } = req.body;
+    const { interviewerRemarks, codingTestSessionId, liveCode } = req.body;
 
     console.log(`[InterviewController][Complete] Starting interview completion for ${req.params.id}`);
 
@@ -586,21 +591,13 @@ exports.completeInterview = async (req, res) => {
         .join('\n\n');
     }
 
-    // Step 3: Build AI payload
-    const aiPayload = {
-      interviewId: interview._id.toString(),
-      candidateCode: candidateCode,
-      codingScore: codingScore,
-      codingTestConducted: codingTestConducted,
-      proctorEvents: (interview.proctorLog || []).map((e) => ({
-        type: e.type,
-        detail: e.detail || '',
-        timestamp: e.timestamp ? e.timestamp.toISOString() : '',
-      })),
-      interviewerNotes: interviewerRemarks || interview.notes || '',
-    };
+    // Fall back to live collaborative code if no test session answers exist
+    if (!candidateCode && liveCode) {
+      candidateCode = String(liveCode);
+      codingTestConducted = true;
+    }
 
-    // Step 4: Save interview as Completed + aiGenerating immediately
+    // Step 3: Save interview as Completed + aiGenerating immediately
     interview.interviewerRemarks = interviewerRemarks || '';
     interview.status = 'Completed';
     interview.aiGenerating = true;
@@ -608,7 +605,7 @@ exports.completeInterview = async (req, res) => {
 
     await interview.save();
 
-    // Step 5: Respond immediately to client
+    // Step 4: Respond immediately to client
     const populated = await Interview.findById(interview._id)
       .populate('candidateId', 'name email profilePicture')
       .populate('recruiterId', 'name email profilePicture')
@@ -617,10 +614,35 @@ exports.completeInterview = async (req, res) => {
 
     res.json(populated);
 
-    // Step 6: Background AI evaluation with unhandled rejection guard
+    // Step 5: Background AI evaluation with unhandled rejection guard
     (async () => {
       console.log(`[Complete-BG] Starting background AI evaluation for ${req.params.id}...`);
       let aiResult = null;
+
+      // Re-fetch proctorLog with buffer before dispatching to AI service
+      await new Promise((r) => setTimeout(r, 2500));
+
+      let freshLog = interview.proctorLog || [];
+      try {
+        const freshInterview = await Interview.findById(interview._id).select('proctorLog');
+        if (freshInterview?.proctorLog) {
+          freshLog = freshInterview.proctorLog;
+        }
+      } catch (rfErr) {}
+
+      // Construct AI payload with fresh proctorLog
+      const aiPayload = {
+        interviewId: interview._id.toString(),
+        candidateCode: candidateCode,
+        codingScore: codingScore,
+        codingTestConducted: codingTestConducted,
+        proctorEvents: freshLog.map((e) => ({
+          type: e.type,
+          detail: e.detail || '',
+          timestamp: e.timestamp ? e.timestamp.toISOString() : '',
+        })),
+        interviewerNotes: interviewerRemarks || interview.notes || '',
+      };
 
       try {
         const fetchFn = global.fetch || require('node-fetch');
@@ -652,17 +674,7 @@ exports.completeInterview = async (req, res) => {
         };
       }
 
-      // Re-fetch proctorLog with buffer
-      await new Promise((r) => setTimeout(r, 2500));
-
-      let finalRedFlags = [];
-      try {
-        const freshInterview = await Interview.findById(interview._id).select('proctorLog');
-        const freshLog = freshInterview?.proctorLog || [];
-        finalRedFlags = buildRedFlagsFromLog(freshLog);
-      } catch (rfErr) {
-        finalRedFlags = buildRedFlagsFromLog(interview.proctorLog || []);
-      }
+      const finalRedFlags = buildRedFlagsFromLog(freshLog);
 
       // Update interview record
       await Interview.findByIdAndUpdate(interview._id, {

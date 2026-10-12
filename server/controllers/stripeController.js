@@ -141,7 +141,56 @@ const stripeWebhook = async (req, res) => {
     res.status(200).send();
 };
 
+// @desc    Verify Stripe Checkout Session or interview payment status
+// @route   POST /api/payments/verify-session
+// @access  Private (Recruiter / Org / Admin)
+const verifySession = async (req, res) => {
+    try {
+        const { sessionId, interviewId } = req.body;
+
+        if (sessionId && stripe) {
+            const session = await stripe.checkout.sessions.retrieve(sessionId);
+            if (session && (session.payment_status === 'paid' || session.status === 'complete')) {
+                const targetInterviewId = session.metadata?.interviewId || interviewId;
+                if (targetInterviewId) {
+                    const updated = await Interview.findByIdAndUpdate(
+                        targetInterviewId,
+                        { paymentStatus: 'Paid' },
+                        { new: true }
+                    );
+                    return res.json({ verified: true, paymentStatus: 'Paid', interview: updated });
+                }
+                return res.json({ verified: true, paymentStatus: 'Paid' });
+            }
+        }
+
+        if (interviewId) {
+            const interview = await Interview.findById(interviewId);
+            if (!interview) return res.status(404).json({ message: 'Interview not found' });
+
+            if (interview.paymentStatus === 'Paid') {
+                return res.json({ verified: true, paymentStatus: 'Paid', interview });
+            }
+
+            // Dev / demo fallback when stripe is not enabled in local environment
+            if (!stripe) {
+                interview.paymentStatus = 'Paid';
+                await interview.save();
+                return res.json({ verified: true, paymentStatus: 'Paid', interview });
+            }
+
+            return res.json({ verified: false, paymentStatus: interview.paymentStatus, interview });
+        }
+
+        return res.status(400).json({ message: 'sessionId or interviewId is required' });
+    } catch (error) {
+        console.error('Verify session error:', error);
+        res.status(500).json({ message: error.message || 'Server error' });
+    }
+};
+
 module.exports = {
     createCheckoutSession,
-    stripeWebhook
+    stripeWebhook,
+    verifySession,
 };

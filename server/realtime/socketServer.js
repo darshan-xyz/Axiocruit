@@ -9,9 +9,10 @@ const { registerChatHandlers } = require('./chatHandler');
 const { registerProctorHandlers } = require('./proctorHandler');
 const { registerInterviewSignalingHandlers } = require('./interviewSignaling');
 const { normalizeRole } = require('../schemas/roleTaxonomy');
+const { getJwtSecret } = require('../config/jwt');
 
 const createSocketServer = (httpServer, options = {}) => {
-  const JWT_SECRET = process.env.JWT_SECRET || 'secret123';
+  const JWT_SECRET = getJwtSecret();
 
   const io = new Server(httpServer, {
     cors: {
@@ -35,7 +36,7 @@ const createSocketServer = (httpServer, options = {}) => {
 
     try {
       const decoded = jwt.verify(token, JWT_SECRET);
-      socket.userId = decoded.id;
+      socket.userId = decoded.id || decoded._id;
       socket.userName = socket.handshake.auth?.userName || decoded.name || 'Unknown User';
       socket.userRole = normalizeRole(decoded.role);
       next();

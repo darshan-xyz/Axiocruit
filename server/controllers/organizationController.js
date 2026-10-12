@@ -203,3 +203,84 @@ exports.getOrgJobs = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+// @desc    Get organization profile details
+// @route   GET /api/organization/details
+// @access  Private (organization | ADMIN)
+exports.getOrganizationDetails = async (req, res) => {
+    try {
+        const orgUser = await User.findById(req.user.id || req.user._id);
+        if (!orgUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        let organization = null;
+        if (orgUser.organization) {
+            organization = await Organization.findById(orgUser.organization);
+        } else {
+            organization = await Organization.findOne({ admin: orgUser._id });
+        }
+
+        if (!organization) {
+            return res.json({
+                name: orgUser.companyName || orgUser.name || 'My Organization',
+                website: orgUser.website || '',
+                description: orgUser.companyDescription || '',
+                recruiters: []
+            });
+        }
+
+        res.json(organization);
+    } catch (err) {
+        console.error('getOrganizationDetails error:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+// @desc    Update organization profile details
+// @route   PUT /api/organization/details
+// @access  Private (organization | ADMIN)
+exports.updateOrganizationDetails = async (req, res) => {
+    try {
+        const { name, website, description } = req.body;
+        const orgUser = await User.findById(req.user.id || req.user._id);
+        if (!orgUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        let organization = null;
+        if (orgUser.organization) {
+            organization = await Organization.findById(orgUser.organization);
+        } else {
+            organization = await Organization.findOne({ admin: orgUser._id });
+        }
+
+        if (!organization) {
+            organization = new Organization({
+                name: name || orgUser.companyName || orgUser.name || 'My Organization',
+                admin: orgUser._id,
+                website: website || '',
+                description: description || '',
+                recruiters: []
+            });
+            await organization.save();
+            orgUser.organization = organization._id;
+            await orgUser.save();
+        } else {
+            if (name !== undefined) organization.name = name;
+            if (website !== undefined) organization.website = website;
+            if (description !== undefined) organization.description = description;
+            await organization.save();
+        }
+
+        if (name) {
+            orgUser.companyName = name;
+            await orgUser.save();
+        }
+
+        res.json({ message: 'Organization details updated successfully', organization });
+    } catch (err) {
+        console.error('updateOrganizationDetails error:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};

@@ -41,6 +41,34 @@ export const CompletedDelegations: React.FC = () => {
         }
     };
 
+    const handleRequestRevision = async (job: any) => {
+        const notes = prompt("Enter feedback or revision requirements for the interviewer:") || '';
+        if (notes === null) return;
+        setApproving(job._id);
+        try {
+            await apiRequest(`/jobs/${job._id}`, 'PUT', { delegationStatus: 'accepted' });
+            const freelancerId = job.delegatedFreelancerId?._id || job.delegatedFreelancerId;
+            if (freelancerId) {
+                const messageText = `Revision requested for "${job.title}": ${notes || 'Please review other candidates or conduct additional assessments.'}`;
+                try {
+                    await apiRequest('/interviews/message', 'POST', { receiverId: freelancerId, content: messageText });
+                } catch (e) {
+                    try {
+                        await apiRequest('/messages/send', 'POST', { receiverId: freelancerId, content: messageText });
+                    } catch (mErr) {
+                        console.error('Failed to send revision message', mErr);
+                    }
+                }
+            }
+            alert('Revision requested. The pipeline has been returned to the interviewer.');
+            setJobs(prev => prev.filter(j => j._id !== job._id));
+        } catch (err: any) {
+            alert(err.message || 'Failed to request revision');
+        } finally {
+            setApproving(null);
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div>
@@ -219,9 +247,9 @@ export const CompletedDelegations: React.FC = () => {
                                 </div>
 
                                 {/* Actions */}
-                                <div className="px-5 pb-5 flex gap-3">
+                                <div className="px-5 pb-5 flex flex-wrap gap-3">
                                     <Button
-                                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold gap-1.5"
+                                        className="flex-1 min-w-[140px] bg-emerald-600 hover:bg-emerald-700 text-white font-semibold gap-1.5"
                                         onClick={() => handleApprove(job._id)}
                                         disabled={isProcessing}
                                     >
@@ -231,6 +259,14 @@ export const CompletedDelegations: React.FC = () => {
                                                 Approve & Hire
                                             </>
                                         )}
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        className="border-amber-500/40 text-amber-400 hover:bg-amber-500/10 font-semibold"
+                                        onClick={() => handleRequestRevision(job)}
+                                        disabled={isProcessing}
+                                    >
+                                        Request Revision
                                     </Button>
                                     <Button
                                         variant="outline"

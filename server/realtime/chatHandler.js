@@ -4,11 +4,20 @@
  */
 
 const registerChatHandlers = (io, socket, userSocketMap) => {
-  // Register user for direct message routing
+  // Register user for direct message routing — bind strictly to authenticated socket.userId
   socket.on('register-user', (userId) => {
-    if (userId) {
-      userSocketMap.set(String(userId), socket.id);
-      console.log(`[Socket.IO][DM] Registered user ${userId} -> ${socket.id}`);
+    const boundUserId = socket.userId || userId;
+    if (boundUserId) {
+      userSocketMap.set(String(boundUserId), socket.id);
+      console.log(`[Socket.IO][DM] Registered user ${boundUserId} -> ${socket.id}`);
+    }
+  });
+
+  // Join a dedicated chat room
+  socket.on('join-chat', (chatId) => {
+    if (chatId) {
+      socket.join(`chat:${chatId}`);
+      console.log(`[Socket.IO][DM] User ${socket.userId} joined chat:${chatId}`);
     }
   });
 
@@ -17,7 +26,10 @@ const registerChatHandlers = (io, socket, userSocketMap) => {
     if (!data || !data.receiverId) return;
     const recipientSocketId = userSocketMap.get(String(data.receiverId));
     if (recipientSocketId) {
-      io.to(recipientSocketId).emit('receive-message', data.message);
+      const payload = typeof data.message === 'object'
+        ? { ...data.message, senderId: socket.userId, senderName: socket.userName }
+        : { content: data.message, senderId: socket.userId, senderName: socket.userName };
+      io.to(recipientSocketId).emit('receive-message', payload);
       console.log(`[Socket.IO][DM] Relayed message from ${socket.userId} to ${data.receiverId}`);
     }
   });

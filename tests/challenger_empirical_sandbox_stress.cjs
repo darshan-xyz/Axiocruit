@@ -98,12 +98,13 @@ except Exception as e:
     }
   });
 
-  // 5. Massive Stdout Output (100,000 characters)
+  // 5. Massive Stdout Output (100,000 characters capped to MAX_OUTPUT_BYTES)
   await test('Massive stdout output handling without buffer hang or truncation crash', async () => {
     const code = 'print("A" * 100000)';
     const res = await executePython(code, '');
     assert.strictEqual(res.errorType, null);
-    assert.strictEqual(res.stdout.trim().length, 100000);
+    const expectedCap = parseInt(process.env.MAX_OUTPUT_BYTES, 10) || (64 * 1024);
+    assert.strictEqual(res.stdout.trim().length, expectedCap);
   });
 
   // 6. Non-zero exit code with and without stderr

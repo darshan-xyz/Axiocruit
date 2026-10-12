@@ -100,8 +100,9 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
   // SVG Gauge calculations
   const gaugeRadius = 18;
   const gaugeCircumference = 2 * Math.PI * gaugeRadius; // ~113.1
+  const gaugeScore = score !== null ? Math.min(100, Math.max(0, score)) : 0;
   const gaugeOffset = hasScore
-    ? gaugeCircumference - (Math.min(100, Math.max(0, score ?? 0)) / 100) * gaugeCircumference
+    ? gaugeCircumference - (gaugeScore / 100) * gaugeCircumference
     : gaugeCircumference;
 
   const userStr = localStorage.getItem('user');

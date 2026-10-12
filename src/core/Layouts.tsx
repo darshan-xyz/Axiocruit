@@ -468,12 +468,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
                 const isActive = location.pathname === link.path ||
                   (link.path !== rolePath && location.pathname.startsWith(link.path));
                 
-                // Live pipeline badge counts
-                const badgeCount = link.name === 'Applicants' ? '24' :
-                  link.name === 'Jobs' ? '8' :
-                  link.name === 'Schedule' ? '3' :
-                  link.name === 'Pipeline' ? '12' :
-                  link.name === 'My Applications' ? '5' : null;
+                const badgeCount = link.count !== undefined && link.count !== null ? String(link.count) : null;
 
                 return (
                   <NavLink

@@ -5,6 +5,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { UserRole, normalizeRole, getRoleHome } from '@/types';
 import { apiRequest } from '@/utils/api';
 import { useTheme } from '@/core/ThemeContext';
+import { useAuth } from '@/core/AuthContext';
 
 export interface AuthPageProps {
   type: 'login' | 'signup';
@@ -13,6 +14,7 @@ export interface AuthPageProps {
 export const AuthPage: React.FC<AuthPageProps> = ({ type }) => {
   const navigate = useNavigate();
   const { isDark } = useTheme();
+  const { login } = useAuth();
   const [role, setRole] = useState<UserRole>('CANDIDATE');
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -49,9 +51,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type }) => {
       const canonicalRole = normalizeRole(data.role);
       data.role = canonicalRole;
 
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('role', canonicalRole);
-      localStorage.setItem('user', JSON.stringify(data));
+      login(data.token, { ...data, role: canonicalRole });
 
       navigate(getRoleHome(canonicalRole));
 

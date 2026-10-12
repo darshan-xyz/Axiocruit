@@ -45,6 +45,8 @@ export const InterviewRoomContainer: React.FC = () => {
     const roleBasedIsHost = isHostRole(user?.role);
     const isRecruiter = interview?.isUserHost ?? roleBasedIsHost;
 
+    const flushLogsRef = useRef<() => Promise<void>>(async () => {});
+
     // Headless signaling hook
     const signaling = useInterviewSignaling({
         interviewId: id,
@@ -52,6 +54,7 @@ export const InterviewRoomContainer: React.FC = () => {
         isRecruiter,
         initialCode: getStarterCode('Candidate'),
         initialLanguage: 'python',
+        flushLogs: () => flushLogsRef.current(),
     });
 
     // Proctoring Hook (Candidate only)
@@ -65,6 +68,10 @@ export const InterviewRoomContainer: React.FC = () => {
         socketRef: signaling.socketRef,
         roomId: interview?.meetingId || '',
     });
+
+    useEffect(() => {
+        flushLogsRef.current = flushLogs;
+    }, [flushLogs]);
 
     // Close participant dropdown on click outside
     useEffect(() => {
@@ -132,6 +139,7 @@ export const InterviewRoomContainer: React.FC = () => {
     // Just leave call without completing
     const handleJustLeaveCall = async () => {
         setShowEndInterviewModal(false);
+        await flushLogsRef.current().catch(() => {});
         if (signaling.localStreamRef.current) signaling.localStreamRef.current.getTracks().forEach((t) => t.stop());
         if (signaling.screenStreamRef.current) signaling.screenStreamRef.current.getTracks().forEach((t) => t.stop());
         signaling.peerConnectionsRef.current.forEach((pc) => pc.close());
@@ -147,6 +155,8 @@ export const InterviewRoomContainer: React.FC = () => {
         setCompletingInterview(true);
 
         try {
+            await flushLogsRef.current().catch(() => {});
+
             if (signaling.socketRef.current && interview.meetingId) {
                 signaling.socketRef.current.emit('end-interview', { meetingId: interview.meetingId });
             }
@@ -159,6 +169,7 @@ export const InterviewRoomContainer: React.FC = () => {
             await apiRequest(`/interviews/${interview._id}/complete`, 'POST', {
                 interviewerRemarks: interviewerRemarks.trim(),
                 codingTestSessionId: signaling.adaptiveSession?.sessionId || undefined,
+                liveCode: signaling.code || undefined,
             });
 
             addToast('success', '✅ Interview completed! AI report is generating in the background.');

@@ -20,6 +20,29 @@ const HOST_ROLES = ['RECRUITER', 'ADMIN', 'ORGANIZATION', 'INTERVIEWER'];
 const MAX_QUESTIONS    = 999; // Practically infinite
 const EXEC_TIMEOUT_MS  = 5000; // Python execution timeout (ms)
 const PYTHON_BIN        = process.env.PYTHON_BIN || (process.platform === 'win32' ? 'python' : 'python3');
+const MAX_OUTPUT_BYTES  = parseInt(process.env.MAX_OUTPUT_BYTES, 10) || (64 * 1024);
+
+const PYTHON_SECURITY_PRELUDE = `import sys, os; os.system = None; os.popen = None\nfor _m in ['subprocess','socket','shutil','ctypes','multiprocessing','urllib','http','ftplib','smtplib','asyncio']: sys.modules[_m] = None\n`;
+
+const getSafePythonEnv = () => {
+  const safeEnv = { ...process.env };
+  const sensitiveKeys = [
+    'MONGO_URI',
+    'MONGODB_URI',
+    'JWT_SECRET',
+    'STRIPE_SECRET_KEY',
+    'STRIPE_WEBHOOK_SECRET',
+    'GEMINI_API_KEY',
+    'OPENAI_API_KEY',
+  ];
+  for (const key of sensitiveKeys) {
+    delete safeEnv[key];
+  }
+  safeEnv.PYTHONIOENCODING = 'utf-8';
+  safeEnv.PYTHONUTF8 = '1';
+  return safeEnv;
+};
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Output Normalization & Smart Comparison
@@ -191,10 +214,16 @@ const sanitizeErrorOutput = (errText) => {
 
   let sanitized = String(raw);
 
-  // 1. Scrub File "..." pattern (standard Python tracebacks)
+  // 1. Scrub File "..." pattern and adjust line numbers for temp execution files with prelude
+  sanitized = sanitized.replace(/File\s+["']([^"']*axiocruit_[^"']*\.py)["'],\s*line\s*(\d+)/gi, (match, filePath, lineNum) => {
+    const adjusted = Math.max(1, parseInt(lineNum, 10) - 2);
+    return `File "solution.py", line ${adjusted}`;
+  });
+
+  // 2. Scrub any remaining File "..." pattern (standard Python tracebacks)
   sanitized = sanitized.replace(/File\s+["'].*?\.py["']/gi, 'File "solution.py"');
 
-  // 2. Scrub any direct references to temp axiocruit python files
+  // 3. Scrub any direct references to temp axiocruit python files
   sanitized = sanitized.replace(/[^\s"'`()<>]+axiocruit_[^\s"'`()<>]+\.py/gi, 'solution.py');
   sanitized = sanitized.replace(/axiocruit_[^\s"'`()<>]+\.py/gi, 'solution.py');
 
@@ -240,13 +269,17 @@ const runOneCase = (tmpFile, input, expectedOutput) => {
       resolve(result);
     };
 
-    const child = spawn(PYTHON_BIN, [tmpFile], {
+    const child = spawn(PYTHON_BIN, ['-I', '-B', '-X', 'utf8', tmpFile], {
       timeout: EXEC_TIMEOUT_MS,
+      cwd: os.tmpdir(),
+      env: getSafePythonEnv(),
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
     let stdout = '';
     let stderr = '';
+    let stdoutBytes = 0;
+    let stderrBytes = 0;
 
     child.stdin.on('error', () => {});
 
@@ -259,8 +292,20 @@ const runOneCase = (tmpFile, input, expectedOutput) => {
       child.stdin.end();
     }
 
-    child.stdout.on('data', (d) => { stdout += d.toString(); });
-    child.stderr.on('data', (d) => { stderr += d.toString(); });
+    child.stdout.on('data', (d) => {
+      if (stdoutBytes < MAX_OUTPUT_BYTES) {
+        const remaining = MAX_OUTPUT_BYTES - stdoutBytes;
+        stdout += d.toString('utf8').slice(0, remaining);
+        stdoutBytes += d.length;
+      }
+    });
+    child.stderr.on('data', (d) => {
+      if (stderrBytes < MAX_OUTPUT_BYTES) {
+        const remaining = MAX_OUTPUT_BYTES - stderrBytes;
+        stderr += d.toString('utf8').slice(0, remaining);
+        stderrBytes += d.length;
+      }
+    });
 
     child.on('error', (err) => {
       const errText = stderr + (err.message || '');
@@ -317,13 +362,13 @@ const runAllTestCases = async (code, testCases) => {
   );
 
   try {
-    await fs.promises.writeFile(tmpFile, code, 'utf8');
+    await fs.promises.writeFile(tmpFile, PYTHON_SECURITY_PRELUDE + code, 'utf8');
 
     // Fast-fail on SyntaxError: check compile asynchronously
     let syntaxErrorText = null;
     try {
       await new Promise((resolve, reject) => {
-        execFile(PYTHON_BIN, ['-m', 'py_compile', tmpFile], { timeout: 3000 }, (err, stdout, stderr) => {
+        execFile(PYTHON_BIN, ['-I', '-B', '-X', 'utf8', '-m', 'py_compile', tmpFile], { timeout: 3000, cwd: os.tmpdir(), env: getSafePythonEnv() }, (err, stdout, stderr) => {
           if (err) reject(stderr || err.message);
           else resolve();
         });
@@ -383,7 +428,7 @@ const executePython = (code, input) => {
       resolve(result);
     };
 
-    fs.writeFile(tmpFile, code, 'utf8', (writeErr) => {
+    fs.writeFile(tmpFile, PYTHON_SECURITY_PRELUDE + code, 'utf8', (writeErr) => {
       if (writeErr) {
         return finish({
           stdout: '',
@@ -392,13 +437,17 @@ const executePython = (code, input) => {
         });
       }
 
-      const child = spawn(PYTHON_BIN, [tmpFile], {
+      const child = spawn(PYTHON_BIN, ['-I', '-B', '-X', 'utf8', tmpFile], {
         timeout: EXEC_TIMEOUT_MS,
+        cwd: os.tmpdir(),
+        env: getSafePythonEnv(),
         stdio: ['pipe', 'pipe', 'pipe'],
       });
 
       let stdout = '';
       let stderr = '';
+      let stdoutBytes = 0;
+      let stderrBytes = 0;
 
       child.stdin.on('error', () => {});
 
@@ -411,8 +460,20 @@ const executePython = (code, input) => {
         child.stdin.end();
       }
 
-      child.stdout.on('data', (d) => { stdout += d.toString(); });
-      child.stderr.on('data', (d) => { stderr += d.toString(); });
+      child.stdout.on('data', (d) => {
+        if (stdoutBytes < MAX_OUTPUT_BYTES) {
+          const remaining = MAX_OUTPUT_BYTES - stdoutBytes;
+          stdout += d.toString('utf8').slice(0, remaining);
+          stdoutBytes += d.length;
+        }
+      });
+      child.stderr.on('data', (d) => {
+        if (stderrBytes < MAX_OUTPUT_BYTES) {
+          const remaining = MAX_OUTPUT_BYTES - stderrBytes;
+          stderr += d.toString('utf8').slice(0, remaining);
+          stderrBytes += d.length;
+        }
+      });
 
       child.on('error', (err) => {
         finish({
@@ -834,9 +895,9 @@ const submitAnswer = async (req, res) => {
     );
     let syntaxErrorText = null;
     try {
-      await fs.promises.writeFile(tmpSyntaxFile, submittedCode, 'utf8');
+      await fs.promises.writeFile(tmpSyntaxFile, PYTHON_SECURITY_PRELUDE + submittedCode, 'utf8');
       await new Promise((resolve, reject) => {
-        execFile(PYTHON_BIN, ['-m', 'py_compile', tmpSyntaxFile], { timeout: 3000 }, (err, stdout, stderr) => {
+        execFile(PYTHON_BIN, ['-I', '-B', '-X', 'utf8', '-m', 'py_compile', tmpSyntaxFile], { timeout: 3000, cwd: os.tmpdir(), env: getSafePythonEnv() }, (err, stdout, stderr) => {
           if (err) reject(stderr || err.message);
           else resolve();
         });
@@ -942,11 +1003,26 @@ const submitAnswer = async (req, res) => {
                 errorType: 'TimeLimitExceeded',
             };
         } else if (useFunctionMode) {
-            // MODE A: Function-call — append print(fn(args)) and run with no stdin
-            const functionCall = `print(${question.functionName}(${tc.input}))`;
-            const executableCode = `${submittedCode}\n\n${functionCall}`;
-            console.log(`[CodingTest]   [${caseLabel}] MODE-A: Running → print(${question.functionName}(${(tc.input || '').substring(0, 80)}))`);
-            execResult = await executePython(executableCode, '');
+            // MODE A: Function-call — safely unpack arguments from stdin via ast.literal_eval
+            const runnerCode = [
+              submittedCode,
+              '',
+              'import sys, ast',
+              'try:',
+              '    _raw_stdin = sys.stdin.read().strip()',
+              '    if _raw_stdin:',
+              '        try:',
+              `            _args = ast.literal_eval(f"({_raw_stdin},)")`,
+              `            print(${question.functionName}(*_args))`,
+              '        except (ValueError, SyntaxError):',
+              `            print(${question.functionName}(_raw_stdin))`,
+              '    else:',
+              `        print(${question.functionName}())`,
+              'except Exception as _e:',
+              '    raise',
+            ].join('\n');
+            console.log(`[CodingTest]   [${caseLabel}] MODE-A: Running ${question.functionName} via stdin unpack → "${(tc.input || '').substring(0, 80)}"`);
+            execResult = await executePython(runnerCode, tc.input || '');
         } else {
             // MODE B: Stdin — run the submitted code as-is, providing tc.input via stdin
             console.log(`[CodingTest]   [${caseLabel}] MODE-B: Running with stdin → "${(tc.input || '').substring(0, 80)}"`);

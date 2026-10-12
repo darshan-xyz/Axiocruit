@@ -8,6 +8,12 @@ interface Job {
   _id: string;
   title: string;
   status: string;
+  location?: string;
+  type?: string;
+  salary?: string;
+  skills?: string[];
+  description?: string;
+  requirements?: string;
   postedBy: {
     _id: string;
     name: string;
@@ -226,6 +232,52 @@ export const OrgJobsList: React.FC = () => {
                   <p className={`font-semibold ${textPrimary}`}>{selectedJob.applicantCount || 0} Applicants</p>
                 </div>
               </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+                <div className={`p-2.5 rounded-lg ${isDark ? 'bg-slate-900' : 'bg-white'} border ${borderColor}`}>
+                  <p className={`text-[11px] ${textMuted} mb-0.5`}>Location</p>
+                  <p className={`text-xs font-semibold ${textPrimary}`}>{selectedJob.location || 'Remote'}</p>
+                </div>
+                <div className={`p-2.5 rounded-lg ${isDark ? 'bg-slate-900' : 'bg-white'} border ${borderColor}`}>
+                  <p className={`text-[11px] ${textMuted} mb-0.5`}>Employment Type</p>
+                  <p className={`text-xs font-semibold ${textPrimary}`}>{selectedJob.type || 'Full-time'}</p>
+                </div>
+                <div className={`p-2.5 rounded-lg ${isDark ? 'bg-slate-900' : 'bg-white'} border ${borderColor}`}>
+                  <p className={`text-[11px] ${textMuted} mb-0.5`}>Salary</p>
+                  <p className={`text-xs font-semibold ${textPrimary}`}>{selectedJob.salary || 'Not specified'}</p>
+                </div>
+              </div>
+
+              {selectedJob.skills && selectedJob.skills.length > 0 && (
+                <div className="mt-4">
+                  <p className={`text-xs font-bold ${textPrimary} mb-2`}>Required Skills</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedJob.skills.map((s, idx) => (
+                      <span key={idx} className="px-2.5 py-1 text-xs rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/60 font-medium">
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedJob.description && (
+                <div className="mt-4">
+                  <p className={`text-xs font-bold ${textPrimary} mb-1`}>Description</p>
+                  <p className={`text-xs ${textMuted} whitespace-pre-line leading-relaxed max-h-36 overflow-y-auto`}>
+                    {selectedJob.description}
+                  </p>
+                </div>
+              )}
+
+              {selectedJob.requirements && (
+                <div className="mt-4">
+                  <p className={`text-xs font-bold ${textPrimary} mb-1`}>Requirements</p>
+                  <p className={`text-xs ${textMuted} whitespace-pre-line leading-relaxed max-h-36 overflow-y-auto`}>
+                    {selectedJob.requirements}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end gap-3 pt-2">

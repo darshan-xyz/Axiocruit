@@ -17,6 +17,7 @@ interface InterviewData {
     meetingId: string;
     scheduledTime: string;
     status: 'Pending' | 'Accepted' | 'Rejected' | 'Scheduled' | 'InProgress' | 'Completed' | 'Cancelled';
+    paymentStatus?: 'Unpaid' | 'Paid';
     notes?: string;
     candidateId: { _id: string; name: string; email: string; profilePicture?: string };
     recruiterId: { _id: string; name: string; email: string; profilePicture?: string };
@@ -134,6 +135,38 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
         }
     };
 
+    // ── Check URL for Stripe payment callback ────────────────────────
+    useEffect(() => {
+        const hash = window.location.hash || '';
+        const search = window.location.search || '';
+        const hashQuery = hash.includes('?') ? hash.split('?')[1] : '';
+        const urlParams = new URLSearchParams(hashQuery || search);
+        if (urlParams.get('payment') === 'success') {
+            const sessionId = urlParams.get('session_id') || undefined;
+            apiRequest('/payments/verify-session', 'POST', { sessionId })
+                .then(() => {
+                    addToast('success', 'Payment verified successfully!');
+                    fetchInterviews();
+                })
+                .catch(() => {
+                    fetchInterviews();
+                });
+        }
+    }, []);
+
+    const handlePayInterviewer = async (interviewId: string) => {
+        try {
+            const res = await apiRequest('/payments/create-checkout-session', 'POST', { interviewId });
+            if (res.url) {
+                window.location.href = res.url;
+            } else {
+                addToast('info', 'Payment checkout session created');
+            }
+        } catch (err: any) {
+            addToast('error', err.message || 'Payment initiation failed');
+        }
+    };
+
     // ── Poll interviews that are still generating AI reports ────────────────
     useEffect(() => {
         const generatingIds = interviews
@@ -211,10 +244,16 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
         try {
             await apiRequest(`/interviews/${interviewId}`, 'DELETE');
             addToast('success', 'Interview cancelled — moved to history');
-            // Optimistic update: flip status locally so UI reflects immediately
+            // Optimistic update: flip status locally so UI reflects immediately across all interview lists
             setInterviews(prev =>
                 prev.map(i => i._id === interviewId ? { ...i, status: 'Cancelled' } : i)
             );
+            const targetInterview = upcomingInterviews.find(i => i._id === interviewId) || interviews.find(i => i._id === interviewId);
+            setUpcomingInterviews(prev => prev.filter(i => i._id !== interviewId));
+            if (targetInterview) {
+                setPastInterviews(prev => [{ ...targetInterview, status: 'Cancelled' }, ...prev.filter(i => i._id !== interviewId)]);
+            }
+            fetchInterviews();
         } catch (err: any) {
             addToast('error', err.message || 'Failed to cancel interview');
         }
@@ -322,6 +361,11 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                                                     <Badge variant={statusBadgeVariant[interview.status] || 'neutral'}>
                                                         {interview.status}
                                                     </Badge>
+                                                    {interview.paymentStatus && (
+                                                        <Badge variant={interview.paymentStatus === 'Paid' ? 'success' : 'warning'}>
+                                                            {interview.paymentStatus}
+                                                        </Badge>
+                                                    )}
                                                 </div>
                                                 <div className="flex items-center gap-4 text-sm text-neutral-400 flex-wrap">
                                                     <span className="flex items-center gap-1">
@@ -344,6 +388,16 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
 
                                         {/* Right: actions */}
                                         <div className="flex gap-2 items-center flex-shrink-0">
+                                            {interview.paymentStatus !== 'Paid' && interview.interviewerId && (role === 'RECRUITER' || (role as string) === 'ORGANIZATION') && (
+                                                <Button
+                                                    variant="primary"
+                                                    size="sm"
+                                                    className="bg-emerald-600 hover:bg-emerald-500 text-white"
+                                                    onClick={() => handlePayInterviewer(interview._id)}
+                                                >
+                                                    Pay Interviewer
+                                                </Button>
+                                            )}
                                             <Button
                                                 variant="outline"
                                                 size="sm"
@@ -360,7 +414,7 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                                                 <MessageSquare size={14} className="mr-1" />
                                                 Message
                                             </Button>
-                                            {role === 'RECRUITER' && (
+                                            {(role === 'RECRUITER' || (role as string) === 'ADMIN' || (role as string) === 'ORGANIZATION') && (
                                                 <Button
                                                     variant="outline"
                                                     size="sm"

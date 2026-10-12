@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { normalizeRole } = require('../schemas/roleTaxonomy');
+const { getJwtSecret } = require('../config/jwt');
 
 const protect = async (req, res, next) => {
     let token;
@@ -14,12 +15,18 @@ const protect = async (req, res, next) => {
             token = req.headers.authorization.split(' ')[1];
 
             // Verify token
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret123');
+            const decoded = jwt.verify(token, getJwtSecret());
+            decoded._id = decoded._id || decoded.id;
+            decoded.id = decoded.id || String(decoded._id);
 
             // Get user from the token
             req.user = await User.findById(decoded.id).select('-password');
             if (!req.user) {
                 return res.status(401).json({ message: 'User not found or account deactivated' });
+            }
+            if (req.user) {
+                req.user._id = req.user._id || req.user.id;
+                req.user.id = req.user.id || String(req.user._id);
             }
 
             return next();
@@ -58,8 +65,14 @@ const optionalAuth = async (req, res, next) => {
     ) {
         try {
             token = req.headers.authorization.split(' ')[1];
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret123');
+            const decoded = jwt.verify(token, getJwtSecret());
+            decoded._id = decoded._id || decoded.id;
+            decoded.id = decoded.id || String(decoded._id);
             req.user = await User.findById(decoded.id).select('-password');
+            if (req.user) {
+                req.user._id = req.user._id || req.user.id;
+                req.user.id = req.user.id || String(req.user._id);
+            }
         } catch (error) {
             // Ignore errors for optional auth
         }
