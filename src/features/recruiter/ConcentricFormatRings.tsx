@@ -27,7 +27,7 @@ export const ConcentricFormatRings: React.FC<ConcentricFormatRingsProps> = ({ jo
   }, [jobs]);
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
@@ -85,7 +85,7 @@ export const ConcentricFormatRings: React.FC<ConcentricFormatRingsProps> = ({ jo
         </div>
 
         {/* Legend */}
-        <div className="space-y-2 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+        <div className="space-y-2 mt-3 pt-3 border-t border-slate-300 dark:border-slate-700 text-xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB]" />

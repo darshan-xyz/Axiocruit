@@ -23,6 +23,13 @@ interface Question {
   category: 'basics' | 'oop' | 'dsa';
   visibleTestCases: TestCase[];
   starterCode?: string;
+  starterTemplates?: {
+    python?: string;
+    javascript?: string;
+    typescript?: string;
+    java?: string;
+    cpp?: string;
+  };
 }
 
 interface VisibleCaseResult {
@@ -53,6 +60,7 @@ interface SubmitResponse {
 }
 
 type Phase = 'loading' | 'question' | 'result_feedback' | 'completed' | 'error';
+export type SupportedLanguage = 'python' | 'javascript' | 'typescript' | 'java' | 'cpp';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 const DIFFICULTY_CONFIG = {
@@ -68,11 +76,15 @@ const CATEGORY_CONFIG = {
 };
 const MAX_QUESTIONS = 5;
 
-const STARTER_CODE = `# Write your Python solution below
-# Read input using: input() if needed
-# Print output using: print()
+const DEFAULT_STARTER_TEMPLATES: Record<SupportedLanguage, string> = {
+  python: `# Write your Python solution below\n# Read input using: input() or sys.stdin.read()\n# Print output using: print()\n\n`,
+  javascript: `// Write your JavaScript (Node.js) solution below\n// Read input using fs.readFileSync(0, 'utf-8')\n// Print output using console.log()\nconst fs = require('fs');\n\n`,
+  typescript: `// Write your TypeScript solution below\nimport * as fs from 'fs';\n\n`,
+  java: `import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Write your solution below\n    }\n}\n`,
+  cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    // Write your solution below\n    return 0;\n}\n`,
+};
 
-`;
+const STARTER_CODE = DEFAULT_STARTER_TEMPLATES.python;
 
 // ── Helper Components ──────────────────────────────────────────────────────────
 const DifficultyBadge: React.FC<{ difficulty: keyof typeof DIFFICULTY_CONFIG }> = ({ difficulty }) => {
@@ -137,6 +149,7 @@ export const CodingTestPage: React.FC = () => {
   const [sessionId, setSessionId]             = useState<string | null>(null);
   const [question, setQuestion]               = useState<Question | null>(null);
   const [questionNumber, setQuestionNumber]   = useState(1);
+  const [language, setLanguage]               = useState<SupportedLanguage>('python');
   const [code, setCode]                       = useState(STARTER_CODE);
   const [submitting, setSubmitting]           = useState(false);
   const [submitResponse, setSubmitResponse]   = useState<SubmitResponse | null>(null);
@@ -150,6 +163,30 @@ export const CodingTestPage: React.FC = () => {
 
   // Real-time Socket.IO sync ref
   const socketRef = useRef<any>(null);
+
+  const getInitialCode = (q: Question | null, lang: SupportedLanguage) => {
+    if (!q) return DEFAULT_STARTER_TEMPLATES[lang];
+    if (q.starterTemplates && q.starterTemplates[lang]) {
+      return q.starterTemplates[lang]!;
+    }
+    if (lang === 'python' && q.starterCode) {
+      return q.starterCode;
+    }
+    return DEFAULT_STARTER_TEMPLATES[lang];
+  };
+
+  const handleLanguageChange = (newLang: SupportedLanguage) => {
+    setLanguage(newLang);
+    const newTemplate = getInitialCode(question, newLang);
+    setCode(newTemplate);
+    if (socketRef.current && sessionId) {
+      socketRef.current.emit('code-change', {
+        roomId: sessionId,
+        code: newTemplate,
+        language: newLang,
+      });
+    }
+  };
 
   // ── Socket.IO Real-time Connection for Assessment Sync ────────────────────────
   useEffect(() => {
@@ -174,9 +211,12 @@ export const CodingTestPage: React.FC = () => {
         });
       });
 
-      socket.on('code-change', ({ code: incomingCode }: { code?: string }) => {
+      socket.on('code-change', ({ code: incomingCode, language: incomingLang }: { code?: string; language?: SupportedLanguage }) => {
         if (incomingCode !== undefined) {
           setCode(incomingCode);
+        }
+        if (incomingLang !== undefined) {
+          setLanguage(incomingLang);
         }
       });
 
@@ -195,7 +235,7 @@ export const CodingTestPage: React.FC = () => {
       socketRef.current.emit('code-change', {
         roomId: sessionId,
         code: newCode,
-        language: 'python',
+        language,
       });
     }
   };
@@ -213,7 +253,7 @@ export const CodingTestPage: React.FC = () => {
       setSessionId(res.sessionId);
       setQuestion(res.question);
       setQuestionNumber(1);
-      setCode(res.question?.starterCode || STARTER_CODE);
+      setCode(getInitialCode(res.question, language));
       setPhase('question');
     } catch (err: any) {
       // If an in-progress session already exists, try to resume it
@@ -233,7 +273,7 @@ export const CodingTestPage: React.FC = () => {
       if (res.done) { setFinalScore(res.finalScore ?? 0); setPhase('completed'); return; }
       setQuestion(res.question);
       setQuestionNumber(res.questionNumber);
-      setCode(res.question?.starterCode || STARTER_CODE);
+      setCode(getInitialCode(res.question, language));
       setPhase('question');
     } catch {
       setErrorMsg('Failed to resume session.');
@@ -252,7 +292,7 @@ export const CodingTestPage: React.FC = () => {
       const res: SubmitResponse = await apiRequest(
         `/coding-test/${sessionId}/submit`,
         'POST',
-        { questionId: question._id, submittedCode: code }
+        { questionId: question._id, submittedCode: code, language }
       );
       submittedIds.current.add(question._id);
       setSubmitResponse(res);
@@ -280,7 +320,7 @@ export const CodingTestPage: React.FC = () => {
     } finally {
       setSubmitting(false);
     }
-  }, [sessionId, question, code, submitting, questionNumber]);
+  }, [sessionId, question, code, submitting, questionNumber, language]);
 
   // ── Fetch next question ───────────────────────────────────────────────────────
   const handleNext = async () => {
@@ -294,7 +334,7 @@ export const CodingTestPage: React.FC = () => {
       } else {
         setQuestion(res.question);
         setQuestionNumber(res.questionNumber);
-        setCode(res.question?.starterCode || STARTER_CODE);
+        setCode(getInitialCode(res.question, language));
         setSubmitResponse(null);
         setPhase('question');
       }
@@ -656,14 +696,28 @@ export const CodingTestPage: React.FC = () => {
           {/* Editor toolbar */}
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-neutral-800/60 bg-[#0a001a]/20 shrink-0">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-neutral-400 font-mono font-medium">solution.py</span>
+              <span className="text-xs text-neutral-400 font-mono font-medium">
+                {language === 'python' ? 'solution.py' :
+                 language === 'javascript' ? 'solution.js' :
+                 language === 'typescript' ? 'solution.ts' :
+                 language === 'java' ? 'Solution.java' : 'solution.cpp'}
+              </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-neutral-600 bg-neutral-800/60 px-2 py-0.5 rounded">
-                Python 3
-              </span>
+              <select
+                value={language}
+                onChange={(e) => handleLanguageChange(e.target.value as SupportedLanguage)}
+                disabled={isResultPhase}
+                className="text-[11px] bg-neutral-800/80 text-neutral-200 border border-neutral-700/60 rounded px-2 py-0.5 outline-none cursor-pointer hover:border-neutral-500 transition"
+              >
+                <option value="python">Python 3</option>
+                <option value="javascript">JavaScript (Node.js)</option>
+                <option value="typescript">TypeScript</option>
+                <option value="java">Java (JDK 21)</option>
+                <option value="cpp">C++ (C++17)</option>
+              </select>
               {!isResultPhase && (
-                <span className="text-[10px] text-neutral-600">
+                <span className="text-[10px] text-neutral-500 hidden sm:inline">
                   Ctrl+Enter to submit
                 </span>
               )}
@@ -675,6 +729,7 @@ export const CodingTestPage: React.FC = () => {
             <Editor
               height="100%"
               defaultLanguage="python"
+              language={language === 'java' ? 'java' : (language === 'cpp' ? 'cpp' : (language === 'typescript' ? 'typescript' : (language === 'javascript' ? 'javascript' : 'python')))}
               value={code}
               onChange={handleCodeChange}
               theme="vs-dark"

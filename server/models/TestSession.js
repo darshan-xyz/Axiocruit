@@ -8,6 +8,7 @@ const responseSchema = new mongoose.Schema(
             required: true,
         },
         submittedCode: { type: String, default: '' },
+        language: { type: String, default: 'python' },
         passed: { type: Boolean, default: false },
         score: { type: Number, default: 0 },
         aiAnalysis: { type: mongoose.Schema.Types.Mixed, default: null },

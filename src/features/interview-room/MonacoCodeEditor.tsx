@@ -22,6 +22,7 @@ export const MonacoCodeEditor: React.FC<MonacoCodeEditorProps> = ({
     code,
     language = 'python',
     onChange,
+    onLanguageChange,
     isEditorFocused,
     onToggleFocus,
     editorContainerRef,
@@ -57,10 +58,15 @@ export const MonacoCodeEditor: React.FC<MonacoCodeEditorProps> = ({
                 <div className="flex items-center gap-2">
                     <select
                         value={language}
-                        disabled
-                        className={`border text-xs rounded px-2 py-1 opacity-80 cursor-not-allowed outline-none ${isDark ? 'bg-neutral-800 border-neutral-700 text-neutral-300' : 'bg-blue-50 border-blue-200 text-blue-700'}`}
+                        onChange={(e) => onLanguageChange && onLanguageChange(e.target.value)}
+                        disabled={!onLanguageChange}
+                        className={`border text-xs rounded px-2 py-1 outline-none font-medium transition ${!onLanguageChange ? 'opacity-80 cursor-not-allowed' : 'cursor-pointer hover:border-blue-500'} ${isDark ? 'bg-neutral-800 border-neutral-700 text-neutral-200' : 'bg-blue-50 border-blue-200 text-blue-700'}`}
                     >
                         <option value="python">Python</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="typescript">TypeScript</option>
+                        <option value="java">Java</option>
+                        <option value="cpp">C++</option>
                     </select>
                     <button
                         onClick={onToggleFocus}
@@ -79,7 +85,7 @@ export const MonacoCodeEditor: React.FC<MonacoCodeEditorProps> = ({
             <div className="flex-1 relative">
                 <Editor
                     height="100%"
-                    language={language}
+                    language={language === 'nodejs' ? 'javascript' : (language === 'c++' ? 'cpp' : language)}
                     theme={isDark ? 'vs-dark' : 'light'}
                     value={code}
                     onChange={onChange}

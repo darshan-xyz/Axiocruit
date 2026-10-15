@@ -96,9 +96,9 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
   ];
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm flex flex-col">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm flex flex-col">
       {/* Top Filter Controls: Category Pills & Search */}
-      <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="p-5 border-b border-slate-200 dark:border-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         {/* Category filtering pills (Requirement R2 / F8) */}
         <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
           {categoryPills.map(cat => {
@@ -116,7 +116,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                   isActive
                     ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/25 font-black'
-                    : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-750'
+                    : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-750'
                 }`}
               >
                 <span>{cat}</span>
@@ -144,12 +144,12 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
                 onSearchChange(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full pl-9 pr-3.5 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all"
+              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-full pl-9 pr-3.5 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all"
             />
           </div>
           <button
             onClick={() => onCategoryChange('All')}
-            className="px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 flex items-center gap-1.5 shadow-2xs transition-all"
+            className="px-3 py-1.5 rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 flex items-center gap-1.5 shadow-2xs transition-all"
             title="Reset filters"
           >
             <SlidersHorizontal size={13} />
@@ -161,7 +161,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
       {/* High-Density Candidate Table (Requirement R2 / F9, F10) */}
       <div className="overflow-x-auto">
         {/* Table Column Headers */}
-        <div className="grid grid-cols-12 gap-2 px-5 py-3.5 bg-slate-50/80 dark:bg-slate-900/60 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-black text-slate-500 uppercase tracking-wider min-w-[620px]">
+        <div className="grid grid-cols-12 gap-2 px-5 py-3.5 bg-slate-50/80 dark:bg-slate-900/60 border-b border-slate-300 dark:border-slate-700 text-[11px] font-black text-slate-500 uppercase tracking-wider min-w-[620px]">
           <div className="col-span-1">#</div>
           <div className="col-span-4">Candidate</div>
           <div className="col-span-2">Department</div>
@@ -183,7 +183,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
             <p className="text-xs text-slate-400 mt-1">Try adjusting your search query or category filter.</p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100 dark:divide-slate-800/70 min-w-[620px]">
+          <div className="divide-y divide-slate-200 dark:divide-slate-700 min-w-[620px]">
             {paginatedList.map((cand, pageIndex) => {
               const index = startIndex + pageIndex;
               const isSelected = selectedCandidateId === cand._id || selectedCandidateId === cand.candidate?._id;
@@ -220,7 +220,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
                     <img
                       src={cand.candidate?.profilePicture || DEFAULT_AVATAR}
                       alt={cand.candidate?.name}
-                      className="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-slate-700 flex-shrink-0"
+                      className="w-9 h-9 rounded-full object-cover border border-slate-300 dark:border-slate-600 flex-shrink-0"
                     />
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
@@ -293,7 +293,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
       </div>
 
       {/* Table Footer with Dynamic Pagination Pills */}
-      <div className="px-5 py-3.5 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 bg-slate-50/40 dark:bg-slate-900/30">
+      <div className="px-5 py-3.5 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 bg-slate-50/40 dark:bg-slate-900/30">
         <span>Showing {filteredList.length === 0 ? 0 : startIndex + 1} to {Math.min(startIndex + pageSize, filteredList.length)} of {displayTotal} candidates</span>
 
         <div className="flex items-center gap-1.5">
@@ -301,7 +301,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
           <button
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage <= 1}
-            className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center transition-colors shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-7 h-7 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center transition-colors shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label="Previous page"
           >
             &lt;
@@ -324,7 +324,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
                 className={`w-7 h-7 rounded-lg font-bold flex items-center justify-center shadow-2xs transition-all ${
                   isActive
                     ? 'bg-blue-600 text-white font-black'
-                    : 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                    : 'border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
                 }`}
               >
                 {pageNum}
@@ -336,7 +336,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
           <button
             onClick={() => setCurrentPage(prev => Math.min(totalPages, Math.min(46, prev + 1)))}
             disabled={currentPage >= totalPages}
-            className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center transition-colors shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-7 h-7 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center transition-colors shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label="Next page"
           >
             &gt;
@@ -345,7 +345,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
 
         <div className="hidden md:flex items-center gap-1.5 text-xs text-slate-500">
           <span>Show</span>
-          <span className="px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1">
+          <span className="px-2 py-0.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1">
             10 <ChevronDown size={11} />
           </span>
           <span>per page</span>

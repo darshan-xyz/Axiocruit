@@ -320,7 +320,7 @@ const MessagesTab: React.FC = () => {
   const textPrimary = isDark ? 'text-white' : 'text-slate-900';
   const textSecondary = isDark ? 'text-neutral-400' : 'text-slate-600';
   const textMuted = isDark ? 'text-neutral-500' : 'text-neutral-400';
-  const borderColor = isDark ? 'border-[#1e1e2e]' : 'border-slate-200';
+  const borderColor = isDark ? 'border-slate-700' : 'border-slate-300';
   const inputBg = isDark ? 'bg-[#1a1a2e]' : 'bg-slate-100';
 
   return (
@@ -479,7 +479,7 @@ const MessagesTab: React.FC = () => {
                           className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm transition-all ${
                             isMine
                               ? 'bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-br-md'
-                              : `${isDark ? 'bg-[#1a1a2e]' : 'bg-white border border-slate-200'} ${textPrimary} rounded-bl-md`
+                              : `${isDark ? 'bg-[#1a1a2e] border border-slate-700' : 'bg-white border border-slate-300'} ${textPrimary} rounded-bl-md`
                           }`}
                         >
                           <p className="whitespace-pre-wrap break-words">{msg.content}</p>

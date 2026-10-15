@@ -382,7 +382,7 @@ export const RankedCandidates: React.FC = () => {
     const s = status.toLowerCase();
     if (s.includes('interview')) {
       return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/60">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-300 dark:border-blue-700">
           <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
           Interview
         </span>
@@ -390,7 +390,7 @@ export const RankedCandidates: React.FC = () => {
     }
     if (s.includes('assessment') || s.includes('test')) {
       return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800/60">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-300 dark:border-purple-700">
           <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
           Assessment
         </span>
@@ -398,14 +398,14 @@ export const RankedCandidates: React.FC = () => {
     }
     if (s.includes('screening') || s.includes('review')) {
       return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
           Screening
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-300 dark:border-slate-600">
         <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
         New
       </span>
@@ -416,7 +416,7 @@ export const RankedCandidates: React.FC = () => {
     return (
       <div className="flex items-center justify-center py-28">
         <div className="text-center">
-          <div className="w-10 h-10 rounded-full border-3 border-slate-200 dark:border-slate-700 border-t-blue-600 animate-spin mx-auto mb-4" />
+          <div className="w-10 h-10 rounded-full border-3 border-slate-300 dark:border-slate-600 border-t-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-sm font-bold text-slate-600 dark:text-slate-400">Loading candidate ranking & AI metrics...</p>
         </div>
       </div>
@@ -438,7 +438,7 @@ export const RankedCandidates: React.FC = () => {
   return (
     <div className="w-full space-y-6 animate-in fade-in duration-300">
       {/* Top Bar with Window Controls & Pill Navigation */}
-      <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl px-5 py-3.5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl px-5 py-3.5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-4 w-full md:w-auto">
 
           {/* Top Pill Tabs: Home, Candidates (blue pill active), Jobs, Analytics, Menu ∨ */}
@@ -480,7 +480,7 @@ export const RankedCandidates: React.FC = () => {
           <div className="relative flex-1 md:w-64">
             <Search className="absolute left-3.5 top-2.5 text-slate-400 w-4 h-4" />
             <input
-              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full pl-10 pr-4 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all"
+              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-full pl-10 pr-4 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all"
               placeholder="Search candidate, email, skill..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
@@ -488,7 +488,7 @@ export const RankedCandidates: React.FC = () => {
           </div>
           <button
             onClick={() => setActiveCategoryFilter('All')}
-            className="px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 flex items-center gap-1.5 shadow-2xs transition-all"
+            className="px-3.5 py-1.5 rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 flex items-center gap-1.5 shadow-2xs transition-all"
           >
             <SlidersHorizontal size={13} />
             <span>Filter</span>
@@ -509,7 +509,7 @@ export const RankedCandidates: React.FC = () => {
             <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
               {jobTitle}
             </h1>
-            <span className="px-3 py-1 rounded-full text-xs font-black bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/80">
+            <span className="px-3 py-1 rounded-full text-xs font-black bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-300 dark:border-blue-700">
               AI Ranked
             </span>
           </div>
@@ -528,7 +528,7 @@ export const RankedCandidates: React.FC = () => {
             className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
               activeCategoryFilter === cat
                 ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/25'
-                : 'bg-white dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-750'
+                : 'bg-white dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-750'
             }`}
           >
             {cat} {cat === 'All' ? `(${candidates.length})` : ''}
@@ -537,10 +537,10 @@ export const RankedCandidates: React.FC = () => {
       </div>
 
       {/* Full-width Card Container */}
-      <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 sm:p-7 shadow-sm">
+      <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-5 sm:p-7 shadow-sm">
         
         {/* Top Navbar: Brand Logo, Pill Tabs, Settings, Bell, Avatar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/recruiter')}>
             <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-sm shadow-sm shadow-blue-500/25">
               A
@@ -549,7 +549,7 @@ export const RankedCandidates: React.FC = () => {
           </div>
 
           {/* Center Pill Navigation Tabs (Home, Candidates [active], Jobs, Analytics, Menu ⌄) */}
-          <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-900 p-1 rounded-full border border-slate-200/80 dark:border-slate-800 overflow-x-auto">
+          <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-900 p-1 rounded-full border border-slate-300 dark:border-slate-700 overflow-x-auto">
             <button
               onClick={() => navigate('/recruiter')}
               className="px-4 py-1.5 rounded-full text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 transition-colors"
@@ -597,7 +597,7 @@ export const RankedCandidates: React.FC = () => {
             </button>
             <img
               src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&h=64&fit=crop&crop=faces"
-              className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700"
+              className="w-8 h-8 rounded-full object-cover border border-slate-300 dark:border-slate-600"
               alt="Recruiter profile"
             />
           </div>
@@ -612,7 +612,7 @@ export const RankedCandidates: React.FC = () => {
         {/* Filter & Search Bar: All Candidate ⌄, Search input, Filter button, ... */}
         <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
           <div className="flex items-center gap-2">
-            <button className="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 flex items-center gap-2 shadow-2xs">
+            <button className="px-3.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-600 text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 flex items-center gap-2 shadow-2xs">
               <span>All Candidate</span>
               <ChevronDown size={13} className="text-slate-400" />
             </button>
@@ -622,7 +622,7 @@ export const RankedCandidates: React.FC = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3.5 top-2.5 text-slate-400 w-3.5 h-3.5" />
               <input
-                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl pl-9 pr-4 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:border-blue-500 transition-colors"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl pl-9 pr-4 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:border-blue-500 transition-colors"
                 placeholder="Search..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
@@ -630,12 +630,12 @@ export const RankedCandidates: React.FC = () => {
             </div>
             <button
               onClick={() => setActiveCategoryFilter('All')}
-              className="px-4 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 flex items-center gap-1.5 shadow-2xs transition-colors"
+              className="px-4 py-1.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 flex items-center gap-1.5 shadow-2xs transition-colors"
             >
               <SlidersHorizontal size={13} />
               <span>Filter</span>
             </button>
-            <button className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 hover:bg-slate-50 shadow-2xs">
+            <button className="p-1.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-500 hover:bg-slate-50 shadow-2xs">
               •••
             </button>
           </div>
@@ -646,10 +646,10 @@ export const RankedCandidates: React.FC = () => {
           
           {/* LEFT TABLE: Candidate, Position, Stage, Match, Applied */}
           <div className={`${selectedCandidate ? 'lg:col-span-7' : 'lg:col-span-12'} transition-all duration-300 overflow-x-auto`}>
-            <div className="border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden">
+            <div className="border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50/70 dark:bg-slate-900/50 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  <tr className="bg-slate-50/70 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                     <th className="py-3 px-4">Candidate</th>
                     <th className="py-3 px-3">Position</th>
                     <th className="py-3 px-3">Stage</th>
@@ -657,7 +657,7 @@ export const RankedCandidates: React.FC = () => {
                     <th className="py-3 pr-4 text-right">Applied</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-700 text-xs">
                   {filteredCandidates.map((app) => {
                     const isSelected = selectedCandidate?._id === app._id;
                     const score = app.aiScore ?? 80;
@@ -680,7 +680,7 @@ export const RankedCandidates: React.FC = () => {
                             <img
                               src={app.candidate?.profilePicture || DEFAULT_AVATAR}
                               alt={app.candidate?.name}
-                              className="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-slate-700 flex-shrink-0"
+                              className="w-9 h-9 rounded-full object-cover border border-slate-300 dark:border-slate-600 flex-shrink-0"
                             />
                             <div className="min-w-0">
                               <p className="font-bold text-slate-900 dark:text-white truncate">
@@ -741,7 +741,7 @@ export const RankedCandidates: React.FC = () => {
               </table>
 
               {/* Table Footer matching Reference 1 */}
-              <div className="px-5 py-3.5 bg-white dark:bg-[#111726] border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+              <div className="px-5 py-3.5 bg-white dark:bg-[#111726] border-t border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
                 <span>Showing 1 to {filteredCandidates.length} of 455 candidates</span>
 
                 <div className="flex items-center gap-1.5">
@@ -768,7 +768,7 @@ export const RankedCandidates: React.FC = () => {
 
                 <div className="flex items-center gap-1.5 text-xs text-slate-500">
                   <span>Show</span>
-                  <button className="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1">
+                  <button className="px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1">
                     <span>10</span>
                     <ChevronDown size={11} />
                   </button>
@@ -781,7 +781,7 @@ export const RankedCandidates: React.FC = () => {
 
           {/* RIGHT COLUMN: Slide-Over Inspector Drawer for Sarah Miller */}
           {selectedCandidate && (
-            <div className="lg:col-span-5 bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-xl relative sticky top-20">
+            <div className="lg:col-span-5 bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-3xl p-6 shadow-xl relative sticky top-20">
               
               {/* Close Button X */}
               <button
@@ -796,14 +796,14 @@ export const RankedCandidates: React.FC = () => {
                 <img
                   src={selectedCandidate.candidate?.profilePicture || DEFAULT_AVATAR}
                   alt={selectedCandidate.candidate?.name}
-                  className="w-16 h-16 rounded-full object-cover mx-auto mb-3 border-2 border-slate-100 dark:border-slate-700 shadow-sm"
+                  className="w-16 h-16 rounded-full object-cover mx-auto mb-3 border-2 border-slate-300 dark:border-slate-600 shadow-sm"
                 />
                 <h3 className="text-lg font-black text-slate-900 dark:text-white">
                   {selectedCandidate.candidate?.name}
                 </h3>
 
                 {/* Subtitle Row: Left Department Icon / Right Match Score 83% */}
-                <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-left">
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 text-left">
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
                       <Box size={14} />
@@ -839,7 +839,7 @@ export const RankedCandidates: React.FC = () => {
               </div>
 
               {/* Sub-Navigation Tabs: Overview, Profile, Activity, Notes, Files */}
-              <div className="flex items-center gap-4 border-b border-slate-100 dark:border-slate-800 pb-2 mb-4 text-xs font-bold text-slate-400">
+              <div className="flex items-center gap-4 border-b border-slate-200 dark:border-slate-700 pb-2 mb-4 text-xs font-bold text-slate-400">
                 {(['Overview', 'Profile', 'Activity', 'Notes', 'Files'] as const).map(tab => (
                   <button
                     key={tab}
@@ -885,7 +885,7 @@ export const RankedCandidates: React.FC = () => {
                   </div>
 
                   {/* Right Column: Source & Applied */}
-                  <div className="space-y-3 pl-2 border-l border-slate-100 dark:border-slate-800">
+                  <div className="space-y-3 pl-2 border-l border-slate-300 dark:border-slate-700">
                     <div>
                       <span className="text-[10px] text-slate-400 block font-medium">Source</span>
                       <span className="font-bold text-slate-900 dark:text-white">LinkedIn</span>
@@ -905,7 +905,7 @@ export const RankedCandidates: React.FC = () => {
                   {['Figma', 'Design Systems', 'UX Research', 'Prototyping', 'User Flow', 'Wireframing', '+3'].map(skill => (
                     <span
                       key={skill}
-                      className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60"
+                      className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600"
                     >
                       {skill}
                     </span>
@@ -914,7 +914,7 @@ export const RankedCandidates: React.FC = () => {
               </div>
 
               {/* AI Summary Card */}
-              <div className="p-4 rounded-2xl bg-[#EFF6FF] dark:bg-blue-950/40 border border-blue-200/60 dark:border-blue-900/40 mb-5">
+              <div className="p-4 rounded-2xl bg-[#EFF6FF] dark:bg-blue-950/40 border border-blue-300 dark:border-blue-700 mb-5">
                 <div className="flex items-center gap-1.5 text-blue-600 font-black text-xs mb-1.5">
                   <Sparkles size={13} />
                   <span>AI Summary</span>
@@ -926,14 +926,14 @@ export const RankedCandidates: React.FC = () => {
 
               {/* Current Stage & Next Interview Cards */}
               <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="p-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40">
+                <div className="p-3 rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40">
                   <span className="text-[10px] text-slate-400 font-medium block mb-1">Current Stage</span>
-                  <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-600 border border-blue-200/60">
+                  <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-600 border border-blue-300 dark:border-blue-700">
                     Interview
                   </span>
                 </div>
 
-                <div className="p-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 flex items-center justify-between cursor-pointer hover:border-slate-300 transition-colors">
+                <div className="p-3 rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40 flex items-center justify-between cursor-pointer hover:border-slate-400 transition-colors">
                   <div>
                     <span className="text-[10px] text-slate-400 font-medium block">Next Interview</span>
                     <p className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">Tomorrow</p>
@@ -947,7 +947,7 @@ export const RankedCandidates: React.FC = () => {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => navigate('/recruiter/schedule')}
-                  className="flex-1 py-2.5 px-4 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 font-bold text-xs text-slate-800 dark:text-slate-100 flex items-center justify-center gap-2 transition-colors shadow-2xs"
+                  className="flex-1 py-2.5 px-4 rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 font-bold text-xs text-slate-800 dark:text-slate-100 flex items-center justify-center gap-2 transition-colors shadow-2xs"
                 >
                   <Calendar size={13} className="text-blue-600" />
                   <span>Schedule Interview</span>

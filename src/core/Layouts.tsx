@@ -371,7 +371,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
       <div className="w-full flex-1 flex flex-col min-h-screen bg-white dark:bg-[#111726] border-0 rounded-none shadow-none overflow-hidden /* full-screen edge-to-edge layout: w-full max-w-[1540px] mx-auto rounded-[28px] rounded-[36px] shadow-2xl */">
         
         {/* macOS Window Top Chrome & Pill Navigation Bar */}
-        <header className="h-16 flex items-center justify-between px-5 md:px-7 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/60 backdrop-blur-md flex-shrink-0 z-20">
+        <header className="h-16 flex items-center justify-between px-5 md:px-7 border-b border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/60 backdrop-blur-md flex-shrink-0 z-20">
           <div className="flex items-center gap-4">
             {/* Full-screen navigation header */}
 
@@ -390,7 +390,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
             </div>
 
             {/* Top Navigation Pills */}
-            <div className="hidden lg:flex items-center gap-1 ml-4 pl-4 border-l border-slate-200/80 dark:border-slate-700/80">
+            <div className="hidden lg:flex items-center gap-1 ml-4 pl-4 border-l border-slate-300 dark:border-slate-700">
               {topPills.map(pill => {
                 const isPillActive = location.pathname === pill.path ||
                   (pill.path !== `/${role.toLowerCase().replace('_', '-')}` && location.pathname.startsWith(pill.path));
@@ -414,7 +414,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
           {/* Right Header Actions */}
           <div className="flex items-center gap-3">
             {/* Quick Search with shortcut */}
-            <div className="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-slate-800 text-slate-400 border border-slate-200/80 dark:border-slate-700/80 text-xs shadow-2xs">
+            <div className="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-slate-800 text-slate-400 border border-slate-300 dark:border-slate-600 text-xs shadow-2xs">
               <Search size={14} className="text-slate-400" />
               <input
                 type="text"
@@ -427,7 +427,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
             </div>
 
             {/* Notification Bell */}
-            <button className="relative p-2 rounded-full text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+            <button className="relative p-2 rounded-full text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-300 dark:hover:border-slate-700 transition-all">
               <Bell size={17} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-600 ring-2 ring-white dark:ring-slate-900" />
             </button>
@@ -453,7 +453,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
           {/* Left Navigation Sidebar */}
           <aside className={`
             fixed inset-y-0 left-0 z-40 w-64 flex flex-col transform transition-transform duration-300 ease-in-out
-            ${isDark ? 'bg-[#111726] border-r border-slate-800' : 'bg-white border-r border-slate-200/80'}
+            ${isDark ? 'bg-[#111726] border-r border-slate-700' : 'bg-white border-r border-slate-300'}
             ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static
           `}>
             {/* Sidebar Navigation Items */}
@@ -521,7 +521,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
             </div>
 
             {/* User Profile & Sign Out Footer */}
-            <div className="p-3.5 border-t border-slate-100 dark:border-slate-800/80">
+            <div className="p-3.5 border-t border-slate-200 dark:border-slate-700">
               <div className="flex items-center justify-between px-2 py-1.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-850 transition-colors">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">

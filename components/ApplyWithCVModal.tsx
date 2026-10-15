@@ -83,9 +83,9 @@ export const ApplyWithCVModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, j
     };
 
     const getScoreBadge = (score: number) => {
-        if (score >= 80) return { color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30', label: 'Excellent Match' };
-        if (score >= 50) return { color: 'bg-amber-500/15 text-amber-400 border-amber-500/30', label: 'Good Match' };
-        return { color: 'bg-red-500/15 text-red-400 border-red-500/30', label: 'Low Match' };
+        if (score >= 80) return { color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/50', label: 'Excellent Match' };
+        if (score >= 50) return { color: 'bg-amber-500/15 text-amber-400 border-amber-500/50', label: 'Good Match' };
+        return { color: 'bg-red-500/15 text-red-400 border-red-500/50', label: 'Low Match' };
     };
 
     return (
@@ -117,7 +117,7 @@ export const ApplyWithCVModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, j
                             </div>
                         ) : (
                             <div className="space-y-6">
-                                <div className="border border-neutral-700/50 rounded-xl p-5 bg-neutral-800/20">
+                                <div className="border border-neutral-700 rounded-xl p-5 bg-neutral-800/20">
                                     <div className="flex items-center gap-4 mb-4">
                                         <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
                                             <FileText size={24} />
@@ -128,7 +128,7 @@ export const ApplyWithCVModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, j
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-3 p-3 bg-blue-500/5 border border-blue-500/10 rounded-lg">
+                                    <div className="flex items-center gap-3 p-3 bg-blue-500/5 border border-blue-500/30 rounded-lg">
                                         <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                                         <p className="text-xs text-neutral-300">
                                             Our AI will analyze your profile CV against the job requirements to calculate your suitability score.
@@ -137,7 +137,7 @@ export const ApplyWithCVModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, j
                                 </div>
 
                                 {errorMessage && (
-                                    <div className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
+                                    <div className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/40 rounded-lg px-4 py-3">
                                         <AlertCircle size={16} />
                                         {errorMessage}
                                     </div>
@@ -193,7 +193,7 @@ export const ApplyWithCVModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, j
 
                         {aiResult.aiAnalyzed && aiResult.aiScore !== null && (
                             <>
-                                <div className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700/50">
+                                <div className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700">
                                     <div className="flex items-center justify-between mb-4">
                                         <span className="text-sm font-medium text-neutral-300">AI Suitability Score</span>
                                         <span className={`text-sm font-medium px-3 py-1 rounded-full border ${getScoreBadge(aiResult.aiScore).color}`}>
@@ -223,7 +223,7 @@ export const ApplyWithCVModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, j
                                             {aiResult.matchedKeywords.slice(0, 12).map((kw, idx) => (
                                                 <span
                                                     key={idx}
-                                                    className="px-2.5 py-1 text-xs rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20"
+                                                    className="px-2.5 py-1 text-xs rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/40"
                                                 >
                                                     {kw}
                                                 </span>
@@ -240,7 +240,7 @@ export const ApplyWithCVModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, j
                         )}
 
                         {!aiResult.aiAnalyzed && (
-                            <div className="flex items-center gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                            <div className="flex items-center gap-3 p-4 bg-amber-500/10 border border-amber-500/40 rounded-xl">
                                 <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
                                 <p className="text-xs text-neutral-300">
                                     AI analysis is temporarily unavailable. Your application has been submitted and will be reviewed by the recruiter.

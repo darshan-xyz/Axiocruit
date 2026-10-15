@@ -29,7 +29,7 @@ export const AnalyticsChartView: React.FC<{ data?: AnalyticsDataPoint[] }> = ({
   data = DEFAULT_ANALYTICS_DATA,
 }) => {
   return (
-    <div className="w-full h-48 bg-white dark:bg-[#111726] rounded-2xl p-4 border border-slate-100 dark:border-slate-800">
+    <div className="w-full h-48 bg-white dark:bg-[#111726] rounded-2xl p-4 border border-slate-300 dark:border-slate-700">
       <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
         Weekly Interview Velocity
       </div>

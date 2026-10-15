@@ -52,7 +52,7 @@ export const EmployeeDepartmentCards: React.FC<EmployeeDepartmentCardsProps> = (
   });
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
@@ -76,7 +76,7 @@ export const EmployeeDepartmentCards: React.FC<EmployeeDepartmentCardsProps> = (
           return (
             <div
               key={d.name}
-              className="p-3.5 rounded-2xl bg-slate-50/60 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 flex items-center justify-between"
+              className="p-3.5 rounded-2xl bg-slate-50/60 dark:bg-slate-900/40 border border-slate-300 dark:border-slate-700 flex items-center justify-between"
             >
               <div>
                 <h4 className="font-bold text-xs text-slate-900 dark:text-white">{d.name}</h4>
@@ -98,13 +98,13 @@ export const EmployeeDepartmentCards: React.FC<EmployeeDepartmentCardsProps> = (
                       <img
                         key={i}
                         src={c.profilePicture || DEFAULT_AVATAR}
-                        className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-800 object-cover"
+                        className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-700 object-cover"
                         alt={c.name || 'Candidate'}
                         title={c.name}
                       />
                     ))}
                     {extraCount > 0 && (
-                      <span className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 text-[9px] font-black flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-2xs">
+                      <span className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 text-[9px] font-black flex items-center justify-center border-2 border-white dark:border-slate-700 shadow-2xs">
                         +{extraCount}
                       </span>
                     )}

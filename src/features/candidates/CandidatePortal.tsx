@@ -47,9 +47,9 @@ export const CandidatePortal: React.FC = () => {
     return (
         <div className="w-full space-y-6 animate-in fade-in duration-300">
             {/* Hero Profile & Readiness Banner */}
-            <div className="w-full p-6 md:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="w-full p-6 md:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="relative z-10 max-w-xl">
-                    <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cobalt-50 text-cobalt-700 dark:bg-cobalt-950/60 dark:text-cobalt-300 border border-cobalt-200/60 dark:border-cobalt-800/60 mb-3">
+                    <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cobalt-50 text-cobalt-700 dark:bg-cobalt-950/60 dark:text-cobalt-300 border border-cobalt-300 dark:border-cobalt-700 mb-3">
                         <Sparkles size={12} className="text-cobalt-600" />
                         <span>Candidate Talent Portal</span>
                     </div>
@@ -79,7 +79,7 @@ export const CandidatePortal: React.FC = () => {
                 </div>
 
                 {/* Readiness Gauge Widget */}
-                <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 self-start md:self-auto">
+                <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700 self-start md:self-auto">
                     <CircularProgressGauge
                         percentage={profileStrength}
                         size={76}
@@ -170,19 +170,19 @@ export const CandidatePortal: React.FC = () => {
                             >
                                 <div className="flex justify-between items-start">
                                     <div className="flex items-center gap-3.5">
-                                        <div className="w-11 h-11 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center font-black text-slate-800 dark:text-slate-100 text-sm">
+                                        <div className="w-11 h-11 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 flex items-center justify-center font-black text-slate-800 dark:text-slate-100 text-sm">
                                             {job.company.substring(0, 2).toUpperCase()}
                                         </div>
                                         <div>
                                             <h4 className="text-sm font-extrabold text-slate-900 dark:text-white group-hover:text-cobalt-600 dark:group-hover:text-cobalt-400 transition-colors">
-                                                {job.title}
+                                                 {job.title}
                                             </h4>
                                             <p className="text-xs text-slate-500">{job.company}</p>
                                         </div>
                                     </div>
                                     <Badge variant="remote">{job.type || 'Full-time'}</Badge>
                                 </div>
-                                <div className="flex items-center gap-5 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-500">
+                                <div className="flex items-center gap-5 mt-4 pt-3 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-500">
                                     <span className="flex items-center gap-1.5"><MapPin size={13} className="text-slate-400" /> {job.location}</span>
                                     {job.salary && <span className="flex items-center gap-1.5 font-semibold text-slate-700 dark:text-slate-300"><DollarSign size={13} className="text-emerald-500" /> {job.salary}</span>}
                                     <span className="ml-auto text-[11px] font-bold text-cobalt-600 dark:text-cobalt-400 inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
@@ -225,7 +225,7 @@ export const CandidatePortal: React.FC = () => {
                                     const meetingUrl = inv.meetingLink || (inv.meetingId ? `#/interview/room/${inv.meetingId}` : undefined);
 
                                     return (
-                                        <div key={inv._id} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 space-y-2">
+                                        <div key={inv._id} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700 space-y-2">
                                             <div className="flex items-center justify-between">
                                                 <span className="text-xs font-bold text-slate-900 dark:text-white">Interview Session</span>
                                                 <span className="text-[10px] font-semibold text-cobalt-600 dark:text-cobalt-400">{dateStr}</span>
@@ -264,7 +264,7 @@ export const CandidatePortal: React.FC = () => {
                         ) : (
                             <div className="space-y-2.5">
                                 {messages.slice(0, 3).map(msg => (
-                                    <div key={msg._id} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50">
+                                    <div key={msg._id} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-300 dark:border-slate-700">
                                         <p className="text-xs font-bold text-slate-900 dark:text-white mb-0.5">{(msg.senderId as any)?.name || 'Recruiter'}</p>
                                         <p className="text-xs text-slate-500 line-clamp-2">{msg.content}</p>
                                     </div>

@@ -23,8 +23,8 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variants = {
     primary: "bg-blue-600 text-white hover:bg-blue-700 shadow-sm shadow-blue-500/20 rounded-full font-semibold",
-    secondary: "bg-white text-slate-800 border border-slate-200/80 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700 dark:hover:bg-slate-750 shadow-sm rounded-full",
-    outline: "border border-slate-300/80 text-slate-700 hover:bg-slate-100/60 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 rounded-full",
+    secondary: "bg-white text-slate-800 border border-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600 dark:hover:bg-slate-750 shadow-sm rounded-full",
+    outline: "border border-slate-300 text-slate-700 hover:bg-slate-100/80 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800 rounded-full",
     ghost: "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/80 dark:hover:text-white rounded-full",
     pill: "bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 rounded-full font-semibold shadow-sm",
     dark: "bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-full font-semibold",
@@ -70,12 +70,12 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`bg-white dark:bg-[#111726] border border-slate-200/70 dark:border-slate-800/80 rounded-2xl md:rounded-3xl p-5 md:p-6 shadow-sm transition-all duration-200 text-slate-900 dark:text-slate-100 ${
-        onClick || hoverEffect ? 'cursor-pointer hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700' : ''
+      className={`bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl md:rounded-3xl p-5 md:p-6 shadow-sm transition-all duration-200 text-slate-900 dark:text-slate-100 ${
+        onClick || hoverEffect ? 'cursor-pointer hover:shadow-md hover:border-slate-400 dark:hover:border-slate-600' : ''
       } ${className}`}
     >
       {(title || action) && (
-        <div className="flex justify-between items-center mb-5 pb-3 border-b border-slate-100 dark:border-slate-800/80">
+        <div className="flex justify-between items-center mb-5 pb-3 border-b border-slate-200 dark:border-slate-700">
           {title && (typeof title === 'string' ? <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">{title}</h3> : title)}
           {action && <div>{action}</div>}
         </div>
@@ -114,8 +114,8 @@ export const Input: React.FC<InputProps> = ({
         )}
         <input
           className={`w-full rounded-xl py-2.5 text-sm transition-all outline-none border
-            bg-white text-slate-900 border-slate-200/90 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 
-            dark:bg-slate-900/90 dark:text-white dark:border-slate-700 dark:focus:ring-blue-500/30 dark:focus:border-blue-500 dark:placeholder-slate-500
+            bg-white text-slate-900 border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 
+            dark:bg-slate-900/90 dark:text-white dark:border-slate-600 dark:focus:ring-blue-500/30 dark:focus:border-blue-500 dark:placeholder-slate-500
             ${error ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500 dark:border-red-500' : ''}
             ${Icon ? 'pl-10' : 'px-4'} ${EndIcon ? 'pr-10' : 'px-4'}
             ${className}`}
@@ -148,23 +148,23 @@ export interface BadgeProps {
 export const Badge: React.FC<BadgeProps> = ({ children, variant = 'neutral', className = '', dot = false }) => {
   const styles: Record<string, string> = {
     // Standard Statuses
-    success: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50',
-    warning: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/50',
-    danger: 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50',
-    error: 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-200/70 dark:border-rose-800/50',
-    info: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200/70 dark:border-blue-800/50',
-    neutral: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700',
-    purple: 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border-purple-200/70 dark:border-purple-800/50',
-    outline: 'bg-transparent text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700',
+    success: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700',
+    warning: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-300 dark:border-amber-700',
+    danger: 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-300 dark:border-rose-700',
+    error: 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-300 dark:border-rose-700',
+    info: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-300 dark:border-blue-700',
+    neutral: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-600',
+    purple: 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border-purple-300 dark:border-purple-700',
+    outline: 'bg-transparent text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600',
     
     // Enterprise Pipeline Badges
-    interview: 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 border-blue-200/60 dark:border-blue-800/40',
-    screening: 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40',
-    assessment: 'bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 border-purple-200/60 dark:border-purple-800/40',
-    new: 'bg-slate-100 text-slate-600 dark:bg-slate-800/80 dark:text-slate-300 border-slate-200 dark:border-slate-700/80',
-    completed: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40',
-    remote: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400',
-    hybrid: 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400',
+    interview: 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 border-blue-300 dark:border-blue-700',
+    screening: 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 border-amber-300 dark:border-amber-700',
+    assessment: 'bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 border-purple-300 dark:border-purple-700',
+    new: 'bg-slate-100 text-slate-600 dark:bg-slate-800/80 dark:text-slate-300 border-slate-300 dark:border-slate-600',
+    completed: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700',
+    remote: 'bg-emerald-50 text-emerald-600 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-700',
+    hybrid: 'bg-blue-50 text-blue-600 border-blue-300 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-700',
   };
 
   const dotColors: Record<string, string> = {
@@ -206,9 +206,9 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" onClick={onClose} />
-      <div className={`relative rounded-3xl w-full ${widthClass} shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh] bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 overflow-hidden`}>
+      <div className={`relative rounded-3xl w-full ${widthClass} shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh] bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 overflow-hidden`}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/50 rounded-t-3xl flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 rounded-t-3xl flex-shrink-0">
           <div className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
             {title}
           </div>
@@ -261,8 +261,8 @@ export const MetricStatCard: React.FC<MetricStatCardProps> = ({
     emerald: "bg-[#10B981] text-white",
     blue: "bg-[#2563EB] text-white",
     coral: "bg-[#FF6B6B] text-white",
-    dark: "bg-slate-900 text-white dark:bg-slate-850 border border-slate-800",
-    white: "bg-white text-slate-900 dark:bg-[#111726] dark:text-white border border-slate-200/70 dark:border-slate-800/80 shadow-sm",
+    dark: "bg-slate-900 text-white dark:bg-slate-850 border border-slate-700",
+    white: "bg-white text-slate-900 dark:bg-[#111726] dark:text-white border border-slate-300 dark:border-slate-700 shadow-sm",
   };
 
   const isSolid = colorVariant !== 'white';
@@ -421,7 +421,7 @@ export const AISummaryCard: React.FC<AISummaryCardProps> = ({
   className = ''
 }) => {
   return (
-    <div className={`rounded-2xl p-4.5 bg-blue-50/70 border border-blue-200/60 dark:bg-blue-950/25 dark:border-blue-800/40 text-slate-900 dark:text-slate-100 ${className}`}>
+    <div className={`rounded-2xl p-4.5 bg-blue-50/70 border border-blue-300 dark:bg-blue-950/25 dark:border-blue-700 text-slate-900 dark:text-slate-100 ${className}`}>
       <div className="flex items-center gap-2 mb-2">
         <div className="w-5 h-5 rounded-md bg-blue-600 flex items-center justify-center text-white">
           <Sparkles className="w-3 h-3" />
@@ -434,9 +434,9 @@ export const AISummaryCard: React.FC<AISummaryCardProps> = ({
         {summary}
       </p>
       {highlights.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 pt-1 border-t border-blue-200/40 dark:border-blue-800/30">
+        <div className="flex flex-wrap gap-1.5 pt-1 border-t border-blue-300 dark:border-blue-700">
           {highlights.map((h, i) => (
-            <span key={i} className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/80 dark:bg-slate-900/60 text-blue-700 dark:text-blue-300 border border-blue-200/50 dark:border-blue-700/50">
+            <span key={i} className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/80 dark:bg-slate-900/60 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-600">
               {h}
             </span>
           ))}
@@ -463,7 +463,7 @@ export const InspectionDrawer: React.FC<InspectionDrawerProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={`rounded-2xl md:rounded-3xl bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 shadow-xl p-6 transition-all duration-300 flex flex-col ${className}`}>
+    <div className={`rounded-2xl md:rounded-3xl bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 shadow-xl p-6 transition-all duration-300 flex flex-col ${className}`}>
       <div className="flex justify-end mb-2">
         <button
           onClick={onClose}

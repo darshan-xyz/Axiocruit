@@ -20,7 +20,7 @@ export const CandidateApplicationsView: React.FC = () => {
         <div className="w-full space-y-6">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">My Applications</h2>
             {applications.length === 0 ? (
-                <div className="text-center p-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
+                <div className="text-center p-12 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl">
                     <Briefcase className="w-12 h-12 text-slate-400 mx-auto mb-3" />
                     <p className="text-slate-500 text-sm">You haven't applied to any positions yet.</p>
                 </div>
@@ -39,7 +39,7 @@ export const CandidateApplicationsView: React.FC = () => {
                                 </Badge>
                             </div>
                             <p className="text-cobalt-600 dark:text-cobalt-400 text-xs font-semibold mb-4">{app.job?.company || 'Company'} • {app.job?.location || 'Remote'}</p>
-                            <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                            <div className="mt-auto pt-4 border-t border-slate-300 dark:border-slate-700 flex justify-between items-center">
                                 <span className="text-xs text-slate-400">Applied: {new Date(app.appliedAt).toLocaleDateString()}</span>
                                 <div className="flex items-center gap-2 flex-wrap">
                                     {app.job?.postedBy && (

@@ -23,7 +23,7 @@ export const TimeTrackingStopwatch: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -41,7 +41,7 @@ export const TimeTrackingStopwatch: React.FC = () => {
           Rubric assessment session time tracker for candidate evaluations.
         </p>
 
-        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 text-center mb-4">
+        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-700 text-center mb-4">
           <div className="font-mono text-3xl font-black text-slate-900 dark:text-white tracking-wider">
             {formatTime(seconds)}
           </div>
@@ -51,7 +51,7 @@ export const TimeTrackingStopwatch: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+      <div className="flex items-center gap-2 pt-3 border-t border-slate-300 dark:border-slate-700">
         <button
           onClick={() => setIsRunning(!isRunning)}
           className={`flex-1 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer ${
@@ -64,7 +64,7 @@ export const TimeTrackingStopwatch: React.FC = () => {
         </button>
         <button
           onClick={() => { setSeconds(0); setIsRunning(false); }}
-          className="p-2 rounded-full border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          className="p-2 rounded-full border border-slate-300 dark:border-slate-600 text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           title="Reset timer"
         >
           <RotateCcw size={14} />
@@ -101,7 +101,7 @@ export const TagNotesWidget: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -122,7 +122,7 @@ export const TagNotesWidget: React.FC = () => {
             notes.map((note, idx) => (
               <div
                 key={idx}
-                className="p-2.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200/50 dark:border-purple-800/30 flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300"
+                className="p-2.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-300 dark:border-purple-700/50 flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5 flex-shrink-0" />
                 <span className="flex-1 leading-snug">{note}</span>
@@ -138,12 +138,12 @@ export const TagNotesWidget: React.FC = () => {
         </div>
       </div>
 
-      <form onSubmit={handleAddNote} className="flex items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+      <form onSubmit={handleAddNote} className="flex items-center gap-2 pt-3 border-t border-slate-300 dark:border-slate-700">
         <input
           value={newNote}
           onChange={e => setNewNote(e.target.value)}
           placeholder="Add candidate note..."
-          className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full px-3.5 py-1.5 text-xs text-slate-900 dark:text-white outline-none focus:border-purple-500"
+          className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-full px-3.5 py-1.5 text-xs text-slate-900 dark:text-white outline-none focus:border-purple-500"
         />
         <button
           type="submit"
@@ -186,7 +186,7 @@ export const MiniCalendarWidget: React.FC<{ interviews?: any[] }> = ({ interview
   }).length;
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
@@ -231,7 +231,7 @@ export const MiniCalendarWidget: React.FC<{ interviews?: any[] }> = ({ interview
         </div>
       </div>
 
-      <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 flex items-center justify-between">
+      <div className="pt-3 mt-3 border-t border-slate-300 dark:border-slate-700 text-[11px] text-slate-500 flex items-center justify-between">
         <span className="flex items-center gap-1.5 font-bold text-blue-600 dark:text-blue-400">
           <span className="w-2 h-2 rounded-full bg-blue-600" /> Today: {todayCount} {todayCount === 1 ? 'Interview' : 'Interviews'}
         </span>
@@ -300,27 +300,27 @@ export const MyTaskScheduleList: React.FC<{ interviews?: any[] }> = ({ interview
   };
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
             <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
               My Task
             </h3>
-            <span className="px-2.5 py-0.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 flex items-center gap-1.5 shadow-2xs">
+            <span className="px-2.5 py-0.5 rounded-xl border border-slate-300 dark:border-slate-600 text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 flex items-center gap-1.5 shadow-2xs">
               <span>Today</span>
             </span>
           </div>
           <button
             onClick={() => (window.location.href = '#/recruiter/schedule')}
-            className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-black text-slate-800 dark:text-slate-200 hover:bg-slate-50 flex items-center gap-1 shadow-2xs cursor-pointer"
+            className="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-xs font-black text-slate-800 dark:text-slate-200 hover:bg-slate-50 flex items-center gap-1 shadow-2xs cursor-pointer"
           >
             + ADD TASK
           </button>
         </div>
 
         {tasks.length === 0 ? (
-          <div className="py-8 px-4 text-center rounded-2xl bg-slate-50/60 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 space-y-2">
+          <div className="py-8 px-4 text-center rounded-2xl bg-slate-50/60 dark:bg-slate-900/40 border border-slate-300 dark:border-slate-700 space-y-2">
             <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
               No live interview tasks scheduled for today
             </p>
@@ -340,7 +340,7 @@ export const MyTaskScheduleList: React.FC<{ interviews?: any[] }> = ({ interview
               <div
                 key={t.id}
                 onClick={() => toggleDone(t.id)}
-                className={`p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/80 ${t.color} flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-100/60 dark:hover:bg-slate-850/60 transition-colors`}
+                className={`p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 ${t.color} flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-100/60 dark:hover:bg-slate-850/60 transition-colors`}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold whitespace-nowrap min-w-[90px]">

@@ -24,6 +24,13 @@ interface Question {
   category: 'basics' | 'oop' | 'dsa';
   visibleTestCases: TestCase[];
   starterCode?: string;
+  starterTemplates?: {
+    python?: string;
+    javascript?: string;
+    typescript?: string;
+    java?: string;
+    cpp?: string;
+  };
 }
 
 interface VisibleCaseResult {
@@ -106,9 +113,12 @@ export const CodingAssessment: React.FC = () => {
       });
     });
 
-    socket.on('code-change', ({ code: incomingCode }: any) => {
+    socket.on('code-change', ({ code: incomingCode, language: incomingLang }: any) => {
       if (incomingCode !== undefined) {
         setCode(incomingCode);
+      }
+      if (incomingLang !== undefined) {
+        setLanguage(incomingLang);
       }
     });
 
@@ -118,7 +128,40 @@ export const CodingAssessment: React.FC = () => {
   }, [actualSessionId, sessionId]);
 
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [language, setLanguage]               = useState<string>('python');
   const [code, setCode]                       = useState<string>('');
+
+  const getInitialCode = (q: Question | null, lang: string) => {
+    const templates: Record<string, string> = {
+      python: `# Write your Python solution below\n# Read input using: input() or sys.stdin.read()\n# Print output using: print()\n\n`,
+      javascript: `// Write your JavaScript (Node.js) solution below\n// Read input using fs.readFileSync(0, 'utf-8')\n// Print output using console.log()\nconst fs = require('fs');\n\n`,
+      typescript: `// Write your TypeScript solution below\nimport * as fs from 'fs';\n\n`,
+      java: `import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Write your solution below\n    }\n}\n`,
+      cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    // Write your solution below\n    return 0;\n}\n`,
+    };
+    if (!q) return templates[lang] || templates.python;
+    if (q.starterTemplates && (q.starterTemplates as any)[lang]) {
+      return (q.starterTemplates as any)[lang]!;
+    }
+    if (lang === 'python' && q.starterCode) {
+      return q.starterCode;
+    }
+    return templates[lang] || templates.python;
+  };
+
+  const handleLanguageChange = (newLang: string) => {
+    setLanguage(newLang);
+    const newTemplate = getInitialCode(currentQuestion, newLang);
+    setCode(newTemplate);
+    const activeId = actualSessionIdRef.current || sessionId;
+    if (socketRef.current && activeId) {
+      socketRef.current.emit('code-change', {
+        roomId: activeId,
+        code: newTemplate,
+        language: newLang,
+      });
+    }
+  };
 
   const handleCodeChange = (val: string | undefined) => {
     const newCode = val ?? '';
@@ -128,7 +171,7 @@ export const CodingAssessment: React.FC = () => {
       socketRef.current.emit('code-change', {
         roomId: activeId,
         code: newCode,
-        language: 'python'
+        language,
       });
     }
   };
@@ -253,7 +296,7 @@ export const CodingAssessment: React.FC = () => {
       const res: SubmitResponse = await apiRequest(
         `/coding-test/${targetSessionId}/submit`,
         'POST',
-        { questionId: currentQuestion._id, submittedCode: code }
+        { questionId: currentQuestion._id, submittedCode: code, language }
       );
 
       submittedIds.current.add(currentQuestion._id);
@@ -678,11 +721,31 @@ export const CodingAssessment: React.FC = () => {
             style={{ flexShrink: 0, padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
           >
             <div className="flex items-center gap-2">
-              <span className={`text-xs font-mono font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>solution.py</span>
+              <span className={`text-xs font-mono font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                {language === 'python' ? 'solution.py' :
+                 language === 'javascript' ? 'solution.js' :
+                 language === 'typescript' ? 'solution.ts' :
+                 language === 'java' ? 'Solution.java' : 'solution.cpp'}
+              </span>
             </div>
             <div className="flex items-center gap-3">
-              <span className={`text-[10px] px-2 py-0.5 rounded ${isDark ? 'text-neutral-600 bg-neutral-800/60' : 'text-blue-600 bg-blue-100'}`}>Python 3</span>
-              <span className={`text-[10px] ${isDark ? 'text-neutral-600' : 'text-blue-600'}`}>Ctrl+Enter to submit</span>
+              <select
+                value={language}
+                onChange={(e) => handleLanguageChange(e.target.value)}
+                disabled={hasSubmitted}
+                className={`text-[11px] rounded px-2 py-0.5 outline-none cursor-pointer transition ${
+                  isDark ? 'bg-neutral-800 text-neutral-200 border border-neutral-700' : 'bg-white text-slate-700 border border-slate-300'
+                }`}
+              >
+                <option value="python">Python 3</option>
+                <option value="javascript">JavaScript (Node.js)</option>
+                <option value="typescript">TypeScript</option>
+                <option value="java">Java (JDK 21)</option>
+                <option value="cpp">C++ (C++17)</option>
+              </select>
+              <span className={`text-[10px] hidden sm:inline ${isDark ? 'text-neutral-500' : 'text-slate-500'}`}>
+                Ctrl+Enter to submit
+              </span>
             </div>
           </div>
 
@@ -691,7 +754,7 @@ export const CodingAssessment: React.FC = () => {
             <Editor
               height="100%"
               defaultLanguage="python"
-              language="python"
+              language={language === 'java' ? 'java' : (language === 'cpp' ? 'cpp' : (language === 'typescript' ? 'typescript' : (language === 'javascript' ? 'javascript' : 'python')))}
               value={code}
               onChange={handleCodeChange}
               theme={isDark ? 'vs-dark' : 'light'}

@@ -172,3 +172,57 @@ export interface Message {
   isRead: boolean;
   createdAt: string;
 }
+
+export interface CodingTestCase {
+  input: string;
+  expectedOutput: string;
+}
+
+export interface CodingQuestion {
+  _id: string;
+  title: string;
+  description: string;
+  starterCode?: string;
+  starterTemplates?: {
+    python?: string;
+    javascript?: string;
+    typescript?: string;
+    java?: string;
+    cpp?: string;
+  };
+  functionName?: string;
+  difficulty: 'very_easy' | 'easy' | 'medium' | 'hard';
+  category: 'basics' | 'oop' | 'dsa';
+  visibleTestCases: CodingTestCase[];
+  hiddenTestCases?: CodingTestCase[];
+  createdAt?: string;
+}
+
+export interface TestResponse {
+  questionId: string | CodingQuestion;
+  submittedCode: string;
+  language?: string;
+  passed: boolean;
+  score: number;
+  aiAnalysis?: {
+    logicScore: number;
+    accuracyFeedback: string;
+    efficiencyFeedback: string;
+    model?: string;
+  };
+}
+
+export interface TestSession {
+  _id: string;
+  candidateId: string | User;
+  jobId?: string | Job;
+  questionsAsked: (string | CodingQuestion)[];
+  responses: TestResponse[];
+  currentDifficulty: 'very_easy' | 'easy' | 'medium' | 'hard';
+  currentCategory: 'basics' | 'oop' | 'dsa' | null;
+  status: 'in_progress' | 'completed';
+  finalScore: number;
+  startedAt: string;
+  completedAt?: string;
+}
+

@@ -26,7 +26,7 @@ export const JobsSummaryDonutChart: React.FC<JobsSummaryDonutChartProps> = ({ jo
   const cRatio = total > 0 ? closed / total : 0;
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
@@ -83,7 +83,7 @@ export const JobsSummaryDonutChart: React.FC<JobsSummaryDonutChartProps> = ({ jo
         </div>
 
         {/* Legend */}
-        <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 text-xs">
+        <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-300 dark:border-slate-700 text-xs">
           <div className="flex items-center gap-2 p-2">
             <span className="w-1 h-5 rounded-full bg-[#8B5CF6]" />
             <div>

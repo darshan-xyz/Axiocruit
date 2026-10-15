@@ -249,7 +249,7 @@ export const CandidateProfileView: React.FC = () => {
                         <Input label="Professional Headline" placeholder="e.g. Senior Full Stack Developer" value={formData.headline} onChange={(e) => setFormData({ ...formData, headline: e.target.value })} />
                         <div>
                             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Bio</label>
-                            <textarea className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white h-24 focus:border-cobalt-500 outline-none text-sm"
+                            <textarea className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white h-24 focus:border-cobalt-500 outline-none text-sm"
                                 placeholder="Tell recruiters about yourself..." value={formData.bio} onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                             />
                         </div>
@@ -260,7 +260,7 @@ export const CandidateProfileView: React.FC = () => {
             <Card title="Work Experience">
                 <div className="space-y-4">
                     {experience.map((exp, idx) => (
-                        <div key={idx} className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 relative group">
+                        <div key={idx} className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-300 dark:border-slate-700 relative group">
                             <button
                                 onClick={() => handleRemoveExperience(idx)}
                                 className="absolute top-4 right-4 text-slate-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -275,7 +275,7 @@ export const CandidateProfileView: React.FC = () => {
                     ))}
 
                     {showExpForm ? (
-                        <div className="p-6 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl space-y-4 animate-in fade-in zoom-in duration-200">
+                        <div className="p-6 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl space-y-4 animate-in fade-in zoom-in duration-200">
                             <div className="grid md:grid-cols-2 gap-4">
                                 <Input label="Company" placeholder="Google" value={newExp.company} onChange={e => setNewExp({ ...newExp, company: e.target.value })} />
                                 <Input label="Designation" placeholder="Software Engineer" value={newExp.designation} onChange={e => setNewExp({ ...newExp, designation: e.target.value })} />
@@ -287,7 +287,7 @@ export const CandidateProfileView: React.FC = () => {
                             <div>
                                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Description</label>
                                 <textarea
-                                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white h-20 focus:border-cobalt-500 outline-none text-sm"
+                                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white h-20 focus:border-cobalt-500 outline-none text-sm"
                                     placeholder="Describe your role..."
                                     value={newExp.work}
                                     onChange={e => setNewExp({ ...newExp, work: e.target.value })}
@@ -309,7 +309,7 @@ export const CandidateProfileView: React.FC = () => {
             <Card title="Education">
                 <div className="space-y-4">
                     {education.map((edu, idx) => (
-                        <div key={idx} className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 relative group">
+                        <div key={idx} className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-300 dark:border-slate-700 relative group">
                             <button
                                 onClick={() => handleRemoveEducation(idx)}
                                 className="absolute top-4 right-4 text-slate-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -323,7 +323,7 @@ export const CandidateProfileView: React.FC = () => {
                     ))}
 
                     {showEduForm ? (
-                        <div className="p-6 bg-neutral-900 border border-neutral-700 rounded-lg space-y-4 animate-in fade-in zoom-in duration-200">
+                        <div className="p-6 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl space-y-4 animate-in fade-in zoom-in duration-200">
                             <div className="grid md:grid-cols-2 gap-4">
                                 <Input label="Institution" placeholder="Stanford University" value={newEdu.institution} onChange={e => setNewEdu({ ...newEdu, institution: e.target.value })} />
                                 <Input label="Degree" placeholder="Bachelor's" value={newEdu.degree} onChange={e => setNewEdu({ ...newEdu, degree: e.target.value })} />
@@ -360,16 +360,16 @@ export const CandidateProfileView: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="border-t border-neutral-800 pt-6">
+                    <div className="border-t border-slate-300 dark:border-slate-700 pt-6">
                         <label className="block text-sm font-medium text-neutral-400 mb-3">Resume / CV</label>
-                        <label className="border-2 border-dashed border-neutral-700 rounded-xl p-8 text-center hover:bg-neutral-800/50 transition-colors cursor-pointer block">
+                        <label className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-8 text-center hover:bg-neutral-800/50 transition-colors cursor-pointer block">
                             <FileText className="w-8 h-8 mx-auto text-neutral-500 mb-2" />
                             <p className="text-neutral-300 font-medium">{resumeName || "Click to upload or drag and drop"}</p>
                             <p className="text-xs text-neutral-500 mt-1">PDF Only (Max 10MB)</p>
                             <input type="file" className="hidden" accept="application/pdf" onChange={(e) => handleFileChange(e, 'resume')} />
                         </label>
                         {resumeUrl && (
-                            <div className="mt-4 flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <div className="mt-4 flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-300 dark:border-slate-700">
                                 <div className="flex items-center gap-2">
                                     <FileText size={16} className="text-cobalt-600 dark:text-cobalt-400" />
                                     <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Resume Uploaded & Verified</span>

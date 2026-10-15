@@ -68,7 +68,7 @@ const Avatar: React.FC<{
                 src={photoUrl}
                 alt={name || 'User'}
                 onError={() => setImgError(true)}
-                className={`${dim} rounded-full object-cover flex-shrink-0 border border-neutral-700`}
+                className={`${dim} rounded-full object-cover flex-shrink-0 border border-slate-300 dark:border-neutral-700`}
             />
         );
     }
@@ -401,7 +401,7 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                className="border-neutral-700 text-neutral-300 hover:text-white hover:border-blue-500"
+                                                className="border-slate-300 dark:border-neutral-700 text-neutral-300 hover:text-white hover:border-blue-500"
                                                 onClick={() => {
                                                     const otherId = other?._id;
                                                     if (!otherId) return;

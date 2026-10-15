@@ -56,14 +56,14 @@ export const AdminLayout: React.FC = () => {
     ];
 
     const sidebarBg = isDark
-        ? 'bg-slate-900/90 border-r border-slate-800/80 backdrop-blur-xl'
-        : 'bg-white/95 border-r border-slate-200/80 backdrop-blur-xl';
+        ? 'bg-slate-900/90 border-r border-slate-700 backdrop-blur-xl'
+        : 'bg-white/95 border-r border-slate-300 backdrop-blur-xl';
     const mainBg = isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900';
     const textPrimary = isDark ? 'text-slate-100' : 'text-slate-900';
     const textMuted = isDark ? 'text-slate-400' : 'text-slate-500';
     const headerBg = isDark
-        ? 'border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl'
-        : 'border-b border-slate-200/80 bg-white/80 backdrop-blur-xl';
+        ? 'border-b border-slate-700 bg-slate-950/80 backdrop-blur-xl'
+        : 'border-b border-slate-300 bg-white/80 backdrop-blur-xl';
 
     const currentItem = navItems.find(i => location.pathname === i.path || (location.pathname.startsWith(i.path) && i.path !== '/admin/dashboard'));
     const pageTitle = currentItem?.label || 'Admin Panel';
@@ -76,7 +76,7 @@ export const AdminLayout: React.FC = () => {
             {/* Sidebar */}
             <aside className={`w-64 fixed h-full flex flex-col z-20 ${sidebarBg}`}>
                 {/* Brand Area */}
-                <div className={`h-16 flex items-center px-5 gap-3 border-b ${isDark ? 'border-slate-800/80' : 'border-slate-200/80'}`}>
+                <div className={`h-16 flex items-center px-5 gap-3 border-b ${isDark ? 'border-slate-700' : 'border-slate-300'}`}>
                     <div className="w-8 h-8 rounded-xl bg-cobalt-600 flex items-center justify-center text-white font-bold shadow-md shadow-cobalt-500/20">
                         <Shield size={16} />
                     </div>
@@ -110,9 +110,9 @@ export const AdminLayout: React.FC = () => {
                 </nav>
 
                 {/* Sidebar Footer */}
-                <div className={`p-3 border-t space-y-2 ${isDark ? 'border-slate-800/80' : 'border-slate-200/80'}`}>
+                <div className={`p-3 border-t space-y-2 ${isDark ? 'border-slate-700' : 'border-slate-300'}`}>
                     {/* User info */}
-                    <div className={`flex items-center gap-3 px-3 py-2 rounded-xl ${isDark ? 'bg-slate-800/60 border border-slate-700/50' : 'bg-slate-100/80 border border-slate-200/60'}`}>
+                    <div className={`flex items-center gap-3 px-3 py-2 rounded-xl ${isDark ? 'bg-slate-800/60 border border-slate-700' : 'bg-slate-100/80 border border-slate-300'}`}>
                         <div className="w-8 h-8 rounded-full bg-slate-900 dark:bg-slate-800 text-white flex items-center justify-center text-xs font-bold flex-shrink-0 shadow-sm ring-1 ring-slate-300 dark:ring-slate-700">
                             {userInitial}
                         </div>
@@ -123,7 +123,7 @@ export const AdminLayout: React.FC = () => {
                     </div>
 
                     {/* Theme toggle */}
-                    <div className={`flex items-center justify-between px-3 py-2 rounded-xl ${isDark ? 'bg-slate-800/60 border border-slate-700/50' : 'bg-slate-100/80 border border-slate-200/60'}`}>
+                    <div className={`flex items-center justify-between px-3 py-2 rounded-xl ${isDark ? 'bg-slate-800/60 border border-slate-700' : 'bg-slate-100/80 border border-slate-300'}`}>
                         <span className={`text-xs font-medium ${textMuted}`}>{isDark ? 'Dark Mode' : 'Light Mode'}</span>
                         <ThemeToggle />
                     </div>

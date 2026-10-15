@@ -45,7 +45,7 @@ export const CandidateJobsView: React.FC = () => {
                     <div className="relative">
                         <Search className="absolute left-3 top-2.5 text-slate-400 w-4 h-4" />
                         <input
-                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-900 dark:text-white focus:border-cobalt-500 outline-none"
+                            className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-900 dark:text-white focus:border-cobalt-500 outline-none"
                             placeholder="Job Title..."
                             value={filters.title}
                             onChange={(e) => setFilters({ ...filters, title: e.target.value })}
@@ -54,14 +54,14 @@ export const CandidateJobsView: React.FC = () => {
                     <div className="relative">
                         <MapPin className="absolute left-3 top-2.5 text-slate-400 w-4 h-4" />
                         <input
-                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-900 dark:text-white focus:border-cobalt-500 outline-none"
+                            className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-900 dark:text-white focus:border-cobalt-500 outline-none"
                             placeholder="Location..."
                             value={filters.location}
                             onChange={(e) => setFilters({ ...filters, location: e.target.value })}
                         />
                     </div>
                     <select
-                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white focus:border-cobalt-500 outline-none"
+                        className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white focus:border-cobalt-500 outline-none"
                         value={filters.type}
                         onChange={(e) => setFilters({ ...filters, type: e.target.value })}
                     >
@@ -82,7 +82,7 @@ export const CandidateJobsView: React.FC = () => {
                     jobs.map(job => (
                         <Card key={job._id} className="hover:-translate-y-1 transition-transform cursor-pointer flex flex-col h-full relative group" onClick={() => setSelectedJob(job)}>
                             <div className="flex justify-between items-start mb-4">
-                                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center">
                                     <span className="text-slate-900 dark:text-white font-black text-base">{job.company.substring(0, 2).toUpperCase()}</span>
                                 </div>
                                 <Badge variant="neutral">{job.type}</Badge>
@@ -91,7 +91,7 @@ export const CandidateJobsView: React.FC = () => {
                             <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">{job.company} • {job.location}</p>
                             <div className="flex-1"></div>
                             <div className="flex gap-2 flex-wrap mb-4">
-                                {job.salary && <span className="text-xs border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-full px-2.5 py-0.5 flex items-center gap-1 font-semibold"><DollarSign size={11} className="text-emerald-500" /> {job.salary}</span>}
+                                {job.salary && <span className="text-xs border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-full px-2.5 py-0.5 flex items-center gap-1 font-semibold"><DollarSign size={11} className="text-emerald-500" /> {job.salary}</span>}
                                 {job.postedBy && <span className="text-xs text-slate-400 self-center">Posted {new Date(job.createdAt).toLocaleDateString()}</span>}
                             </div>
                             <div className="flex gap-2">
@@ -115,7 +115,7 @@ export const CandidateJobsView: React.FC = () => {
                             <Badge variant="remote" className="text-sm px-3 py-1">{selectedJob.type}</Badge>
                         </div>
 
-                        <div className="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800 pb-6">
+                        <div className="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-slate-300 border-b border-slate-300 dark:border-slate-700 pb-6">
                             <span className="flex items-center gap-2"><MapPin size={16} className="text-cobalt-500" /> {selectedJob.location}</span>
                             {selectedJob.salary && <span className="flex items-center gap-2"><DollarSign size={16} className="text-emerald-500" /> {selectedJob.salary}</span>}
                             <span className="flex items-center gap-2"><Clock size={16} className="text-slate-400" /> Posted {new Date(selectedJob.createdAt).toLocaleDateString()}</span>
@@ -146,7 +146,7 @@ export const CandidateJobsView: React.FC = () => {
                             </div>
                         )}
 
-                        <div className="pt-6 border-t border-neutral-800 flex justify-end gap-3">
+                        <div className="pt-6 border-t border-slate-300 dark:border-slate-700 flex justify-end gap-3">
                             <Button variant="ghost" onClick={() => setSelectedJob(null)}>Close</Button>
                             <Button onClick={() => { handleApply(selectedJob); setSelectedJob(null); }}>Apply</Button>
                         </div>

@@ -22,6 +22,13 @@ const codingQuestionSchema = new mongoose.Schema({
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true },
     starterCode: { type: String, default: '' },
+    starterTemplates: {
+        python: { type: String, default: '' },
+        javascript: { type: String, default: '' },
+        typescript: { type: String, default: '' },
+        cpp: { type: String, default: '' },
+        java: { type: String, default: '' },
+    },
     functionName: { type: String, default: '' },
     difficulty: {
         type: String,

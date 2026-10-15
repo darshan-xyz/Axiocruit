@@ -14,7 +14,7 @@ const JobReviewModal: React.FC<JobReviewModalProps> = ({ job, onClose }) => {
         <Modal isOpen={!!job} onClose={onClose} title="Job Details">
             <div className="space-y-6">
                 {/* Header Section */}
-                <div className="border-b border-neutral-800 pb-4">
+                <div className="border-b border-slate-300 dark:border-neutral-700 pb-4">
                     <h2 className="text-2xl font-bold text-white mb-2">{job.title}</h2>
                     <div className="flex flex-wrap gap-4 text-sm text-neutral-400">
                         <span className="flex items-center gap-1.5">
@@ -64,13 +64,13 @@ const JobReviewModal: React.FC<JobReviewModalProps> = ({ job, onClose }) => {
 
                 {/* Skills */}
                 {job.skills && job.skills.length > 0 && (
-                    <div className="pt-4 border-t border-neutral-800">
+                    <div className="pt-4 border-t border-slate-300 dark:border-neutral-700">
                         <h3 className="text-sm font-semibold text-neutral-300 uppercase tracking-wider mb-3">Required Skills</h3>
                         <div className="flex flex-wrap gap-2">
                             {job.skills.map((skill: string, index: number) => (
                                 <span 
                                     key={index} 
-                                    className="text-xs px-3 py-1 bg-neutral-800 text-neutral-300 rounded-full border border-neutral-700"
+                                    className="text-xs px-3 py-1 bg-neutral-800 text-neutral-300 rounded-full border border-neutral-600"
                                 >
                                     {skill}
                                 </span>

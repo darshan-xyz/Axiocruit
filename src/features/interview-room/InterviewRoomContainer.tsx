@@ -442,6 +442,15 @@ export const InterviewRoomContainer: React.FC = () => {
                         code={signaling.code}
                         language={signaling.editorLanguage}
                         onChange={signaling.broadcastCodeChange}
+                        onLanguageChange={(newLang) => {
+                            signaling.setEditorLanguage(newLang);
+                            if (signaling.socketRef.current && interview) {
+                                signaling.socketRef.current.emit('language-change', {
+                                    roomId: interview.meetingId,
+                                    language: newLang,
+                                });
+                            }
+                        }}
                         isEditorFocused={isEditorFocused}
                         onToggleFocus={() => setIsEditorFocused(!isEditorFocused)}
                         editorContainerRef={editorContainerRef}

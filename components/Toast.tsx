@@ -15,10 +15,10 @@ const iconMap = {
 };
 
 const colorMap = {
-    success: 'border-green-500/30 bg-green-500/10 text-green-400',
-    error: 'border-red-500/30 bg-red-500/10 text-red-400',
-    info: 'border-blue-500/30 bg-blue-500/10 text-blue-400',
-    warning: 'border-amber-500/30 bg-amber-500/10 text-amber-400',
+    success: 'border-green-500/60 bg-green-500/10 text-green-400',
+    error: 'border-red-500/60 bg-red-500/10 text-red-400',
+    info: 'border-blue-500/60 bg-blue-500/10 text-blue-400',
+    warning: 'border-amber-500/60 bg-amber-500/10 text-amber-400',
 };
 
 const Toast: React.FC<{ toast: ToastMessage; onDismiss: (id: string) => void }> = ({ toast, onDismiss }) => {

@@ -129,13 +129,13 @@ export const HiringMatrixGrid: React.FC<HiringMatrixGridProps> = ({ jobs, applic
   }, [jobs, applications]);
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
             Technical Pipeline Matrix
           </h3>
-          <button className="px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 flex items-center gap-1.5 shadow-2xs">
+          <button className="px-3 py-1 rounded-xl border border-slate-300 dark:border-slate-600 text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 flex items-center gap-1.5 shadow-2xs">
             <span>Engineering</span>
             <ChevronRight size={12} className="rotate-90 text-slate-400" />
           </button>
@@ -151,7 +151,7 @@ export const HiringMatrixGrid: React.FC<HiringMatrixGridProps> = ({ jobs, applic
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <tr className="border-b border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               <th className="pb-3 pr-4 font-bold">Jobs</th>
               <th className="pb-3 px-3 text-center font-bold">New Applied</th>
               <th className="pb-3 px-3 text-center font-bold">Screening</th>
@@ -160,7 +160,7 @@ export const HiringMatrixGrid: React.FC<HiringMatrixGridProps> = ({ jobs, applic
               <th className="pb-3 pl-3 text-center font-bold">Hired</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-700 text-xs">
             {rows.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-slate-400 dark:text-neutral-500 font-medium">

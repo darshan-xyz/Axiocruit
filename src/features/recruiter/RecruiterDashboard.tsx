@@ -88,7 +88,7 @@ export const RecruiterDashboard: React.FC = () => {
         <div className="w-full space-y-6 animate-in fade-in duration-300">
 
             {/* 1. HERO RECRUITER PROFILE BANNER */}
-            <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
                     <div className="relative">
                         <img
@@ -103,7 +103,7 @@ export const RecruiterDashboard: React.FC = () => {
                             <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                                 {displayName}
                             </h2>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-300 dark:border-blue-700">
                                 Hiring Lead
                             </span>
                         </div>
@@ -202,7 +202,7 @@ export const RecruiterDashboard: React.FC = () => {
                 <ConcentricFormatRings jobs={rawJobs} />
                 
                 {/* Weekly Recruitment Velocity Arc & Split Format */}
-                <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm h-full flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-3xl p-6 shadow-sm h-full flex flex-col justify-between">
                     <div>
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
@@ -224,19 +224,19 @@ export const RecruiterDashboard: React.FC = () => {
                         </div>
 
                         {/* Working Format Split Cards */}
-                        <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div className="mt-5 pt-4 border-t border-slate-300 dark:border-slate-700">
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2.5">
                                 Candidate Work Preference
                             </span>
                             <div className="grid grid-cols-2 gap-3">
-                                <div className="flex items-center justify-between p-3 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40">
+                                <div className="flex items-center justify-between p-3 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-700">
                                     <div className="flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-emerald-500" />
                                         <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Remote</span>
                                     </div>
                                     <span className="text-xs font-black text-emerald-700 dark:text-emerald-400">{remotePrefPercent}%</span>
                                 </div>
-                                <div className="flex items-center justify-between p-3 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-800/40">
+                                <div className="flex items-center justify-between p-3 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-300 dark:border-blue-700">
                                     <div className="flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-blue-500" />
                                         <span className="text-xs font-bold text-blue-800 dark:text-blue-300">Hybrid / Office</span>
@@ -286,7 +286,7 @@ export const RecruiterDashboard: React.FC = () => {
                         const c = statusColors[status] || statusColors.Applied;
 
                         return (
-                            <div key={status} className={`p-4 rounded-2xl ${c.bg} border border-slate-200/60 dark:border-slate-800/60 space-y-2`}>
+                            <div key={status} className={`p-4 rounded-2xl ${c.bg} border border-slate-300 dark:border-slate-700 space-y-2`}>
                                 <div className="flex items-center justify-between">
                                     <span className={`text-[11px] font-bold uppercase tracking-wider ${c.text}`}>{status}</span>
                                     <span className="text-xs font-semibold text-slate-400">{percent}%</span>
@@ -302,14 +302,14 @@ export const RecruiterDashboard: React.FC = () => {
 
                 {/* Recent Jobs with Quick Link to Ranked Candidates */}
                 {recentJobsList.length > 0 && (
-                    <div className="divide-y divide-slate-100 dark:divide-slate-800 pt-2">
+                    <div className="divide-y divide-slate-200 dark:divide-slate-700 pt-2">
                         {recentJobsList.map(job => {
                             const appCount = job.applicantCount || job.applicationCount || (rawApplications.filter((a: any) => (a.job?._id || a.job)?.toString() === job._id?.toString()).length) || 0;
                             return (
                                 <div key={job._id} className="py-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:bg-slate-50/60 dark:hover:bg-slate-850/40 px-3 rounded-2xl transition-colors">
                                     <div>
                                         <h4 className="text-xs font-bold text-slate-900 dark:text-white">
-                                            {job.title}
+                                             {job.title}
                                         </h4>
                                         <p className="text-[11px] text-slate-500">
                                             {job.department || 'Engineering'} • {job.location || 'Remote'} • Posted {new Date(job.createdAt || Date.now()).toLocaleDateString()}
@@ -321,7 +321,7 @@ export const RecruiterDashboard: React.FC = () => {
                                         </span>
                                         <button
                                             onClick={() => window.location.href = `#/recruiter/ranked/${job._id}`}
-                                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/80 hover:bg-blue-600 hover:text-white transition-all shadow-2xs cursor-pointer"
+                                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-300 dark:border-blue-700 hover:bg-blue-600 hover:text-white transition-all shadow-2xs cursor-pointer"
                                         >
                                             <Sparkles size={13} />
                                             Ranked Candidates ↗

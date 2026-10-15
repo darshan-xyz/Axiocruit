@@ -54,17 +54,17 @@ const AIReportCard: React.FC<AIReportCardProps> = ({
     const getScoreTheme = (score: number) => {
         if (score >= 70) return {
             color: '#10B981', bg: 'rgba(16, 185, 129, 0.1)',
-            border: 'rgba(16, 185, 129, 0.3)', label: 'Strong Candidate',
+            border: 'rgba(16, 185, 129, 0.5)', label: 'Strong Candidate',
             gradient: 'from-emerald-500 to-green-400',
         };
         if (score >= 40) return {
             color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.1)',
-            border: 'rgba(245, 158, 11, 0.3)', label: 'Moderate Candidate',
+            border: 'rgba(245, 158, 11, 0.5)', label: 'Moderate Candidate',
             gradient: 'from-amber-500 to-yellow-400',
         };
         return {
             color: '#EF4444', bg: 'rgba(239, 68, 68, 0.1)',
-            border: 'rgba(239, 68, 68, 0.3)', label: 'Needs Improvement',
+            border: 'rgba(239, 68, 68, 0.5)', label: 'Needs Improvement',
             gradient: 'from-red-500 to-rose-400',
         };
     };
@@ -155,7 +155,7 @@ const AIReportCard: React.FC<AIReportCardProps> = ({
                                 href={`#/recruiter/coding-test-result/${jobId}/candidate/${candidateId}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-2 px-3 py-1.5 mt-3 bg-blue-500/10 border border-blue-500/30 hover:bg-blue-500/20 rounded-lg transition-colors text-xs font-semibold text-blue-600 dark:text-blue-400 no-underline w-fit"
+                                className="flex items-center gap-2 px-3 py-1.5 mt-3 bg-blue-500/10 border border-blue-500/50 hover:bg-blue-500/20 rounded-lg transition-colors text-xs font-semibold text-blue-600 dark:text-blue-400 no-underline w-fit"
                             >
                                 <ExternalLink size={13} />
                                 View Coding Test Results
@@ -168,7 +168,7 @@ const AIReportCard: React.FC<AIReportCardProps> = ({
             {/* Strengths & Weaknesses — Two Column */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Strengths */}
-                <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/15">
+                <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/40">
                     <div className="flex items-center gap-2 mb-3">
                         <div className="w-6 h-6 rounded-md bg-emerald-500/15 flex items-center justify-center">
                             <TrendingUp size={14} className="text-emerald-400" />
@@ -189,7 +189,7 @@ const AIReportCard: React.FC<AIReportCardProps> = ({
                 </div>
 
                 {/* Weaknesses */}
-                <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/15">
+                <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/40">
                     <div className="flex items-center gap-2 mb-3">
                         <div className="w-6 h-6 rounded-md bg-amber-500/15 flex items-center justify-center">
                             <TrendingDown size={14} className="text-amber-400" />
@@ -212,7 +212,7 @@ const AIReportCard: React.FC<AIReportCardProps> = ({
 
             {/* Interviewer Remarks */}
             {interviewerRemarks && interviewerRemarks.trim() && (
-                <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/15">
+                <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/40">
                     <div className="flex items-center gap-2 mb-2">
                         <div className="w-6 h-6 rounded-md bg-blue-500/15 flex items-center justify-center">
                             <Award size={14} className="text-blue-600 dark:text-blue-400" />
@@ -227,7 +227,7 @@ const AIReportCard: React.FC<AIReportCardProps> = ({
 
             {/* Red Flags Section — Conditional */}
             {(evaluation.redFlags?.length ?? 0) > 0 && (
-                <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/20 relative overflow-hidden">
+                <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/50 relative overflow-hidden">
                     {/* Urgent visual indicator */}
                     <div className="absolute top-0 left-0 w-1 h-full bg-red-500" />
 
@@ -248,7 +248,7 @@ const AIReportCard: React.FC<AIReportCardProps> = ({
 
                     <ul className="space-y-2 pl-2">
                         {evaluation.redFlags!.map((flag, i) => (
-                            <li key={i} className="flex items-start gap-2 p-2 rounded-lg bg-red-500/5 border border-red-500/10">
+                            <li key={i} className="flex items-start gap-2 p-2 rounded-lg bg-red-500/5 border border-red-500/30">
                                 <ShieldAlert size={13} className="text-red-500/70 mt-0.5 flex-shrink-0" />
                                 <span className="text-xs text-red-200/80 leading-relaxed">{flag}</span>
                             </li>
