@@ -424,10 +424,22 @@ exports.registerCandidate = async (req, res) => {
 // @access  Public
 exports.login = exports.loginUser = async (req, res) => {
     let { email, password } = req.body;
-    email = email?.toLowerCase();
+    email = email?.toLowerCase()?.trim();
 
     try {
-        const user = await User.findOne({ email }).populate('organization').populate('profile');
+        let user = await User.findOne({ email }).populate('organization').populate('profile');
+
+        // Dynamic domain alias fallback for seamless Procruit demo and legacy login compatibility
+        if (!user && email) {
+            if (email.endsWith('@procruit.com')) {
+                const aliasEmail = email.replace('@procruit.com', '@axiocruit.com');
+                user = await User.findOne({ email: aliasEmail }).populate('organization').populate('profile');
+            } else if (email.endsWith('@axiocruit.com')) {
+                const aliasEmail = email.replace('@axiocruit.com', '@procruit.com');
+                user = await User.findOne({ email: aliasEmail }).populate('organization').populate('profile');
+            }
+        }
+
         if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
         const isMatch = await bcrypt.compare(password, user.password);

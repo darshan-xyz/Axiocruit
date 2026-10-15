@@ -41,33 +41,34 @@ const defaultQuestions = [
 
 const seedDefaultData = async () => {
   try {
-    const userCount = await User.countDocuments();
-    if (userCount <= 1) {
-      console.log('[Axiocruit Database] 📦 Checking/seeding demo accounts...');
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash('Password123!', salt);
 
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash('Password123!', salt);
+    // Organization setup
+    let org = await Organization.findOne({ name: 'Acme Corp' });
 
-      // 1. Admin
-      const existingAdmin = await User.findOne({ email: 'admin@axiocruit.com' });
+    // 1. Admin accounts
+    for (const email of ['admin@procruit.com', 'admin@axiocruit.com']) {
+      const existingAdmin = await User.findOne({ email });
       if (!existingAdmin) {
         const admin = new User({
           name: 'System Admin',
-          email: 'admin@axiocruit.com',
+          email,
           password: hashedPassword,
           role: 'ADMIN',
           approvalStatus: 'APPROVED'
         });
         await admin.save();
       }
+    }
 
-      // 2. Organization & Org Admin
-      let org = await Organization.findOne({ name: 'Acme Corp' });
-      const existingOrgAdmin = await User.findOne({ email: 'org@axiocruit.com' });
-      if (!existingOrgAdmin) {
-        const orgAdmin = new User({
+    // 2. Org Admin accounts
+    for (const email of ['org@procruit.com', 'org@axiocruit.com']) {
+      let orgAdmin = await User.findOne({ email });
+      if (!orgAdmin) {
+        orgAdmin = new User({
           name: 'Acme HR Director',
-          email: 'org@axiocruit.com',
+          email,
           password: hashedPassword,
           role: 'ORGANIZATION',
           approvalStatus: 'APPROVED'
@@ -87,28 +88,36 @@ const seedDefaultData = async () => {
         orgAdmin.organization = org._id;
         await orgAdmin.save();
       }
+    }
 
-      // 3. Recruiter
-      const existingRecruiter = await User.findOne({ email: 'recruiter@axiocruit.com' });
+    if (!org) {
+      org = await Organization.findOne({ name: 'Acme Corp' });
+    }
+
+    // 3. Recruiter accounts
+    for (const email of ['recruiter@procruit.com', 'recruiter@axiocruit.com']) {
+      const existingRecruiter = await User.findOne({ email });
       if (!existingRecruiter && org) {
         const recruiter = new User({
           name: 'Jane Recruiter',
-          email: 'recruiter@axiocruit.com',
+          email,
           password: hashedPassword,
           role: 'RECRUITER',
           organization: org._id,
           approvalStatus: 'APPROVED'
         });
         await recruiter.save();
-        await Organization.findByIdAndUpdate(org._id, { $push: { recruiters: recruiter._id } });
+        await Organization.findByIdAndUpdate(org._id, { $addToSet: { recruiters: recruiter._id } });
       }
+    }
 
-      // 4. Interviewer
-      const existingInterviewer = await User.findOne({ email: 'interviewer@axiocruit.com' });
+    // 4. Interviewer accounts
+    for (const email of ['interviewer@procruit.com', 'interviewer@axiocruit.com']) {
+      const existingInterviewer = await User.findOne({ email });
       if (!existingInterviewer) {
         const interviewer = new User({
           name: 'Alex Interviewer',
-          email: 'interviewer@axiocruit.com',
+          email,
           password: hashedPassword,
           role: 'INTERVIEWER',
           approvalStatus: 'APPROVED',
@@ -127,13 +136,15 @@ const seedDefaultData = async () => {
         interviewer.profile = interviewerProfile._id;
         await interviewer.save();
       }
+    }
 
-      // 5. Candidate
-      const existingCandidate = await User.findOne({ email: 'candidate@axiocruit.com' });
+    // 5. Candidate accounts
+    for (const email of ['candidate@procruit.com', 'candidate@axiocruit.com']) {
+      const existingCandidate = await User.findOne({ email });
       if (!existingCandidate) {
         const candidate = new User({
           name: 'Alex Candidate',
-          email: 'candidate@axiocruit.com',
+          email,
           password: hashedPassword,
           role: 'CANDIDATE',
           approvalStatus: 'APPROVED'
@@ -144,18 +155,18 @@ const seedDefaultData = async () => {
         candidate.profile = candidateProfile._id;
         await candidateProfile.save();
       }
-
-      console.log('[Axiocruit Database] ✅ Demo accounts ready: admin@axiocruit.com, org@axiocruit.com, recruiter@axiocruit.com, interviewer@axiocruit.com, candidate@axiocruit.com (Password: Password123!)');
     }
+
+    console.log('[Procruit Database] ✅ Demo accounts ready: admin, org, recruiter, interviewer, candidate (@procruit.com & @axiocruit.com) (Password: Password123!)');
 
     const questionCount = await CodingQuestion.countDocuments();
     if (questionCount === 0) {
-      console.log('[Axiocruit Database] 📦 Seeding default coding questions...');
+      console.log('[Procruit Database] 📦 Seeding default coding questions...');
       await CodingQuestion.insertMany(defaultQuestions);
-      console.log('[Axiocruit Database] ✅ Coding questions seeded successfully.');
+      console.log('[Procruit Database] ✅ Coding questions seeded successfully.');
     }
   } catch (err) {
-    console.warn('[Axiocruit Database] Notice: auto-seeding skipped or encountered error:', err.message);
+    console.warn('[Procruit Database] Notice: auto-seeding skipped or encountered error:', err.message);
   }
 };
 
