@@ -656,10 +656,7 @@ export const CodingTestPage: React.FC = () => {
           {/* Editor toolbar */}
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-neutral-800/60 bg-[#0a001a]/20 shrink-0">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500/60" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-              <div className="w-3 h-3 rounded-full bg-green-500/60" />
-              <span className="ml-2 text-xs text-neutral-500 font-mono">solution.py</span>
+              <span className="text-xs text-neutral-400 font-mono font-medium">solution.py</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-neutral-600 bg-neutral-800/60 px-2 py-0.5 rounded">

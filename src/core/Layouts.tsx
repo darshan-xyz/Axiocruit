@@ -373,12 +373,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
         {/* macOS Window Top Chrome & Pill Navigation Bar */}
         <header className="h-16 flex items-center justify-between px-5 md:px-7 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/60 backdrop-blur-md flex-shrink-0 z-20">
           <div className="flex items-center gap-4">
-            {/* macOS 3 Window Controls (hidden for full-screen UI, retained for test compatibility) */}
-            <div className="hidden items-center gap-1.5 mr-2" aria-hidden="true">
-              <span className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]/60 inline-block shadow-2xs" />
-              <span className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]/60 inline-block shadow-2xs" />
-              <span className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29]/60 inline-block shadow-2xs" />
-            </div>
+            {/* Full-screen navigation header */}
 
             {/* Mobile Sidebar Button */}
             <button

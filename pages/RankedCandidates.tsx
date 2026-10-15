@@ -440,12 +440,6 @@ export const RankedCandidates: React.FC = () => {
       {/* Top Bar with Window Controls & Pill Navigation */}
       <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl px-5 py-3.5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-4 w-full md:w-auto">
-          {/* Hidden window controls */}
-          <div className="hidden" aria-hidden="true">
-            <span className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]/60 inline-block shadow-2xs" />
-            <span className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]/60 inline-block shadow-2xs" />
-            <span className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29]/60 inline-block shadow-2xs" />
-          </div>
 
           {/* Top Pill Tabs: Home, Candidates (blue pill active), Jobs, Analytics, Menu ∨ */}
           <div className="flex items-center gap-1 overflow-x-auto">

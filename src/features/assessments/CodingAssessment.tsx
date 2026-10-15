@@ -678,10 +678,7 @@ export const CodingAssessment: React.FC = () => {
             style={{ flexShrink: 0, padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
           >
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500/60" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-              <div className="w-3 h-3 rounded-full bg-green-500/60" />
-              <span className={`ml-2 text-xs font-mono ${isDark ? 'text-slate-500' : 'text-slate-600'}`}>solution.py</span>
+              <span className={`text-xs font-mono font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>solution.py</span>
             </div>
             <div className="flex items-center gap-3">
               <span className={`text-[10px] px-2 py-0.5 rounded ${isDark ? 'text-neutral-600 bg-neutral-800/60' : 'text-blue-600 bg-blue-100'}`}>Python 3</span>
