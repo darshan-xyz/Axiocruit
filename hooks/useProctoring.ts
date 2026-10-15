@@ -78,13 +78,15 @@ interface UseProctoringProps {
 }
 
 /** Return value from the useProctoring hook. */
-interface ProctoringReturn {
+export interface ProctoringReturn {
     /** Accumulated proctoring events. */
     events: ProctoringEvent[];
     /** Whether the WebSocket to the Python service is connected. */
     isConnected: boolean;
     /** Flush all accumulated events to the Node.js backend. */
     flushLogs: () => Promise<void>;
+    /** Request baseline gaze calibration from the proctoring service. */
+    calibrateBaseline: (samples?: number) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -193,11 +195,16 @@ export function useProctoring(config: UseProctoringProps): ProctoringReturn {
         }
 
         try {
-            const ws = new WebSocket(PROCTOR_WS_URL);
+            const token = localStorage.getItem('token');
+            const wsUrl = token
+                ? `${PROCTOR_WS_URL}?token=${encodeURIComponent(token)}`
+                : PROCTOR_WS_URL;
+            const ws = new WebSocket(wsUrl);
+            ws.binaryType = 'arraybuffer';
             wsRef.current = ws;
 
             ws.onopen = () => {
-                console.log('[Proctor] 🟢 WebSocket CONNECTED to Python proctoring service at', PROCTOR_WS_URL);
+                console.log('[Proctor] 🟢 WebSocket CONNECTED to Python proctoring service at', wsUrl);
                 setIsConnected(true);
                 reconnectAttemptRef.current = 0;
             };
@@ -491,9 +498,19 @@ export function useProctoring(config: UseProctoringProps): ProctoringReturn {
         }
     }, [interviewId]);
 
+    // ── Gaze baseline calibration ────────────────────────────────────
+    const calibrateBaseline = useCallback((samples: number = 5) => {
+        const ws = wsRef.current;
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            console.log(`[Proctor] 🎯 Requesting gaze baseline calibration (${samples} samples)...`);
+            ws.send(JSON.stringify({ type: 'calibrate', samples }));
+        }
+    }, []);
+
     return {
         events,
         isConnected,
         flushLogs,
+        calibrateBaseline,
     };
 }

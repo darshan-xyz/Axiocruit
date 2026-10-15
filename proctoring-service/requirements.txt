@@ -4,3 +4,4 @@ websockets
 opencv-python-headless
 mediapipe
 numpy
+pyjwt

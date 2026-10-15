@@ -75,7 +75,7 @@ export const Card: React.FC<CardProps> = ({
       } ${className}`}
     >
       {(title || action) && (
-        <div className="flex justify-between items-center mb-5 pb-3 border-b border-slate-200 dark:border-slate-700">
+        <div className="flex justify-between items-center mb-5 pb-3 border-b border-slate-300 dark:border-slate-700">
           {title && (typeof title === 'string' ? <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">{title}</h3> : title)}
           {action && <div>{action}</div>}
         </div>
@@ -208,7 +208,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" onClick={onClose} />
       <div className={`relative rounded-3xl w-full ${widthClass} shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh] bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 overflow-hidden`}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 rounded-t-3xl flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 rounded-t-3xl flex-shrink-0">
           <div className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
             {title}
           </div>
