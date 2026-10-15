@@ -223,16 +223,15 @@ exports.updateApplicationStatus = async (req, res) => {
             return res.status(404).json({ message: 'Application not found' });
         }
 
-        // Verify that the user owns the job
-        // We need to check if application.job.postedBy equals req.user.id
-        // However, we populated 'job', so job is an object.
-        // We assume job was populated. If not, we'd need to fetch it.
-        // Wait, I populated it above.
+        if (!application.job) {
+            return res.status(404).json({ message: 'Associated job not found' });
+        }
 
-        // Check ownership: Either the Recruiter who posted it, OR the Freelancer who accepted the delegation, OR Org/Admin
+        // Verify that the user owns the job
         const currentUserId = (req.user._id || req.user.id || '').toString();
-        const isRecruiter = application.job.postedBy?.toString() === currentUserId;
-        const isDelegatedFreelancer = application.job.delegatedFreelancerId?.toString() === currentUserId && application.job.delegationStatus === 'accepted';
+        const jobPosterId = (application.job.postedBy?._id || application.job.postedBy || '').toString();
+        const isRecruiter = jobPosterId === currentUserId;
+        const isDelegatedFreelancer = (application.job.delegatedFreelancerId?._id || application.job.delegatedFreelancerId || '').toString() === currentUserId && application.job.delegationStatus === 'accepted';
         const roleUpper = (req.user.role || '').toUpperCase();
         const isOrgAdmin = roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN';
         const isAdmin = roleUpper === 'ADMIN';
@@ -244,9 +243,10 @@ exports.updateApplicationStatus = async (req, res) => {
                 const currentUserDoc = await User.findById(currentUserId);
                 userOrg = currentUserDoc?.organization;
             }
-            const posterId = application.job.postedBy?._id || application.job.postedBy;
-            const poster = await User.findById(posterId);
-            if (userOrg && poster && poster.organization && String(poster.organization) === String(userOrg)) {
+            const userOrgId = (userOrg?._id || userOrg || '').toString();
+            const poster = await User.findById(jobPosterId);
+            const posterOrgId = (poster?.organization?._id || poster?.organization || '').toString();
+            if (userOrgId && posterOrgId && userOrgId === posterOrgId) {
                 isTenantMatch = true;
             }
         }
@@ -486,18 +486,21 @@ exports.approveDelegatedHire = async (req, res) => {
             return res.status(404).json({ message: 'Job not found' });
         }
 
-        const currentUserId = (req.user._id || req.user.id).toString();
-        const isOwner = job.postedBy && job.postedBy.toString() === currentUserId;
+        const currentUserId = (req.user._id || req.user.id || '').toString();
+        const jobPosterId = (job.postedBy?._id || job.postedBy || '').toString();
+        const isOwner = jobPosterId && jobPosterId === currentUserId;
         const roleUpper = (req.user.role || '').toUpperCase();
         const isOrgAdmin = roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN';
         const isAdmin = roleUpper === 'ADMIN';
 
         let isOrgAdminOfPoster = false;
         if (isOrgAdmin) {
-            const orgUser = await User.findById(req.user.id);
-            if (orgUser && orgUser.organization) {
-                const posterUser = await User.findById(job.postedBy);
-                if (posterUser && posterUser.organization && posterUser.organization.toString() === orgUser.organization.toString()) {
+            const orgUser = await User.findById(currentUserId);
+            const orgUserOrgId = (orgUser?.organization?._id || orgUser?.organization || '').toString();
+            if (orgUserOrgId) {
+                const posterUser = await User.findById(jobPosterId);
+                const posterOrgId = (posterUser?.organization?._id || posterUser?.organization || '').toString();
+                if (posterOrgId && posterOrgId === orgUserOrgId) {
                     isOrgAdminOfPoster = true;
                 }
             }
@@ -531,10 +534,11 @@ exports.approveDelegatedHire = async (req, res) => {
             await job.save(sessionOpt);
 
             // 2. Update Application status to 'Hired' for the proposed candidate
-            if (job.proposedCandidateId) {
+            const proposedCandId = (job.proposedCandidateId?._id || job.proposedCandidateId || '').toString();
+            if (proposedCandId) {
                 const candidateApp = await applicationModel.findOne({
                     job: job._id,
-                    candidate: job.proposedCandidateId
+                    candidate: proposedCandId
                 }).session(activeSession || null);
 
                 if (candidateApp) {
@@ -575,9 +579,10 @@ exports.approveDelegatedHire = async (req, res) => {
                     }
                 }).catch(() => {});
 
-                if (job.proposedCandidateId && candidateAppPrevStatus) {
+                const proposedCandId = (job.proposedCandidateId?._id || job.proposedCandidateId || '').toString();
+                if (proposedCandId && candidateAppPrevStatus) {
                     await applicationModel.findOneAndUpdate(
-                        { job: job._id, candidate: job.proposedCandidateId },
+                        { job: job._id, candidate: proposedCandId },
                         { $set: { status: candidateAppPrevStatus } }
                     ).catch(() => {});
                 }

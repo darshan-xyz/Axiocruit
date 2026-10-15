@@ -153,7 +153,7 @@ exports.deleteUser = async (req, res) => {
             await Availability.deleteMany({ freelancerId: user._id });
             await Job.updateMany(
                 { delegatedFreelancerId: user._id },
-                { delegatedFreelancerId: null, delegationStatus: 'none' }
+                { $set: { delegatedFreelancerId: null, delegationStatus: 'none' } }
             );
         }
 

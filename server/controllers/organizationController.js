@@ -115,12 +115,14 @@ exports.removeRecruiter = async (req, res) => {
         }
 
         // Security: verify this recruiter belongs to the caller's organization
-        if (recruiter.organization?.toString() !== orgUser.organization.toString()) {
+        const recruiterOrgId = (recruiter.organization?._id || recruiter.organization || '').toString();
+        const callerOrgId = (orgUser.organization?._id || orgUser.organization || '').toString();
+        if (!recruiterOrgId || recruiterOrgId !== callerOrgId) {
             return res.status(403).json({ message: 'This recruiter does not belong to your organization' });
         }
 
         // Pull from Organization.recruiters array
-        await Organization.findByIdAndUpdate(orgUser.organization, {
+        await Organization.findByIdAndUpdate(callerOrgId, {
             $pull: { recruiters: recruiter._id }
         });
 

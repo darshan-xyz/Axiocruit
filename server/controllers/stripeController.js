@@ -171,14 +171,29 @@ const verifySession = async (req, res) => {
                 if (posterIdStr && posterIdStr === currentUserId) return true;
             }
 
-            // Check if org admin of recruiter matches
+            // Check if org admin of recruiter or job poster matches
             if (roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN') {
                 const orgUser = await User.findById(currentUserId);
-                if (orgUser && orgUser.organization && recruiterIdStr) {
-                    const recruiterUser = await User.findById(recruiterIdStr);
-                    if (recruiterUser && recruiterUser.organization &&
-                        String(recruiterUser.organization) === String(orgUser.organization)) {
-                        return true;
+                const orgUserOrgId = (orgUser?.organization?._id || orgUser?.organization || '').toString();
+                if (orgUserOrgId) {
+                    if (recruiterIdStr) {
+                        const recruiterUser = await User.findById(recruiterIdStr);
+                        const recruiterOrgId = (recruiterUser?.organization?._id || recruiterUser?.organization || '').toString();
+                        if (recruiterOrgId && recruiterOrgId === orgUserOrgId) {
+                            return true;
+                        }
+                    }
+                    if (interview.jobId) {
+                        const Job = require('../models/Job');
+                        const job = await Job.findById(interview.jobId?._id || interview.jobId);
+                        const posterId = job?.postedBy?._id || job?.postedBy;
+                        if (posterId) {
+                            const poster = await User.findById(posterId);
+                            const posterOrgId = (poster?.organization?._id || poster?.organization || '').toString();
+                            if (posterOrgId && posterOrgId === orgUserOrgId) {
+                                return true;
+                            }
+                        }
                     }
                 }
             }

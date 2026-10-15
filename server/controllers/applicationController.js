@@ -42,6 +42,9 @@ const fetchResumeAsBuffer = async (url) => {
  * Returns the public URL path for the saved file
  */
 const saveResumeFile = async (fileBuffer, originalName) => {
+    if (!fileBuffer || !Buffer.isBuffer(fileBuffer) || fileBuffer.length === 0) {
+        throw new Error('Valid non-empty file buffer is required to save resume');
+    }
     const uploadsDir = path.join(__dirname, '..', 'public', 'uploads', 'resumes');
 
     // Ensure directory exists asynchronously

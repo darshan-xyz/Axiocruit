@@ -24,7 +24,7 @@ router.get('/services', protect, authorize(...RECRUITER_ROLES), async (req, res)
         const filter = { isActive: true };
         if (skill && typeof skill === 'string') {
             // Case-insensitive partial skill match with ReDoS / NoSQL injection protection
-            const escapedSkill = skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const escapedSkill = skill.slice(0, 100).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             filter.skills = { $elemMatch: { $regex: escapedSkill, $options: 'i' } };
         }
         if (maxPrice) filter.price = { ...filter.price, $lte: Number(maxPrice) };

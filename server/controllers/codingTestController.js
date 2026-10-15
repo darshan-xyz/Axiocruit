@@ -22,7 +22,7 @@ const EXEC_TIMEOUT_MS  = 5000; // Python execution timeout (ms)
 const PYTHON_BIN        = process.env.PYTHON_BIN || (process.platform === 'win32' ? 'python' : 'python3');
 const MAX_OUTPUT_BYTES  = parseInt(process.env.MAX_OUTPUT_BYTES, 10) || (64 * 1024);
 
-const PYTHON_SECURITY_PRELUDE = `import sys, os; os.system = None; os.popen = None\nfor _m in ['subprocess','socket','shutil','ctypes','multiprocessing','urllib','http','ftplib','smtplib','asyncio']: sys.modules[_m] = None\n`;
+const PYTHON_SECURITY_PRELUDE = `import sys, os; os.system = None; os.popen = None; os.remove = None; os.unlink = None; os.rmdir = None; os.rename = None; os.replace = None\nfor _m in ['subprocess','socket','shutil','ctypes','multiprocessing','urllib','http','ftplib','smtplib','asyncio']: sys.modules[_m] = None\n`;
 
 const getSafePythonEnv = () => {
   const safeEnv = { ...process.env };
@@ -30,6 +30,7 @@ const getSafePythonEnv = () => {
     'MONGO_URI',
     'MONGODB_URI',
     'JWT_SECRET',
+    'JWT_REFRESH_SECRET',
     'STRIPE_SECRET_KEY',
     'STRIPE_WEBHOOK_SECRET',
     'GEMINI_API_KEY',
@@ -43,7 +44,13 @@ const getSafePythonEnv = () => {
       kUpper.includes('KEY') ||
       kUpper.includes('TOKEN') ||
       kUpper.includes('PASSWORD') ||
-      kUpper.includes('MONGO')
+      kUpper.includes('MONGO') ||
+      kUpper.includes('URI') ||
+      kUpper.includes('URL') ||
+      kUpper.includes('CREDENTIAL') ||
+      kUpper.includes('AUTH') ||
+      kUpper.includes('PASS') ||
+      kUpper.includes('PRIVATE')
     ) {
       delete safeEnv[key];
     }

@@ -181,6 +181,24 @@ async function runPhase3Tests() {
       try { fs.unlinkSync(filePath); } catch (_) {}
     });
 
+    await it('saveResumeFile throws an error when passed an invalid or empty buffer', async () => {
+      let threwNull = false;
+      try {
+        await applicationController.saveResumeFile(null, 'test.pdf');
+      } catch (err) {
+        threwNull = true;
+      }
+      assert.strictEqual(threwNull, true, 'Throws on null buffer');
+
+      let threwEmpty = false;
+      try {
+        await applicationController.saveResumeFile(Buffer.alloc(0), 'test.pdf');
+      } catch (err) {
+        threwEmpty = true;
+      }
+      assert.strictEqual(threwEmpty, true, 'Throws on empty buffer');
+    });
+
     // ------------------------------------------------------------------------
     // Group 3: Multi-Tenant Ownership & ReDoS/Payment Fixes
     // ------------------------------------------------------------------------
@@ -404,6 +422,87 @@ async function runPhase3Tests() {
       assert.strictEqual(interviewInDb.paymentStatus, 'Paid');
     });
 
+    await it('updateApplicationStatus returns 404 if associated job document is missing', async () => {
+      const nonExistentJobId = new mongoose.Types.ObjectId();
+      const orphanedApp = await Application.create({
+        job: nonExistentJobId,
+        candidate: candidateUser._id,
+        status: 'Screening',
+        appliedAt: new Date(),
+      });
+
+      const req = {
+        params: { id: orphanedApp._id.toString() },
+        body: { status: 'Interview' },
+        user: { _id: recruiterA._id, id: recruiterA._id.toString(), role: 'RECRUITER' },
+      };
+      let statusCode = 200;
+      let errorResponse = null;
+      const res = {
+        status: (code) => { statusCode = code; return res; },
+        json: (data) => { errorResponse = data; return res; },
+      };
+
+      await jobController.updateApplicationStatus(req, res);
+      assert.strictEqual(statusCode, 404, 'Returns 404 when application has no valid job');
+      assert(errorResponse && errorResponse.message.includes('job not found'));
+    });
+
+    await it('updateApplicationStatus handles populated organization object in req.user', async () => {
+      const req = {
+        params: { id: appForJobOrgA._id.toString() },
+        body: { status: 'Offer' },
+        user: {
+          _id: orgAdminA._id,
+          id: orgAdminA._id.toString(),
+          role: 'ORGANIZATION',
+          organization: { _id: orgA._id, name: 'Acme Corp' }, // Populated object!
+        },
+      };
+
+      let jsonResponse = null;
+      const res = {
+        status: () => res,
+        json: (data) => { jsonResponse = data; return res; },
+      };
+
+      await jobController.updateApplicationStatus(req, res);
+      assert(jsonResponse !== null, 'Response returned');
+      assert.strictEqual(jsonResponse.status, 'Offer', 'Populated org object properly authorized');
+    });
+
+    await it('stripeController.verifySession allows candidate to verify their own interview', async () => {
+      const candInterview = await Interview.create({
+        recruiterId: recruiterA._id,
+        candidateId: candidateUser._id,
+        jobId: jobOrgA._id,
+        meetingId: 'meet-cand-999',
+        scheduledTime: new Date(Date.now() + 86400000),
+        status: 'Scheduled',
+        paymentStatus: 'Unpaid',
+      });
+
+      const req = {
+        body: { interviewId: candInterview._id.toString() },
+        user: {
+          _id: candidateUser._id,
+          id: candidateUser._id.toString(),
+          role: 'CANDIDATE',
+        },
+      };
+
+      let jsonResponse = null;
+      const res = {
+        status: () => res,
+        json: (data) => { jsonResponse = data; return res; },
+      };
+
+      await stripeController.verifySession(req, res);
+      assert(jsonResponse !== null, 'Candidate can verify interview payment');
+      assert.strictEqual(jsonResponse.verified, true);
+      assert.strictEqual(jsonResponse.paymentStatus, 'Paid');
+    });
+
     // ------------------------------------------------------------------------
     // Group 4: Transactional Cascades & Session Purging
     // ------------------------------------------------------------------------
@@ -495,7 +594,7 @@ async function runPhase3Tests() {
       assert.strictEqual(remainingSessions.length, 0, 'Recruiter sessions must be purged upon removal');
     });
 
-    await it('approveDelegatedHire and registerOrg implement hybrid transaction / compensating rollback', () => {
+    await it('approveDelegatedHire and registerOrg implement hybrid transaction / compensating rollback (code structure)', () => {
       const jobCtrlSource = fs.readFileSync(path.join(__dirname, '../server/controllers/jobController.js'), 'utf-8');
       assert(jobCtrlSource.includes('startSession'), 'jobController uses mongoose session');
       assert(jobCtrlSource.includes('previousJobState'), 'Tracks previous state for rollback');
@@ -505,6 +604,123 @@ async function runPhase3Tests() {
       assert(authCtrlSource.includes('startSession'), 'authController uses mongoose session');
       assert(authCtrlSource.includes('findByIdAndDelete'), 'Contains compensating delete logic');
       assert(authCtrlSource.includes('abortTransaction'), 'Aborts transaction on error');
+    });
+
+    await it('approveDelegatedHire executes full transaction and compensating rollback on failure', async () => {
+      // Create freelancer, job in reviewing status, candidate and applications
+      const freelancerUser = await User.create({
+        name: 'Freelancer Transact',
+        email: 'free_tx@test.com',
+        password: 'hash',
+        role: 'INTERVIEWER',
+      });
+
+      const proposedCandidate = await User.create({
+        name: 'Proposed Cand',
+        email: 'prop_cand@test.com',
+        password: 'hash',
+        role: 'CANDIDATE',
+      });
+
+      const otherCandidate = await User.create({
+        name: 'Other Cand',
+        email: 'other_cand@test.com',
+        password: 'hash',
+        role: 'CANDIDATE',
+      });
+
+      const delegatedJob = await Job.create({
+        title: 'Security Lead',
+        description: 'Security role description',
+        company: 'Acme Corp',
+        location: 'Remote',
+        type: 'Full-time',
+        postedBy: recruiterA._id,
+        delegatedFreelancerId: freelancerUser._id,
+        delegationStatus: 'reviewing',
+        status: 'Active',
+        proposedCandidateId: proposedCandidate._id,
+      });
+
+      const appProposed = await Application.create({
+        job: delegatedJob._id,
+        candidate: proposedCandidate._id,
+        status: 'Screening',
+        appliedAt: new Date(),
+      });
+
+      const appOther = await Application.create({
+        job: delegatedJob._id,
+        candidate: otherCandidate._id,
+        status: 'Applied',
+        appliedAt: new Date(),
+      });
+
+      // 1. Successful execution
+      const reqSuccess = {
+        params: { jobId: delegatedJob._id.toString() },
+        user: { _id: recruiterA._id, id: recruiterA._id.toString(), role: 'RECRUITER' },
+      };
+      let successResponse = null;
+      const resSuccess = {
+        status: () => resSuccess,
+        json: (data) => { successResponse = data; return resSuccess; },
+      };
+
+      await jobController.approveDelegatedHire(reqSuccess, resSuccess);
+      assert(successResponse !== null, 'approveDelegatedHire completed');
+
+      const updatedJob = await Job.findById(delegatedJob._id);
+      assert.strictEqual(updatedJob.delegationStatus, 'completed', 'Job marked completed');
+      assert.strictEqual(updatedJob.status, 'Closed', 'Job closed');
+
+      const updatedAppProposed = await Application.findById(appProposed._id);
+      assert.strictEqual(updatedAppProposed.status, 'Hired', 'Proposed candidate marked Hired');
+
+      const updatedAppOther = await Application.findById(appOther._id);
+      assert.strictEqual(updatedAppOther.status, 'Rejected', 'Other applicant marked Rejected');
+
+      const createdMsg = await Message.findOne({ receiverId: freelancerUser._id });
+      assert(createdMsg !== null, 'Message sent to freelancer');
+    });
+
+    await it('registerOrg executes compensating rollback if organization creation fails', async () => {
+      // Test registerOrg when Organization creation throws error (e.g. simulated DB failure)
+      const uniqueEmail = `org_fail_${Date.now()}@test.com`;
+      const req = {
+        body: {
+          name: 'Org Failure Test',
+          email: uniqueEmail,
+          password: 'Password123!',
+          orgName: 'Failed Org Inc',
+          website: 'https://failure.test',
+          description: 'Failure test',
+        },
+      };
+
+      let statusCode = 200;
+      let errorBody = null;
+      const res = {
+        status: (code) => { statusCode = code; return res; },
+        json: (data) => { errorBody = data; return res; },
+      };
+
+      const origSave = Organization.prototype.save;
+      Organization.prototype.save = async function() {
+        throw new Error('Simulated DB error saving organization');
+      };
+
+      try {
+        await authController.registerOrg(req, res);
+      } finally {
+        Organization.prototype.save = origSave;
+      }
+
+      assert.strictEqual(statusCode, 500, 'Fails with 500 on org creation error');
+
+      // Verify compensating rollback deleted the orphaned user
+      const userInDb = await User.findOne({ email: uniqueEmail });
+      assert.strictEqual(userInDb, null, 'Compensating rollback deleted the orphaned user document');
     });
 
     // ------------------------------------------------------------------------
