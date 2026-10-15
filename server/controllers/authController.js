@@ -91,23 +91,12 @@ exports.registerOrg = async (req, res) => {
         let user = await User.findOne({ email });
         if (user) return res.status(400).json({ message: 'User already exists' });
 
-        let session = null;
-        let useTransaction = false;
-        try {
-            session = await mongoose.startSession();
-            session.startTransaction();
-            useTransaction = true;
-        } catch (_) {
-            session = null;
-            useTransaction = false;
-        }
-
         let savedUser = null;
         let savedOrg = null;
         let organization = null;
 
-        try {
-            const sessionOpt = useTransaction && session ? { session } : {};
+        const executeOrgRegistration = async (activeSession) => {
+            const sessionOpt = activeSession ? { session: activeSession } : {};
 
             // 1. Create User (Admin)
             const salt = await bcrypt.genSalt(10);
@@ -137,16 +126,9 @@ exports.registerOrg = async (req, res) => {
             // 3. Link User to Organization
             user.organization = organization._id;
             await user.save(sessionOpt);
+        };
 
-            if (useTransaction && session) {
-                await session.commitTransaction();
-            }
-        } catch (txnError) {
-            if (useTransaction && session) {
-                await session.abortTransaction().catch(() => {});
-            }
-
-            // Compensating rollback for standalone environments
+        const compensateOrgRollback = async () => {
             try {
                 if (savedOrg && savedOrg._id) {
                     await Organization.findByIdAndDelete(savedOrg._id).catch(() => {});
@@ -158,11 +140,30 @@ exports.registerOrg = async (req, res) => {
             } catch (compErr) {
                 console.error('[registerOrg] Compensation error:', compErr);
             }
+        };
 
-            throw txnError;
-        } finally {
-            if (session) {
+        const topologyType = mongoose.connection.client?.topology?.description?.type;
+        const supportsTxn = topologyType === 'ReplicaSetWithPrimary' || topologyType === 'Sharded';
+
+        if (supportsTxn) {
+            const session = await mongoose.startSession();
+            try {
+                session.startTransaction();
+                await executeOrgRegistration(session);
+                await session.commitTransaction();
+            } catch (txnError) {
+                await session.abortTransaction().catch(() => {});
+                await compensateOrgRollback();
+                throw txnError;
+            } finally {
                 session.endSession().catch(() => {});
+            }
+        } else {
+            try {
+                await executeOrgRegistration(null);
+            } catch (err) {
+                await compensateOrgRollback();
+                throw err;
             }
         }
 

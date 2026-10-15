@@ -519,22 +519,11 @@ exports.approveDelegatedHire = async (req, res) => {
         const applicationModel = require('../models/Application');
         const Message = require('../models/Message');
 
-        let session = null;
-        let useTransaction = false;
-        try {
-            session = await mongoose.startSession();
-            session.startTransaction();
-            useTransaction = true;
-        } catch (_) {
-            session = null;
-            useTransaction = false;
-        }
-
         let candidateAppPrevStatus = null;
         let createdMessageId = null;
 
-        try {
-            const sessionOpt = useTransaction && session ? { session } : {};
+        const executeOperations = async (activeSession) => {
+            const sessionOpt = activeSession ? { session: activeSession } : {};
 
             // 1. Mark job as completed and closed
             job.delegationStatus = 'completed';
@@ -546,7 +535,7 @@ exports.approveDelegatedHire = async (req, res) => {
                 const candidateApp = await applicationModel.findOne({
                     job: job._id,
                     candidate: job.proposedCandidateId
-                }).session(session || null);
+                }).session(activeSession || null);
 
                 if (candidateApp) {
                     candidateAppPrevStatus = candidateApp.status;
@@ -575,16 +564,9 @@ exports.approveDelegatedHire = async (req, res) => {
                     createdMessageId = createdMsg._id;
                 }
             }
+        };
 
-            if (useTransaction && session) {
-                await session.commitTransaction();
-            }
-        } catch (txnError) {
-            if (useTransaction && session) {
-                await session.abortTransaction().catch(() => {});
-            }
-
-            // Compensating rollback for standalone environments
+        const compensateRollback = async () => {
             try {
                 await Job.findByIdAndUpdate(job._id, {
                     $set: {
@@ -606,11 +588,30 @@ exports.approveDelegatedHire = async (req, res) => {
             } catch (compErr) {
                 console.error('[approveDelegatedHire] Compensation error:', compErr);
             }
+        };
 
-            throw txnError;
-        } finally {
-            if (session) {
+        const topologyType = mongoose.connection.client?.topology?.description?.type;
+        const supportsTxn = topologyType === 'ReplicaSetWithPrimary' || topologyType === 'Sharded';
+
+        if (supportsTxn) {
+            const session = await mongoose.startSession();
+            try {
+                session.startTransaction();
+                await executeOperations(session);
+                await session.commitTransaction();
+            } catch (txnError) {
+                await session.abortTransaction().catch(() => {});
+                await compensateRollback();
+                throw txnError;
+            } finally {
                 session.endSession().catch(() => {});
+            }
+        } else {
+            try {
+                await executeOperations(null);
+            } catch (err) {
+                await compensateRollback();
+                throw err;
             }
         }
 
