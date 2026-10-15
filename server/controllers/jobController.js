@@ -230,13 +230,28 @@ exports.updateApplicationStatus = async (req, res) => {
         // Wait, I populated it above.
 
         // Check ownership: Either the Recruiter who posted it, OR the Freelancer who accepted the delegation, OR Org/Admin
-        const isRecruiter = application.job.postedBy?.toString() === req.user.id;
-        const isDelegatedFreelancer = application.job.delegatedFreelancerId?.toString() === req.user.id && application.job.delegationStatus === 'accepted';
+        const currentUserId = (req.user._id || req.user.id || '').toString();
+        const isRecruiter = application.job.postedBy?.toString() === currentUserId;
+        const isDelegatedFreelancer = application.job.delegatedFreelancerId?.toString() === currentUserId && application.job.delegationStatus === 'accepted';
         const roleUpper = (req.user.role || '').toUpperCase();
         const isOrgAdmin = roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN';
         const isAdmin = roleUpper === 'ADMIN';
 
-        if (!isRecruiter && !isDelegatedFreelancer && !isOrgAdmin && !isAdmin) {
+        let isTenantMatch = false;
+        if (isOrgAdmin) {
+            let userOrg = req.user.organization;
+            if (!userOrg) {
+                const currentUserDoc = await User.findById(currentUserId);
+                userOrg = currentUserDoc?.organization;
+            }
+            const posterId = application.job.postedBy?._id || application.job.postedBy;
+            const poster = await User.findById(posterId);
+            if (userOrg && poster && poster.organization && String(poster.organization) === String(userOrg)) {
+                isTenantMatch = true;
+            }
+        }
+
+        if (!isRecruiter && !isDelegatedFreelancer && !isTenantMatch && !isAdmin) {
             return res.status(401).json({ message: 'Not authorized to update this pipeline' });
         }
 
@@ -496,33 +511,107 @@ exports.approveDelegatedHire = async (req, res) => {
             return res.status(400).json({ message: `Cannot approve — delegation status is '${job.delegationStatus}'` });
         }
 
-        // Mark as completed
-        job.delegationStatus = 'completed';
-        job.status = 'Closed';
-        await job.save();
+        const previousJobState = {
+            delegationStatus: job.delegationStatus,
+            status: job.status,
+        };
 
-        // Update the Application status to 'Hired' for the proposed candidate
         const applicationModel = require('../models/Application');
-        if (job.proposedCandidateId) {
-            await applicationModel.findOneAndUpdate(
-                { job: job._id, candidate: job.proposedCandidateId },
-                { status: 'Hired' }
-            );
-            // Reject all OTHER applicants for this job (bulk update)
-            await applicationModel.updateMany(
-                { job: job._id, candidate: { $ne: job.proposedCandidateId }, status: { $ne: 'Hired' } },
-                { status: 'Rejected' }
-            );
+        const Message = require('../models/Message');
+
+        let session = null;
+        let useTransaction = false;
+        try {
+            session = await mongoose.startSession();
+            session.startTransaction();
+            useTransaction = true;
+        } catch (_) {
+            session = null;
+            useTransaction = false;
         }
 
-        // Notify the freelancer
-        const Message = require('../models/Message');
-        if (job.delegatedFreelancerId) {
-            await Message.create({
-                senderId: req.user._id || req.user.id,
-                receiverId: job.delegatedFreelancerId,
-                content: `Great news! The recruiter approved your proposed candidate for the "${job.title}" role. The project is now complete.`
-            });
+        let candidateAppPrevStatus = null;
+        let createdMessageId = null;
+
+        try {
+            const sessionOpt = useTransaction && session ? { session } : {};
+
+            // 1. Mark job as completed and closed
+            job.delegationStatus = 'completed';
+            job.status = 'Closed';
+            await job.save(sessionOpt);
+
+            // 2. Update Application status to 'Hired' for the proposed candidate
+            if (job.proposedCandidateId) {
+                const candidateApp = await applicationModel.findOne({
+                    job: job._id,
+                    candidate: job.proposedCandidateId
+                }).session(session || null);
+
+                if (candidateApp) {
+                    candidateAppPrevStatus = candidateApp.status;
+                    candidateApp.status = 'Hired';
+                    await candidateApp.save(sessionOpt);
+                }
+
+                // Reject all OTHER applicants for this job (bulk update)
+                await applicationModel.updateMany(
+                    { job: job._id, candidate: { $ne: job.proposedCandidateId }, status: { $ne: 'Hired' } },
+                    { $set: { status: 'Rejected' } },
+                    sessionOpt
+                );
+            }
+
+            // 3. Notify the freelancer
+            if (job.delegatedFreelancerId) {
+                const [createdMsg] = await Message.create([
+                    {
+                        senderId: req.user._id || req.user.id,
+                        receiverId: job.delegatedFreelancerId,
+                        content: `Great news! The recruiter approved your proposed candidate for the "${job.title}" role. The project is now complete.`
+                    }
+                ], sessionOpt);
+                if (createdMsg) {
+                    createdMessageId = createdMsg._id;
+                }
+            }
+
+            if (useTransaction && session) {
+                await session.commitTransaction();
+            }
+        } catch (txnError) {
+            if (useTransaction && session) {
+                await session.abortTransaction().catch(() => {});
+            }
+
+            // Compensating rollback for standalone environments
+            try {
+                await Job.findByIdAndUpdate(job._id, {
+                    $set: {
+                        delegationStatus: previousJobState.delegationStatus,
+                        status: previousJobState.status
+                    }
+                }).catch(() => {});
+
+                if (job.proposedCandidateId && candidateAppPrevStatus) {
+                    await applicationModel.findOneAndUpdate(
+                        { job: job._id, candidate: job.proposedCandidateId },
+                        { $set: { status: candidateAppPrevStatus } }
+                    ).catch(() => {});
+                }
+
+                if (createdMessageId) {
+                    await Message.findByIdAndDelete(createdMessageId).catch(() => {});
+                }
+            } catch (compErr) {
+                console.error('[approveDelegatedHire] Compensation error:', compErr);
+            }
+
+            throw txnError;
+        } finally {
+            if (session) {
+                session.endSession().catch(() => {});
+            }
         }
 
         await logAuditEvent({

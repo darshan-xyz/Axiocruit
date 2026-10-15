@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { normalizeRole } = require('../utils/roleUtils');
 
 const userSchema = new mongoose.Schema({
   // Common Fields
@@ -11,15 +12,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['ADMIN', 'ORGANIZATION', 'RECRUITER', 'INTERVIEWER', 'CANDIDATE'],
     default: 'CANDIDATE',
-    set: (v) => {
-      if (!v) return 'CANDIDATE';
-      const upper = String(v).trim().toUpperCase();
-      if (upper === 'ORGANIZATION') return 'ORGANIZATION';
-      if (upper === 'FREELANCER' || upper === 'INTERVIEWER') return 'INTERVIEWER';
-      if (upper === 'RECRUITER') return 'RECRUITER';
-      if (upper === 'ADMIN') return 'ADMIN';
-      return 'CANDIDATE';
-    },
+    set: (v) => normalizeRole(v),
   },
 
   // Freelancer / Interviewer specifics embedded directly
@@ -56,8 +49,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['PENDING', 'APPROVED', 'REJECTED'],
     default: function () {
-      const r = (this.role || '').toUpperCase();
-      return (r === 'INTERVIEWER' || r === 'FREELANCER') ? 'PENDING' : 'APPROVED';
+      const r = normalizeRole(this.role);
+      return r === 'INTERVIEWER' ? 'PENDING' : 'APPROVED';
     },
   },
 
@@ -68,16 +61,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre('validate', function (next) {
   if (this.role) {
-    const upper = String(this.role).trim().toUpperCase();
-    if (upper === 'FREELANCER' || upper === 'INTERVIEWER') {
-      this.role = 'INTERVIEWER';
-    } else if (upper === 'ORGANIZATION') {
-      this.role = 'ORGANIZATION';
-    } else if (['ADMIN', 'RECRUITER', 'CANDIDATE'].includes(upper)) {
-      this.role = upper;
-    } else {
-      this.role = 'CANDIDATE';
-    }
+    this.role = normalizeRole(this.role);
   }
   if (typeof next === 'function') {
     next();

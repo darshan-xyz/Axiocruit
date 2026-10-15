@@ -35,8 +35,18 @@ const getSafePythonEnv = () => {
     'GEMINI_API_KEY',
     'OPENAI_API_KEY',
   ];
-  for (const key of sensitiveKeys) {
-    delete safeEnv[key];
+  for (const key of Object.keys(safeEnv)) {
+    const kUpper = key.toUpperCase();
+    if (
+      sensitiveKeys.includes(key) ||
+      kUpper.includes('SECRET') ||
+      kUpper.includes('KEY') ||
+      kUpper.includes('TOKEN') ||
+      kUpper.includes('PASSWORD') ||
+      kUpper.includes('MONGO')
+    ) {
+      delete safeEnv[key];
+    }
   }
   safeEnv.PYTHONIOENCODING = 'utf-8';
   safeEnv.PYTHONUTF8 = '1';
@@ -501,6 +511,14 @@ const executePython = (code, input) => {
       });
     });
   });
+};
+
+/**
+ * Hardened real Python code execution helper
+ * Protects against secret leakage by applying getSafePythonEnv() and PYTHON_SECURITY_PRELUDE
+ */
+const executeCodeReal = (code, input) => {
+  return executePython(code, input);
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1267,4 +1285,7 @@ module.exports = {
   normalizeOutput,
   classifyError,
   sanitizeErrorOutput,
+  executeCodeReal,
+  getSafePythonEnv,
+  PYTHON_SECURITY_PRELUDE,
 };

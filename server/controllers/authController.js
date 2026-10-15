@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const Organization = require('../models/Organization');
 const Profile = require('../models/Profile'); // For future use when profile data is sent
@@ -90,32 +91,80 @@ exports.registerOrg = async (req, res) => {
         let user = await User.findOne({ email });
         if (user) return res.status(400).json({ message: 'User already exists' });
 
-        // 1. Create User (Admin)
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        let session = null;
+        let useTransaction = false;
+        try {
+            session = await mongoose.startSession();
+            session.startTransaction();
+            useTransaction = true;
+        } catch (_) {
+            session = null;
+            useTransaction = false;
+        }
 
-        user = new User({
-            name: trimmedName,
-            email,
-            password: hashedPassword,
-            role: 'ORGANIZATION' // Organization Admin
-        });
+        let savedUser = null;
+        let savedOrg = null;
+        let organization = null;
 
-        await user.save();
+        try {
+            const sessionOpt = useTransaction && session ? { session } : {};
 
-        // 2. Create Organization linked to Admin
-        const organization = new Organization({
-            name: orgName,
-            admin: user._id,
-            website,
-            description
-        });
+            // 1. Create User (Admin)
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
 
-        await organization.save();
+            user = new User({
+                name: trimmedName,
+                email,
+                password: hashedPassword,
+                role: 'ORGANIZATION' // Organization Admin
+            });
 
-        // 3. Link User to Organization
-        user.organization = organization._id;
-        await user.save();
+            await user.save(sessionOpt);
+            savedUser = user;
+
+            // 2. Create Organization linked to Admin
+            organization = new Organization({
+                name: orgName,
+                admin: user._id,
+                website,
+                description
+            });
+
+            await organization.save(sessionOpt);
+            savedOrg = organization;
+
+            // 3. Link User to Organization
+            user.organization = organization._id;
+            await user.save(sessionOpt);
+
+            if (useTransaction && session) {
+                await session.commitTransaction();
+            }
+        } catch (txnError) {
+            if (useTransaction && session) {
+                await session.abortTransaction().catch(() => {});
+            }
+
+            // Compensating rollback for standalone environments
+            try {
+                if (savedOrg && savedOrg._id) {
+                    await Organization.findByIdAndDelete(savedOrg._id).catch(() => {});
+                }
+                if (savedUser && savedUser._id) {
+                    await Session.deleteMany({ userId: savedUser._id }).catch(() => {});
+                    await User.findByIdAndDelete(savedUser._id).catch(() => {});
+                }
+            } catch (compErr) {
+                console.error('[registerOrg] Compensation error:', compErr);
+            }
+
+            throw txnError;
+        } finally {
+            if (session) {
+                session.endSession().catch(() => {});
+            }
+        }
 
         const { accessToken, refreshToken } = await issueSessionTokens(user, req, res);
 

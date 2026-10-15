@@ -10,6 +10,7 @@ const Availability = require('../models/Availability');
 const TestSession = require('../models/TestSession');
 const InterviewGig = require('../models/InterviewGig');
 const AuditLog = require('../models/AuditLog');
+const Session = require('../models/Session');
 const { logAuditEvent } = require('../utils/auditLogger');
 
 // @desc    Get dashboard stats
@@ -109,6 +110,7 @@ exports.deleteUser = async (req, res) => {
                     if (rec.profile) {
                         await Profile.findByIdAndDelete(rec.profile);
                     }
+                    await Session.deleteMany({ userId: rec._id });
                     await User.findByIdAndDelete(rec._id);
                 }
                 // Delete the Organization
@@ -155,12 +157,16 @@ exports.deleteUser = async (req, res) => {
             );
         }
 
-        // 5. If CANDIDATE: delete applications, pull from job applicants, and delete test sessions
+        // 5. If CANDIDATE: delete applications, pull from job applicants, clear proposedCandidateId, and delete test sessions
         if (roleUpper === 'CANDIDATE') {
             await Application.deleteMany({ candidate: user._id });
             await Job.updateMany(
                 { applicants: user._id },
                 { $pull: { applicants: user._id } }
+            );
+            await Job.updateMany(
+                { proposedCandidateId: user._id },
+                { $set: { proposedCandidateId: null } }
             );
             await TestSession.deleteMany({ candidateId: user._id });
         }
@@ -182,6 +188,9 @@ exports.deleteUser = async (req, res) => {
         await Message.deleteMany({
             $or: [{ senderId: user._id }, { receiverId: user._id }]
         });
+
+        // 10. Purge active sessions so refresh tokens are immediately revoked
+        await Session.deleteMany({ userId: user._id });
 
         // Finally, delete the user
         await User.findByIdAndDelete(req.params.id);

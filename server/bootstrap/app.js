@@ -13,6 +13,7 @@ const {
   correlationMiddleware,
   securityHeadersMiddleware,
   authRateLimiter,
+  apiRateLimiter,
 } = require('../middleware/securityMiddleware');
 const { errorHandler } = require('../middleware/errorMiddleware');
 
@@ -49,15 +50,26 @@ const createApp = () => {
     })
   );
 
+  // Elevated limits (10mb) for routes that genuinely need larger payloads (e.g. code/transcript submissions)
+  const elevatedJson = express.json({
+    limit: '10mb',
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  });
+  app.use('/api/coding-test', elevatedJson);
+  app.use('/api/interviews', elevatedJson);
+
+  // Safe Enterprise Default JSON and URL-Encoded Body Parsers (1mb)
   app.use(
     express.json({
-      limit: '50mb',
+      limit: '1mb',
       verify: (req, res, buf) => {
         req.rawBody = buf;
       },
     })
   );
-  app.use(express.urlencoded({ limit: '50mb', extended: true }));
+  app.use(express.urlencoded({ limit: '1mb', extended: true }));
 
   // Lightweight Cookie Parsing Middleware
   app.use((req, res, next) => {
@@ -94,6 +106,9 @@ const createApp = () => {
   // Health & Readiness Probes
   app.use('/api', healthRoutes);
   app.use('/', healthRoutes);
+
+  // Gateway Rate Limiting across /api routes (preserves specific authRateLimiter on /api/auth)
+  app.use('/api', apiRateLimiter);
 
   // Application Routes (guarded by requireDatabase to prevent unhandled buffering timeouts)
   app.use('/api/auth', authRateLimiter, requireDatabase, authRoutes);

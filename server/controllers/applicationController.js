@@ -41,19 +41,17 @@ const fetchResumeAsBuffer = async (url) => {
  * Helper: Save PDF buffer to local uploads directory
  * Returns the public URL path for the saved file
  */
-const saveResumeFile = (fileBuffer, originalName) => {
+const saveResumeFile = async (fileBuffer, originalName) => {
     const uploadsDir = path.join(__dirname, '..', 'public', 'uploads', 'resumes');
 
-    // Ensure directory exists
-    if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
-    }
+    // Ensure directory exists asynchronously
+    await fs.promises.mkdir(uploadsDir, { recursive: true });
 
-    const ext = path.extname(originalName) || '.pdf';
-    const filename = `${uuidv4()}${ext}`;
+    // Force .pdf extension for security and integrity
+    const filename = `${uuidv4()}.pdf`;
     const filePath = path.join(uploadsDir, filename);
 
-    fs.writeFileSync(filePath, fileBuffer);
+    await fs.promises.writeFile(filePath, fileBuffer);
 
     // Return relative URL that can be served by Express static middleware
     return `/uploads/resumes/${filename}`;
@@ -212,7 +210,7 @@ exports.applyWithCV = async (req, res) => {
         if (req.file && req.file.buffer) {
             fileBuffer = req.file.buffer;
             originalName = req.file.originalname || 'resume.pdf';
-            userResumeUrl = saveResumeFile(fileBuffer, originalName);
+            userResumeUrl = await saveResumeFile(fileBuffer, originalName);
             user.resumeUrl = userResumeUrl;
             await user.save();
             if (user.profile) {
@@ -550,3 +548,5 @@ exports.retryAiAnalysis = async (req, res) => {
         res.status(500).json({ message: 'Server error while retrying AI analysis' });
     }
 };
+
+exports.saveResumeFile = saveResumeFile;

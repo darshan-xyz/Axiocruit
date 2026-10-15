@@ -7,6 +7,7 @@ const Profile = require('../models/Profile');
 const Message = require('../models/Message');
 const InterviewGig = require('../models/InterviewGig');
 const TestSession = require('../models/TestSession');
+const Session = require('../models/Session');
 const bcrypt = require('bcryptjs');
 const { logAuditEvent } = require('../utils/auditLogger');
 
@@ -145,6 +146,9 @@ exports.removeRecruiter = async (req, res) => {
         if (recruiter.profile) {
             await Profile.findByIdAndDelete(recruiter.profile);
         }
+
+        // Purge active sessions so refresh tokens are immediately revoked
+        await Session.deleteMany({ userId: recruiter._id });
 
         // Delete the recruiter user
         await User.findByIdAndDelete(recruiter._id);

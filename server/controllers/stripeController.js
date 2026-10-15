@@ -79,8 +79,8 @@ const createCheckoutSession = async (req, res) => {
             metadata: {
                 interviewId: interview._id.toString(), // Important: Used in Webhook to fulfill the order
             },
-            success_url: `${process.env.CLIENT_URL || 'http://localhost:5173'}/#/recruiter/schedule?payment=success`,
-            cancel_url: `${process.env.CLIENT_URL || 'http://localhost:5173'}/#/recruiter/schedule?payment=cancelled`,
+            success_url: `${process.env.CLIENT_URL || 'http://localhost:3000'}/#/recruiter/schedule?payment=success`,
+            cancel_url: `${process.env.CLIENT_URL || 'http://localhost:3000'}/#/recruiter/schedule?payment=cancelled`,
         });
 
         res.json({ id: session.id, url: session.url });
@@ -143,22 +143,65 @@ const stripeWebhook = async (req, res) => {
 
 // @desc    Verify Stripe Checkout Session or interview payment status
 // @route   POST /api/payments/verify-session
-// @access  Private (Recruiter / Org / Admin)
+// @access  Private (Recruiter / Org / Admin / Candidate)
 const verifySession = async (req, res) => {
     try {
         const { sessionId, interviewId } = req.body;
+        const currentUserId = (req.user?._id || req.user?.id || '').toString();
+        const roleUpper = (req.user?.role || '').toUpperCase();
+        const isAdmin = roleUpper === 'ADMIN';
+
+        const checkInterviewAuth = async (interview) => {
+            if (isAdmin) return true;
+            if (!interview) return false;
+
+            // Check if recruiterId matches
+            const recruiterIdStr = (interview.recruiterId?._id || interview.recruiterId || '').toString();
+            if (recruiterIdStr && recruiterIdStr === currentUserId) return true;
+
+            // Check if candidate matches
+            const candidateIdStr = (interview.candidateId?._id || interview.candidateId || '').toString();
+            if (candidateIdStr && candidateIdStr === currentUserId) return true;
+
+            // Check if job owner matches
+            if (interview.jobId) {
+                const Job = require('../models/Job');
+                const job = await Job.findById(interview.jobId?._id || interview.jobId);
+                const posterIdStr = (job?.postedBy?._id || job?.postedBy || '').toString();
+                if (posterIdStr && posterIdStr === currentUserId) return true;
+            }
+
+            // Check if org admin of recruiter matches
+            if (roleUpper === 'ORGANIZATION' || roleUpper === 'ORG_ADMIN') {
+                const orgUser = await User.findById(currentUserId);
+                if (orgUser && orgUser.organization && recruiterIdStr) {
+                    const recruiterUser = await User.findById(recruiterIdStr);
+                    if (recruiterUser && recruiterUser.organization &&
+                        String(recruiterUser.organization) === String(orgUser.organization)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        };
 
         if (sessionId && stripe) {
             const session = await stripe.checkout.sessions.retrieve(sessionId);
             if (session && (session.payment_status === 'paid' || session.status === 'complete')) {
                 const targetInterviewId = session.metadata?.interviewId || interviewId;
                 if (targetInterviewId) {
-                    const updated = await Interview.findByIdAndUpdate(
-                        targetInterviewId,
-                        { paymentStatus: 'Paid' },
-                        { new: true }
-                    );
-                    return res.json({ verified: true, paymentStatus: 'Paid', interview: updated });
+                    const interview = await Interview.findById(targetInterviewId);
+                    if (!interview) return res.status(404).json({ message: 'Interview not found' });
+
+                    const isAuthorized = await checkInterviewAuth(interview);
+                    if (!isAuthorized) {
+                        return res.status(403).json({ message: 'Not authorized to verify payment for this interview' });
+                    }
+
+                    interview.paymentStatus = 'Paid';
+                    await interview.save();
+                    return res.json({ verified: true, paymentStatus: 'Paid', interview });
                 }
                 return res.json({ verified: true, paymentStatus: 'Paid' });
             }
@@ -167,6 +210,11 @@ const verifySession = async (req, res) => {
         if (interviewId) {
             const interview = await Interview.findById(interviewId);
             if (!interview) return res.status(404).json({ message: 'Interview not found' });
+
+            const isAuthorized = await checkInterviewAuth(interview);
+            if (!isAuthorized) {
+                return res.status(403).json({ message: 'Not authorized to verify payment for this interview' });
+            }
 
             if (interview.paymentStatus === 'Paid') {
                 return res.json({ verified: true, paymentStatus: 'Paid', interview });

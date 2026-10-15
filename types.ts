@@ -74,6 +74,10 @@ export interface User {
   yearsOfExperience?: string;
   availability?: string;
 
+  // Freelancer Approval Status & Organization Link
+  approvalStatus?: 'APPROVED' | 'PENDING' | 'REJECTED';
+  organization?: string;
+
   profile?: any;
   createdAt?: string;
 }
@@ -100,6 +104,9 @@ export interface Job {
   status?: 'Active' | 'Closed' | string;
   applicantCount?: number;
   applicants?: any;
+  proposedCandidateId?: string | User;
+  freelancerFinalReport?: string;
+  aiEvaluationSummary?: string;
 }
 
 export interface Application {
@@ -111,7 +118,7 @@ export interface Application {
   aiScore?: number | null;
   matchedKeywords?: string[];
   missingKeywords?: string[];
-  status: 'Applied' | 'Screening' | 'Interview' | 'Offer' | 'Rejected' | 'Pending AI';
+  status: 'Applied' | 'Screening' | 'Interview' | 'Offer' | 'Rejected' | 'Pending AI' | 'Proposed' | 'Hired';
   appliedAt: string;
 }
 
@@ -126,8 +133,9 @@ export interface Interview {
   status: 'Pending' | 'Accepted' | 'Rejected' | 'Scheduled' | 'InProgress' | 'Completed' | 'Cancelled';
   paymentStatus?: 'Unpaid' | 'Paid';
   notes?: string;
+  aiGenerating?: boolean;
   proctorLog?: Array<{
-    type: 'tab_switch' | 'copy' | 'paste' | 'gaze' | 'face_lost';
+    type: 'tab_switch' | 'copy' | 'paste' | 'gaze' | 'face_lost' | 'multiple_faces' | 'screenshot';
     detail: string;
     timestamp: string;
   }>;
