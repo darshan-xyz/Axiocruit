@@ -98,7 +98,7 @@ export const FindInterviewers: React.FC = () => {
     const minTimeLocal = bookingData.date === minDateLocal ? String(nowLocal.getHours()).padStart(2, '0') + ':' + String(nowLocal.getMinutes()).padStart(2, '0') : undefined;
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             <h2 className="text-2xl font-bold">Find Freelance Interviewers</h2>
 
             <div className="flex flex-col md:flex-row gap-4 bg-white dark:bg-[#111726] p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm items-end transition-colors">
@@ -367,7 +367,7 @@ export const ServiceMarketplace: React.FC = () => {
     const selectedJob = jobs.find(j => (j._id || j.id) === selectedJobId);
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             {/* Header & Segmented Mode Switcher */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>

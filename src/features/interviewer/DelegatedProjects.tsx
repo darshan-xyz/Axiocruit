@@ -87,7 +87,7 @@ export const DelegatedProjects: React.FC = () => {
     const completedCount = jobs.filter(j => j.delegationStatus === 'completed').length;
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             {/* Header */}
             <div>
                 <h2 className="text-2xl font-bold">Delegated Projects</h2>

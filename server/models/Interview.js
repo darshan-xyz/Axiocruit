@@ -7,7 +7,7 @@ const interviewSchema = new mongoose.Schema({
   interviewerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   jobId: { type: mongoose.Schema.Types.ObjectId, ref: 'Job' },
   scheduledTime: { type: Date, required: true },
-  meetingId: { type: String, unique: true, required: true },
+  meetingId: { type: String, required: true },
   status: {
     type: String,
     default: 'Pending',
@@ -46,9 +46,10 @@ const interviewSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-interviewSchema.index({ candidateId: 1, scheduledTime: 1 });
-interviewSchema.index({ recruiterId: 1, scheduledTime: 1 });
-interviewSchema.index({ interviewerId: 1, scheduledTime: 1 });
+interviewSchema.index({ meetingId: 1 }, { unique: true });
+interviewSchema.index({ candidateId: 1, scheduledTime: -1 });
+interviewSchema.index({ recruiterId: 1, scheduledTime: -1 });
+interviewSchema.index({ interviewerId: 1, scheduledTime: -1 });
 
 module.exports = mongoose.model('Interview', interviewSchema);
 

@@ -45,9 +45,9 @@ export const CandidatePortal: React.FC = () => {
     const displayAiTrend = hasScored ? 'Rubric score match' : (applications.length > 0 ? 'Pending AI parse' : 'Submit CV to evaluate');
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-300">
+        <div className="w-full space-y-6 animate-in fade-in duration-300">
             {/* Hero Profile & Readiness Banner */}
-            <div className="p-6 md:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="w-full p-6 md:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="relative z-10 max-w-xl">
                     <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cobalt-50 text-cobalt-700 dark:bg-cobalt-950/60 dark:text-cobalt-300 border border-cobalt-200/60 dark:border-cobalt-800/60 mb-3">
                         <Sparkles size={12} className="text-cobalt-600" />

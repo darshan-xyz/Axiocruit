@@ -87,7 +87,7 @@ export const SubmitFeedbackView: React.FC = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto py-8">
+    <div className="w-full py-8">
       <ToastContainer />
       <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Submit Candidate Feedback</h1>
       <p className="text-neutral-400 mb-8">

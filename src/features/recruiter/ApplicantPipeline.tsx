@@ -127,7 +127,7 @@ export const Applicants: React.FC = () => {
     const minTimeLocal = scheduleData.date === minDateLocal ? String(nowLocal.getHours()).padStart(2, '0') + ':' + String(nowLocal.getMinutes()).padStart(2, '0') : undefined;
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             <h2 className="text-2xl font-bold">Applicants</h2>
 
             <div className="flex gap-4 mb-6">

@@ -298,42 +298,23 @@ exports.uploadResume = async (req, res) => {
     }
     await user.save();
 
-    // Optional: Attempt AI CV parse if AI service is online
+    // Optional: Attempt AI CV parse using resilient circuit breaker
     let parsedData = null;
     try {
-      const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8002';
-      const fetch = require('node-fetch');
-      const FormData = require('form-data');
-
       if (fs.existsSync(req.file.path)) {
         const fileBuffer = await fs.promises.readFile(req.file.path);
-        const form = new FormData();
-        form.append('file', fileBuffer, {
-          filename: req.file.originalname || 'resume.pdf',
-          contentType: 'application/pdf',
+        const { parseCVWithAI } = require('./applicationController');
+        parsedData = await parseCVWithAI(fileBuffer, req.file.originalname, '', {
+          timeoutMs: 8000,
+          maxRetries: 1,
         });
-        form.append('job_description', '');
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-        const aiRes = await fetch(`${AI_SERVICE_URL}/api/ai/parse-cv`, {
-          method: 'POST',
-          body: form,
-          headers: form.getHeaders(),
-          signal: controller.signal,
-        });
-        clearTimeout(timeoutId);
-
-        if (aiRes.ok) {
-          parsedData = await aiRes.json();
-          if (parsedData?.skills && parsedData.skills.length > 0 && profile) {
-            const mergedSkills = Array.from(new Set([...(profile.skills || []), ...parsedData.skills]));
-            profile.skills = mergedSkills;
-            await profile.save();
-            user.skills = mergedSkills;
-            await user.save();
-          }
+        if (parsedData?.skills && parsedData.skills.length > 0 && profile) {
+          const mergedSkills = Array.from(new Set([...(profile.skills || []), ...parsedData.skills]));
+          profile.skills = mergedSkills;
+          await profile.save();
+          user.skills = mergedSkills;
+          await user.save();
         }
       }
     } catch (aiErr) {

@@ -106,7 +106,7 @@ const TALENT_PIPELINE_MATRIX_ROWS = [
 
 const HiringMatrixGrid: React.FC = () => {
   return (
-    <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
@@ -202,7 +202,7 @@ const JobsSummaryDonutChart: React.FC = () => {
   const circumference = 345.57; // 2 * PI * 55
   // Reference 2 exact numbers: Published 80, On Hold 20, Internal 18, Closed 15 => Total 133
   return (
-    <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
@@ -334,7 +334,7 @@ const EmployeeDepartmentCards: React.FC = () => {
   ];
 
   return (
-    <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
           Employee
@@ -379,7 +379,7 @@ const ConcentricFormatRings: React.FC = () => {
   const cInner = 201.06;
 
   return (
-    <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
@@ -478,7 +478,7 @@ const TimeTrackingStopwatch: React.FC = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -545,7 +545,7 @@ const TagNotesWidget: React.FC = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -601,7 +601,7 @@ const MiniCalendarWidget: React.FC = () => {
   const interviewDays = [12, 14, 18, 22, 25];
 
   return (
-    <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
@@ -669,7 +669,7 @@ const MyTaskScheduleList: React.FC = () => {
   ]);
 
   return (
-    <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
@@ -793,10 +793,10 @@ export const RecruiterDashboard: React.FC = () => {
     const displayAvatar = currentUser?.profilePicture || DEFAULT_AVATAR;
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-300">
+        <div className="w-full space-y-6 animate-in fade-in duration-300">
 
             {/* 1. HERO RECRUITER PROFILE BANNER */}
-            <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
                     <div className="relative">
                         <img
@@ -1062,7 +1062,7 @@ export const MyJobs: React.FC = () => {
 
     if (isCreatingJob) {
         return (
-            <div className="space-y-4">
+            <div className="w-full space-y-4">
                 <Button variant="ghost" onClick={() => setIsCreatingJob(false)} className="mb-4 text-neutral-400 hover:text-white">
                     ← Back to Jobs List
                 </Button>
@@ -1072,7 +1072,7 @@ export const MyJobs: React.FC = () => {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold">My Job Postings</h2>
                 <Button icon={Plus} onClick={() => setIsCreatingJob(true)}>Post New Job</Button>
@@ -1155,7 +1155,7 @@ export const CreateJob: React.FC<{ onJobCreated?: () => void, onCancel?: () => v
     };
 
     return (
-        <div className="max-w-3xl mx-auto">
+        <div className="w-full">
             <h2 className="text-2xl font-bold mb-6">Create New Job Post</h2>
             <Card className="p-8 space-y-6">
                 <div className="grid grid-cols-2 gap-6">
@@ -1333,7 +1333,7 @@ export const Applicants: React.FC = () => {
     const minTimeLocal = scheduleData.date === minDateLocal ? String(nowLocal.getHours()).padStart(2, '0') + ':' + String(nowLocal.getMinutes()).padStart(2, '0') : undefined;
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             <h2 className="text-2xl font-bold">Applicants</h2>
 
             <div className="flex gap-4 mb-6">
@@ -1505,7 +1505,7 @@ export const FindInterviewers: React.FC = () => {
     const minTimeLocal = bookingData.date === minDateLocal ? String(nowLocal.getHours()).padStart(2, '0') + ':' + String(nowLocal.getMinutes()).padStart(2, '0') : undefined;
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             <h2 className="text-2xl font-bold">Find Freelance Interviewers</h2>
 
             <div className="flex flex-col md:flex-row gap-4 bg-white dark:bg-[#111726] p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm items-end transition-colors">
@@ -1749,7 +1749,7 @@ export const RecruiterProfile: React.FC = () => {
     if (!user) return <div>Loading...</div>;
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="w-full space-y-8">
             <h2 className="text-2xl font-bold">Recruiter Profile</h2>
             <div className="grid md:grid-cols-3 gap-8">
                 <Card className="md:col-span-1 text-center p-6 h-fit">
@@ -1904,7 +1904,7 @@ export const ServiceMarketplace: React.FC = () => {
     const selectedJob = jobs.find(j => (j._id || j.id) === selectedJobId);
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             {/* Header */}
             <div>
                 <h2 className="text-2xl font-bold">Freelancer Marketplace</h2>
@@ -2223,7 +2223,7 @@ export const CompletedDelegations: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             <div>
                 <h2 className="text-2xl font-bold">Review Proposed Hires</h2>
                 <p className="text-neutral-400 text-sm mt-1">
@@ -2526,7 +2526,7 @@ export const NewHirings: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             {/* Header */}
             <div>
                 <h2 className="text-2xl font-bold flex items-center gap-3">
@@ -2749,7 +2749,7 @@ export const PastJobs: React.FC = () => {
     }, []);
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             {/* Header */}
             <div>
                 <h2 className="text-2xl font-bold flex items-center gap-3">

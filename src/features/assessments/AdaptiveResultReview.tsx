@@ -96,7 +96,7 @@ export const AdaptiveResultReview: React.FC = () => {
   const selectedResponse = responses.find((r) => r.questionId === selectedQuestion?._id);
 
   return (
-    <div className="space-y-6 max-h-[calc(100vh-80px)] min-h-[calc(100vh-80px)] flex flex-col">
+    <div className="w-full space-y-6 max-h-[calc(100vh-80px)] min-h-[calc(100vh-80px)] flex flex-col">
       {/* ── Top Bar ── */}
       <div className="flex items-center justify-between shrink-0">
         <div>

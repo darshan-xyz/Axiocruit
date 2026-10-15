@@ -17,7 +17,7 @@ export const CandidateApplicationsView: React.FC = () => {
     if (loading) return <div className="text-center p-8 text-slate-500">Loading applications...</div>;
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">My Applications</h2>
             {applications.length === 0 ? (
                 <div className="text-center p-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">

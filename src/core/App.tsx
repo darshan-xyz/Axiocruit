@@ -164,7 +164,7 @@ export const App: React.FC = () => {
 
                   {/* Adaptive Test Result Review (Standalone) */}
                   <Route path="/recruiter/coding-test-result/:jobId/candidate/:candidateId" element={
-                    <div className="bg-[#0a001a] min-h-screen text-white p-6">
+                    <div className="bg-[#0a001a] min-h-screen w-full text-white p-6">
                       <AdaptiveResultReview />
                     </div>
                   } />

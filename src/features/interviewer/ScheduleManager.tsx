@@ -27,7 +27,7 @@ export const InterviewerRequests: React.FC = () => {
     const pendingRequests = interviews.filter(i => i.status === 'Pending');
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             <h2 className="text-2xl font-bold">Booking Requests</h2>
             <p className="text-neutral-400">Review and respond to incoming interview requests from recruiters.</p>
 

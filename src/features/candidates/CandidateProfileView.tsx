@@ -221,7 +221,7 @@ export const CandidateProfileView: React.FC = () => {
     if (loading) return <div>Loading profile...</div>;
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="w-full space-y-6">
             <h2 className="text-2xl font-bold">My Profile</h2>
 
             <Card className="p-8">

@@ -324,7 +324,7 @@ const MessagesTab: React.FC = () => {
   const inputBg = isDark ? 'bg-[#1a1a2e]' : 'bg-slate-100';
 
   return (
-    <div className={`h-[calc(100vh-120px)] flex rounded-2xl overflow-hidden shadow-2xl ${cardBg} border ${borderColor}`}>
+    <div className={`h-[calc(100vh-120px)] w-full flex rounded-2xl overflow-hidden shadow-sm ${cardBg} border ${borderColor}`}>
       {/* ═══════ LEFT: Conversation List ═══════ */}
       <div className={`w-full md:w-[380px] flex-shrink-0 flex flex-col ${sidebarBg} border-r ${borderColor} ${mobileShowChat ? 'hidden md:flex' : 'flex'}`}>
         {/* Header */}

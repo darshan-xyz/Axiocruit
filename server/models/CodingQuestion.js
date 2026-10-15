@@ -46,4 +46,6 @@ const codingQuestionSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
 });
 
+codingQuestionSchema.index({ difficulty: 1, category: 1 });
+
 module.exports = mongoose.model('CodingQuestion', codingQuestionSchema);

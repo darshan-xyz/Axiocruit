@@ -83,7 +83,7 @@ export const FreelancerAvailability: React.FC = () => {
     };
 
     return (
-        <Card className="max-w-3xl mx-auto border border-neutral-800 dark:bg-neutral-900 shadow-xl">
+        <Card className="w-full border border-neutral-800 dark:bg-neutral-900 shadow-xl">
             <ToastContainer />
             <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">

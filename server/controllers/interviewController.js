@@ -9,9 +9,37 @@ const TestSession = require('../models/TestSession');
 const Job = require('../models/Job');
 const Application = require('../models/Application');
 const User = require('../models/User');
+const HttpClient = require('../utils/httpClient');
 
 // AI Service URL from environment (defaults to port 8002 for microservice isolation)
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8002';
+
+/**
+ * Enterprise post-interview evaluation using HttpClient with Circuit Breaker
+ */
+const evaluateInterviewWithAI = async (aiPayload, options = {}) => {
+  return HttpClient.executeWithBreaker(
+    'ai-service',
+    async () => {
+      const response = await HttpClient.postJson(`${AI_SERVICE_URL}/api/ai/evaluate-interview`, aiPayload, {
+        timeoutMs: options.timeoutMs || 10000,
+        maxRetries: options.maxRetries !== undefined ? options.maxRetries : 1,
+      });
+      return response;
+    },
+    async (err) => {
+      console.warn(`[evaluateInterviewWithAI] AI evaluation service unavailable (${err.message}). Using fallback evaluation.`);
+      return {
+        suitabilityScore: aiPayload.codingTestConducted ? Math.max(aiPayload.codingScore || 0, 10) : 50,
+        strengths: ['Interview completed successfully', 'Candidate demonstrated technical engagement'],
+        weaknesses: ['AI detailed analysis unavailable — evaluation generated from metrics via circuit breaker fallback'],
+        redFlags: [],
+        isFallback: true,
+      };
+    },
+    options
+  );
+};
 
 // ============================
 // Helper: Build red flags from a proctorLog array (rule-based, no LLM)
@@ -644,35 +672,8 @@ exports.completeInterview = async (req, res) => {
         interviewerNotes: interviewerRemarks || interview.notes || '',
       };
 
-      try {
-        const fetchFn = global.fetch || require('node-fetch');
-        const aiAbort = new AbortController();
-        const aiTimeout = setTimeout(() => aiAbort.abort(), 10 * 60 * 1000);
-
-        const aiResponse = await fetchFn(`${AI_SERVICE_URL}/api/ai/evaluate-interview`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(aiPayload),
-          signal: aiAbort.signal,
-        });
-
-        clearTimeout(aiTimeout);
-
-        if (!aiResponse.ok) {
-          const errText = await aiResponse.text();
-          throw new Error(`AI Service responded with ${aiResponse.status}: ${errText}`);
-        }
-
-        aiResult = await aiResponse.json();
-      } catch (aiError) {
-        console.warn(`[Complete-BG] AI evaluation service unavailable (${aiError.message}). Using fallback evaluation.`);
-        aiResult = {
-          suitabilityScore: codingTestConducted ? Math.max(codingScore, 10) : 50,
-          strengths: ['Interview completed successfully', 'Candidate demonstrated technical engagement'],
-          weaknesses: ['AI detailed analysis unavailable — evaluation generated from metrics'],
-          redFlags: [],
-        };
-      }
+      // Invoke evaluateInterviewWithAI with Circuit Breaker and deterministic fallback
+      aiResult = await evaluateInterviewWithAI(aiPayload);
 
       const finalRedFlags = buildRedFlagsFromLog(freshLog);
 
@@ -701,3 +702,6 @@ exports.completeInterview = async (req, res) => {
     res.status(500).json({ message: 'Failed to complete interview', error: err.message });
   }
 };
+
+exports.evaluateInterviewWithAI = evaluateInterviewWithAI;
+exports.evaluateInterview = evaluateInterviewWithAI;

@@ -438,7 +438,7 @@ export const CodingTestPage: React.FC = () => {
   const isResultPhase = phase === 'result_feedback';
 
   return (
-    <div className="min-h-screen bg-[#07000F] flex flex-col overflow-hidden">
+    <div className="w-full min-h-screen bg-[#07000F] flex flex-col overflow-hidden">
 
       {/* ── Top Nav Bar ─────────────────────────────────────────────────────── */}
       <header className="flex items-center justify-between px-6 py-3 border-b border-neutral-800/80 bg-[#0D0117]/90 backdrop-blur-md shrink-0">

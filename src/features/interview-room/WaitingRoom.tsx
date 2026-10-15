@@ -21,7 +21,7 @@ export const WaitingRoom: React.FC<WaitingRoomProps> = ({
     onLeave,
 }) => {
     return (
-        <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white gap-6 px-4">
+        <div className="min-h-screen w-full bg-black flex flex-col items-center justify-center text-white gap-6 px-4">
             {/* Camera preview so the candidate can check A/V before being admitted */}
             <div className="relative rounded-xl overflow-hidden border border-blue-500/30 shadow-xl shadow-blue-500/20" style={{ width: 280, height: 200 }}>
                 <video

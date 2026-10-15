@@ -508,7 +508,7 @@ export const CodingAssessment: React.FC = () => {
   const hasSubmitted = lastResult !== null;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }} className={isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }} className={`w-full min-h-screen ${isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
 
       {/* ── Top Navigation Bar ──────────────────────────────────────────────── */}
       <header

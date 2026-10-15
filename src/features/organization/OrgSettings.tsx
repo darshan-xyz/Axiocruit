@@ -45,7 +45,7 @@ export const OrgSettings: React.FC = () => {
     };
 
     return (
-        <div className="max-w-2xl mx-auto space-y-8">
+        <div className="w-full space-y-8">
             <div>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Organization Settings</h2>
                 <p className="text-xs sm:text-sm text-slate-500 mt-1">Manage your organization profile and account credentials.</p>

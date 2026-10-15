@@ -57,7 +57,7 @@ export const RecruiterProfile: React.FC = () => {
     if (!user) return <div>Loading...</div>;
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="w-full space-y-8">
             <h2 className="text-2xl font-bold">Recruiter Profile</h2>
             <div className="grid md:grid-cols-3 gap-8">
                 <Card className="md:col-span-1 text-center p-6 h-fit">

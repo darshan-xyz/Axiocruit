@@ -900,7 +900,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type }) => {
   };
 
   return (
-    <div className={`min-h-[100dvh] flex items-center justify-center px-4 py-16 font-sans transition-colors duration-200 ${
+    <div className={`min-h-[100dvh] w-full flex items-center justify-center px-4 py-16 font-sans transition-colors duration-200 ${
       isDark ? 'bg-[#0A0E1A] text-slate-100' : 'bg-[#EDF2F7] text-slate-900'
     }`}>
       <div className="relative z-10 w-full max-w-md animate-in fade-in zoom-in-95 duration-200">

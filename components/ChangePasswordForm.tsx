@@ -52,7 +52,7 @@ export const ChangePasswordForm: React.FC = () => {
     };
 
     return (
-        <Card title="Security Settings" className="max-w-xl">
+        <Card title="Security Settings" className="w-full">
             <div className="space-y-6">
                 <div className="flex items-center gap-3 p-4 bg-orange-500/10 border border-orange-500/20 rounded-lg text-orange-200 text-sm">
                     <Shield size={20} className="text-orange-500" />

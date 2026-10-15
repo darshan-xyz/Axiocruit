@@ -32,7 +32,7 @@ export const InterviewerDashboard: React.FC = () => {
     const totalEarnings = (completedCount * rate).toFixed(0);
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-300">
+        <div className="w-full space-y-6 animate-in fade-in duration-300">
             {/* Top Greeting & Status Banner */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-2">
                 <div>

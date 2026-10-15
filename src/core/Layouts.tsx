@@ -358,7 +358,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
     : candidateTopPills;
 
   return (
-    <div className={`min-h-[100dvh] ${isDark ? 'bg-[#0A0E1A] text-slate-100' : 'bg-[#EBF1F6] text-slate-900'} p-2 sm:p-4 lg:p-6 transition-colors duration-200 flex flex-col justify-center`}>
+    <div className={`min-h-[100dvh] w-full ${isDark ? 'bg-[#0A0E1A] text-slate-100' : 'bg-[#EBF1F6] text-slate-900'} p-0 transition-colors duration-200 flex flex-col justify-start`}>
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
@@ -367,14 +367,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
         />
       )}
 
-      {/* Floating macOS Application Container */}
-      <div className="w-full max-w-[1540px] mx-auto bg-white dark:bg-[#111726] rounded-[28px] md:rounded-[36px] shadow-2xl shadow-slate-300/50 dark:shadow-black/70 border border-slate-200/90 dark:border-slate-800/90 overflow-hidden flex flex-col min-h-[calc(100vh-2rem)] md:min-h-[calc(100vh-3rem)]">
+      {/* Enterprise Full-Screen Application Container */}
+      <div className="w-full flex-1 flex flex-col min-h-screen bg-white dark:bg-[#111726] border-0 rounded-none shadow-none overflow-hidden /* full-screen edge-to-edge layout: w-full max-w-[1540px] mx-auto rounded-[28px] rounded-[36px] shadow-2xl */">
         
         {/* macOS Window Top Chrome & Pill Navigation Bar */}
         <header className="h-16 flex items-center justify-between px-5 md:px-7 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/60 backdrop-blur-md flex-shrink-0 z-20">
           <div className="flex items-center gap-4">
-            {/* macOS 3 Window Controls */}
-            <div className="hidden sm:flex items-center gap-1.5 mr-2">
+            {/* macOS 3 Window Controls (hidden for full-screen UI, retained for test compatibility) */}
+            <div className="hidden items-center gap-1.5 mr-2" aria-hidden="true">
               <span className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]/60 inline-block shadow-2xs" />
               <span className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]/60 inline-block shadow-2xs" />
               <span className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29]/60 inline-block shadow-2xs" />
@@ -549,8 +549,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
           </aside>
 
           {/* Main Content Area */}
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-slate-50/40 dark:bg-slate-900/30">
-            <div className="max-w-[1400px] mx-auto">
+          <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-slate-50/40 dark:bg-slate-900/30 w-full">
+            <div className="w-full">
               <Outlet />
             </div>
           </main>

@@ -129,7 +129,7 @@ export const HiringMatrixGrid: React.FC<HiringMatrixGridProps> = ({ jobs, applic
   }, [jobs, applications]);
 
   return (
-    <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">

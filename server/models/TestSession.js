@@ -62,4 +62,7 @@ const testSessionSchema = new mongoose.Schema({
     completedAt: { type: Date },
 });
 
+testSessionSchema.index({ candidateId: 1, jobId: 1 });
+testSessionSchema.index({ status: 1, startedAt: -1 });
+
 module.exports = mongoose.model('TestSession', testSessionSchema);

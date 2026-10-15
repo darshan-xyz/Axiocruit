@@ -321,7 +321,7 @@ export const InterviewRoomContainer: React.FC = () => {
     const totalConnected = signaling.remoteStreams.length + 1;
 
     return (
-        <div className={`h-screen flex flex-col overflow-hidden ${isDark ? 'bg-black text-white' : 'bg-slate-50 text-slate-900'}`}>
+        <div className={`h-screen w-full flex flex-col overflow-hidden ${isDark ? 'bg-black text-white' : 'bg-slate-50 text-slate-900'}`}>
             <ToastContainer />
 
             {/* Top Bar */}

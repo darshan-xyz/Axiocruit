@@ -70,7 +70,7 @@ export const CompletedDelegations: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             <div>
                 <h2 className="text-2xl font-bold">Review Proposed Hires</h2>
                 <p className="text-neutral-400 text-sm mt-1">

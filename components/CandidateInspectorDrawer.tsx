@@ -136,7 +136,7 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
   ];
 
   return (
-    <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-xl relative sticky top-20 flex flex-col max-h-[calc(100vh-6rem)] overflow-y-auto">
+    <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm relative sticky top-20 flex flex-col max-h-[calc(100vh-6rem)] overflow-y-auto">
       {/* Top Close Button (X) */}
       <button
         onClick={onClose}

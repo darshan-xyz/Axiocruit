@@ -30,7 +30,7 @@ export const ScheduleTimeline: React.FC<ScheduleTimelineProps> = ({
 
   return (
     <div
-      className={`rounded-2xl sm:rounded-3xl p-6 border shadow-sm transition-all duration-200 ${
+      className={`w-full rounded-2xl p-6 border shadow-sm transition-all duration-200 ${
         isDark
           ? 'bg-[#111726] border-slate-800 text-white'
           : 'bg-white border-neutral-200/80 text-[#111111]'

@@ -73,7 +73,7 @@ export const MyJobs: React.FC = () => {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold">My Job Postings</h2>
                 <Button icon={Plus} onClick={() => setIsCreatingJob(true)}>Post New Job</Button>
@@ -200,7 +200,7 @@ export const CreateJob: React.FC<{ onJobCreated?: () => void; onCancel?: () => v
     };
 
     return (
-        <div className="max-w-3xl mx-auto">
+        <div className="w-full">
             <h2 className="text-2xl font-bold mb-6">{isEdit ? 'Edit Job Posting' : 'Create New Job Post'}</h2>
             <Card className="p-8 space-y-6">
                 <div className="grid grid-cols-2 gap-6">

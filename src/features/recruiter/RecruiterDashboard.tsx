@@ -85,10 +85,10 @@ export const RecruiterDashboard: React.FC = () => {
     const displayAvatar = currentUser?.profilePicture || DEFAULT_AVATAR;
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-300">
+        <div className="w-full space-y-6 animate-in fade-in duration-300">
 
             {/* 1. HERO RECRUITER PROFILE BANNER */}
-            <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
                     <div className="relative">
                         <img

@@ -9,6 +9,7 @@ Models are loaded GLOBALLY at startup for sub-30s response times.
 PDF files are processed strictly in-memory (no disk writes).
 """
 
+import asyncio
 import io
 import json
 import logging
@@ -16,6 +17,8 @@ import os
 import re
 import string
 import time
+import zipfile
+import xml.etree.ElementTree as ET
 from contextlib import asynccontextmanager
 from typing import List
 
@@ -40,6 +43,9 @@ logger = logging.getLogger("ai-service")
 embedding_model: SentenceTransformer | None = None
 nlp = None
 http_client: httpx.AsyncClient | None = None
+
+# Concurrency bounding semaphore to prevent CPU saturation from blocking the event loop
+CPU_SEMAPHORE = asyncio.Semaphore(int(os.environ.get("AI_CONCURRENCY_LIMIT", "4")))
 
 # Common NER labels that are never useful keywords
 STOP_LABELS = {"DATE", "TIME", "PERCENT", "MONEY", "QUANTITY", "ORDINAL", "CARDINAL"}
@@ -183,6 +189,58 @@ def extract_text_from_pdf(file_bytes: bytes) -> str:
     if not full_text:
         raise HTTPException(status_code=400, detail="Could not extract any text from the PDF. The file may be image-based or empty.")
     return full_text
+
+
+def extract_text_from_docx(file_bytes: bytes) -> str:
+    """Extract all text from a DOCX file using python-docx if available, else zipfile + ElementTree."""
+    # 1. Try python-docx if installed
+    try:
+        import docx
+        doc = docx.Document(io.BytesIO(file_bytes))
+        paragraphs = [p.text for p in doc.paragraphs if p.text]
+        for table in doc.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    if cell.text.strip():
+                        paragraphs.append(cell.text.strip())
+        full_text = "\n".join(paragraphs).strip()
+        if full_text:
+            return full_text
+    except ImportError:
+        pass
+    except Exception as e:
+        logger.warning("python-docx extraction failed, falling back to zipfile: %s", e)
+
+    # 2. Resilient standard library fallback: parse word/document.xml directly
+    try:
+        with zipfile.ZipFile(io.BytesIO(file_bytes)) as zf:
+            if "word/document.xml" not in zf.namelist():
+                raise HTTPException(status_code=400, detail="Invalid DOCX structure: missing word/document.xml")
+            xml_content = zf.read("word/document.xml")
+            tree = ET.fromstring(xml_content)
+            texts: list[str] = []
+            for elem in tree.iter():
+                if elem.tag.endswith("}t") and elem.text:
+                    texts.append(elem.text)
+                elif elem.tag.endswith("}p"):
+                    texts.append("\n")
+                elif elem.tag.endswith("}tc"):
+                    texts.append(" ")
+                elif elem.tag.endswith("}tab"):
+                    texts.append("\t")
+                elif elem.tag.endswith("}br"):
+                    texts.append("\n")
+            full_text = "".join(texts).strip()
+            full_text = re.sub(r'[ \t]{2,}', ' ', full_text)
+            full_text = re.sub(r'\n{3,}', '\n\n', full_text)
+            if not full_text:
+                raise HTTPException(status_code=400, detail="Could not extract any text from the DOCX file. File may be empty.")
+            return full_text
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.error("DOCX extraction failed: %s", exc)
+        raise HTTPException(status_code=400, detail=f"Invalid or corrupted DOCX file: {exc}")
 
 
 def _normalise(token_text: str) -> str:
@@ -394,10 +452,6 @@ async def parse_cv(
     MAX_FILE_SIZE = 15 * 1024 * 1024  # 15MB limit
 
     try:
-        # Validate file type
-        if not file.filename or not file.filename.lower().endswith(".pdf"):
-            raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
-
         # Read file into memory (enforce 15MB limit)
         file_bytes = await file.read()
         if len(file_bytes) == 0:
@@ -405,15 +459,38 @@ async def parse_cv(
         if len(file_bytes) > MAX_FILE_SIZE:
             raise HTTPException(status_code=413, detail="File too large. Maximum size is 15MB.")
 
+        # Validate file type using extension and magic bytes
+        filename_lower = (file.filename or "").lower()
+        is_pdf_ext = filename_lower.endswith(".pdf")
+        is_docx_ext = filename_lower.endswith(".docx")
+        is_zip_magic = file_bytes.startswith(b"PK\x03\x04")
+        is_pdf_magic = file_bytes.startswith(b"%PDF")
+
+        if is_zip_magic or is_docx_ext:
+            is_docx = True
+            is_pdf = False
+        elif is_pdf_magic or is_pdf_ext:
+            is_pdf = True
+            is_docx = False
+        else:
+            raise HTTPException(status_code=400, detail="Only PDF and DOCX files are accepted.")
+
         logger.info("Processing CV: %s (%d bytes)", file.filename, len(file_bytes))
 
-        # 1. Extract text from PDF
-        cv_text = extract_text_from_pdf(file_bytes)
+        # 1. Extract text from PDF or DOCX (offloaded to thread and bounded by CPU semaphore)
+        async with CPU_SEMAPHORE:
+            if is_docx:
+                cv_text = await asyncio.to_thread(extract_text_from_docx, file_bytes)
+            else:
+                cv_text = await asyncio.to_thread(extract_text_from_pdf, file_bytes)
         logger.info("Extracted %d characters from CV.", len(cv_text))
 
-        # 2. Extract CV keywords & candidate profile metadata
-        cv_keywords = extract_keywords(cv_text)
-        candidate_name, experience_years, domain, ai_summary = extract_candidate_metadata(cv_text, cv_keywords)
+        # 2. Extract CV keywords & candidate profile metadata (offloaded to thread)
+        async with CPU_SEMAPHORE:
+            cv_keywords = await asyncio.to_thread(extract_keywords, cv_text)
+            candidate_name, experience_years, domain, ai_summary = await asyncio.to_thread(
+                extract_candidate_metadata, cv_text, cv_keywords
+            )
 
         clean_jd = (job_description or "").strip()
         if not clean_jd:
@@ -430,12 +507,14 @@ async def parse_cv(
                 ai_summary=ai_summary,
             )
 
-        # 3. Semantic similarity
-        semantic_score = compute_semantic_score(cv_text, clean_jd)
+        # 3. Semantic similarity (offloaded to thread)
+        async with CPU_SEMAPHORE:
+            semantic_score = await asyncio.to_thread(compute_semantic_score, cv_text, clean_jd)
         logger.info("Semantic score: %.2f", semantic_score)
 
-        # 4. Keyword extraction & matching
-        jd_keywords = extract_keywords(clean_jd)
+        # 4. Keyword extraction & matching (offloaded to thread)
+        async with CPU_SEMAPHORE:
+            jd_keywords = await asyncio.to_thread(extract_keywords, clean_jd)
         matched = cv_keywords & jd_keywords
         missing = jd_keywords - cv_keywords
 

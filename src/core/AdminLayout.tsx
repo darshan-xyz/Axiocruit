@@ -156,8 +156,8 @@ export const AdminLayout: React.FC = () => {
                     </div>
                 </header>
 
-                <main className="flex-1 p-8">
-                    <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <main className="flex-1 p-6 md:p-8 w-full">
+                    <div className="w-full animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <Outlet />
                     </div>
                 </main>

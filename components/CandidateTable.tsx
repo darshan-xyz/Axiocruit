@@ -96,7 +96,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
   ];
 
   return (
-    <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm flex flex-col">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm flex flex-col">
       {/* Top Filter Controls: Category Pills & Search */}
       <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         {/* Category filtering pills (Requirement R2 / F8) */}

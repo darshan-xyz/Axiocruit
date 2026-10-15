@@ -95,7 +95,7 @@ export const FreelancerServiceManager: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             <div className="flex justify-between items-center">
                 <div>
                     <h2 className="text-2xl font-bold">My Services</h2>

@@ -38,7 +38,7 @@ export const CandidateJobsView: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             <div className="flex flex-col md:flex-row gap-4 justify-between items-end">
                 <h2 className="text-2xl font-bold">Browse Jobs</h2>
                 <form onSubmit={handleSearch} className="flex flex-wrap gap-2 w-full md:w-auto items-center">

@@ -70,7 +70,7 @@ export const OrgAdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="w-full space-y-8">
       <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Organization Dashboard</h1>
 
       <div className="grid md:grid-cols-3 gap-6">

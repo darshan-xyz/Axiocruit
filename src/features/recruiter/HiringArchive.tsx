@@ -31,7 +31,7 @@ export const NewHirings: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             {/* Header */}
             <div>
                 <h2 className="text-2xl font-bold flex items-center gap-3">
@@ -251,7 +251,7 @@ export const PastJobs: React.FC = () => {
     }, []);
 
     return (
-        <div className="space-y-6">
+        <div className="w-full space-y-6">
             {/* Header */}
             <div>
                 <h2 className="text-2xl font-bold flex items-center gap-3">

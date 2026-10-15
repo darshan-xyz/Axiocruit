@@ -13,6 +13,11 @@ const jobSchema = new mongoose.Schema({
     },
     salary: { type: String },
     skills: [String],
+    organization: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Organization',
+        default: null
+    },
     postedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     applicants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     status: {
@@ -43,6 +48,7 @@ const jobSchema = new mongoose.Schema({
 
 jobSchema.index({ postedBy: 1, status: 1 });
 jobSchema.index({ delegatedFreelancerId: 1, delegationStatus: 1 });
+jobSchema.index({ organization: 1 });
 jobSchema.index({ status: 1 });
 
 module.exports = mongoose.model('Job', jobSchema);

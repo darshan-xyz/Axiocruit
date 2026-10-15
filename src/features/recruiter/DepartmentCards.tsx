@@ -52,7 +52,7 @@ export const EmployeeDepartmentCards: React.FC<EmployeeDepartmentCardsProps> = (
   });
 
   return (
-    <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
