@@ -106,13 +106,13 @@ const TALENT_PIPELINE_MATRIX_ROWS = [
 
 const HiringMatrixGrid: React.FC = () => {
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
             Technical Pipeline Matrix
           </h3>
-          <button className="px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 flex items-center gap-1.5 shadow-2xs">
+          <button className="px-3 py-1 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 flex items-center gap-1.5 shadow-2xs">
             <span>Engineering</span>
             <ChevronRight size={12} className="rotate-90 text-slate-400" />
           </button>
@@ -128,7 +128,7 @@ const HiringMatrixGrid: React.FC = () => {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <tr className="border-b border-slate-300 dark:border-slate-700 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               <th className="pb-3 pr-4 font-bold">Jobs</th>
               <th className="pb-3 px-3 text-center font-bold">New Applied</th>
               <th className="pb-3 px-3 text-center font-bold">Screening</th>
@@ -137,7 +137,7 @@ const HiringMatrixGrid: React.FC = () => {
               <th className="pb-3 pl-3 text-center font-bold">Hired</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-700 text-xs">
             {TALENT_PIPELINE_MATRIX_ROWS.map(row => (
               <tr key={row.jobTitle} className="hover:bg-slate-50/70 dark:hover:bg-slate-850/40 transition-colors">
                 <td className="py-3.5 pr-4 font-bold text-slate-900 dark:text-white min-w-[170px]">
@@ -202,7 +202,7 @@ const JobsSummaryDonutChart: React.FC = () => {
   const circumference = 345.57; // 2 * PI * 55
   // Reference 2 exact numbers: Published 80, On Hold 20, Internal 18, Closed 15 => Total 133
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
@@ -255,7 +255,7 @@ const JobsSummaryDonutChart: React.FC = () => {
         </div>
 
         {/* Legend matching Reference 2 */}
-        <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 text-xs">
+        <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-300 dark:border-slate-700 text-xs">
           <div className="flex items-center gap-2 p-2">
             <span className="w-1 h-5 rounded-full bg-[#8B5CF6]" />
             <div>
@@ -334,7 +334,7 @@ const EmployeeDepartmentCards: React.FC = () => {
   ];
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
           Employee
@@ -351,7 +351,7 @@ const EmployeeDepartmentCards: React.FC = () => {
         {depts.map(d => (
           <div
             key={d.name}
-            className="p-3.5 rounded-2xl bg-slate-50/60 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 flex items-center justify-between"
+            className="p-3.5 rounded-2xl bg-slate-50/60 dark:bg-slate-900/40 border border-slate-300 dark:border-slate-700 flex items-center justify-between"
           >
             <div>
               <h4 className="font-bold text-xs text-slate-900 dark:text-white">{d.name}</h4>
@@ -359,9 +359,9 @@ const EmployeeDepartmentCards: React.FC = () => {
             </div>
             <div className="flex items-center -space-x-1.5">
               {d.avatars.map((url, i) => (
-                <img key={i} src={url} className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-800 object-cover" alt="Member" />
+                <img key={i} src={url} className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-700 object-cover" alt="Member" />
               ))}
-              <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-800 text-[9px] font-black flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-2xs">
+              <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-800 text-[9px] font-black flex items-center justify-center border-2 border-white dark:border-slate-700 shadow-2xs">
                 {d.extra}
               </span>
             </div>
@@ -379,7 +379,7 @@ const ConcentricFormatRings: React.FC = () => {
   const cInner = 201.06;
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
@@ -428,7 +428,7 @@ const ConcentricFormatRings: React.FC = () => {
         </div>
 
         {/* Legend */}
-        <div className="space-y-2 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+        <div className="space-y-2 mt-3 pt-3 border-t border-slate-300 dark:border-slate-700 text-xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB]" />
@@ -478,7 +478,7 @@ const TimeTrackingStopwatch: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -496,7 +496,7 @@ const TimeTrackingStopwatch: React.FC = () => {
           Rubric assessment session time tracker for candidate evaluations.
         </p>
 
-        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 text-center mb-4">
+        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-700 text-center mb-4">
           <div className="font-mono text-3xl font-black text-slate-900 dark:text-white tracking-wider">
             {formatTime(seconds)}
           </div>
@@ -506,7 +506,7 @@ const TimeTrackingStopwatch: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+      <div className="flex items-center gap-2 pt-3 border-t border-slate-300 dark:border-slate-700">
         <button
           onClick={() => setIsRunning(!isRunning)}
           className={`flex-1 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-2xs ${
@@ -519,7 +519,7 @@ const TimeTrackingStopwatch: React.FC = () => {
         </button>
         <button
           onClick={() => { setSeconds(0); setIsRunning(false); }}
-          className="p-2 rounded-full border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+          className="p-2 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
           title="Reset timer"
         >
           <RotateCcw size={14} />
@@ -545,7 +545,7 @@ const TagNotesWidget: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -561,7 +561,7 @@ const TagNotesWidget: React.FC = () => {
           {notes.map((note, idx) => (
             <div
               key={idx}
-              className="p-2.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200/50 dark:border-purple-800/30 flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300"
+              className="p-2.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-300 dark:border-purple-700 flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5 flex-shrink-0" />
               <span className="flex-1 leading-snug">{note}</span>
@@ -576,12 +576,12 @@ const TagNotesWidget: React.FC = () => {
         </div>
       </div>
 
-      <form onSubmit={handleAddNote} className="flex items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+      <form onSubmit={handleAddNote} className="flex items-center gap-2 pt-3 border-t border-slate-300 dark:border-slate-700">
         <input
           value={newNote}
           onChange={e => setNewNote(e.target.value)}
           placeholder="Add candidate note..."
-          className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full px-3.5 py-1.5 text-xs text-slate-900 dark:text-white outline-none focus:border-purple-500"
+          className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-full px-3.5 py-1.5 text-xs text-slate-900 dark:text-white outline-none focus:border-purple-500"
         />
         <button
           type="submit"
@@ -601,7 +601,7 @@ const MiniCalendarWidget: React.FC = () => {
   const interviewDays = [12, 14, 18, 22, 25];
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
@@ -645,7 +645,7 @@ const MiniCalendarWidget: React.FC = () => {
         </div>
       </div>
 
-      <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 flex items-center justify-between">
+      <div className="pt-3 mt-3 border-t border-slate-300 dark:border-slate-700 text-[11px] text-slate-500 flex items-center justify-between">
         <span className="flex items-center gap-1.5 font-bold text-blue-600 dark:text-blue-400">
           <span className="w-2 h-2 rounded-full bg-blue-600" /> Today: 3 Interviews
         </span>
@@ -669,25 +669,25 @@ const MyTaskScheduleList: React.FC = () => {
   ]);
 
   return (
-    <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
+    <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
       <div>
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
             <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
               My Task
             </h3>
-            <button className="px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 flex items-center gap-1.5 shadow-2xs">
+            <button className="px-3 py-1 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 flex items-center gap-1.5 shadow-2xs">
               <span>Today</span>
               <ChevronRight size={12} className="rotate-90 text-slate-400" />
             </button>
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300">
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl border border-slate-300 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300">
               <Calendar size={13} className="text-slate-400" />
               <span>Feb 18 – Nov 18</span>
             </div>
           </div>
           <button
             onClick={() => window.location.href = '#/recruiter/schedule'}
-            className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-black text-slate-800 dark:text-slate-200 hover:bg-slate-50 flex items-center gap-1 shadow-2xs"
+            className="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-black text-slate-800 dark:text-slate-200 hover:bg-slate-50 flex items-center gap-1 shadow-2xs"
           >
             + ADD TASK
           </button>
@@ -698,7 +698,7 @@ const MyTaskScheduleList: React.FC = () => {
             <div
               key={t.id}
               onClick={() => setTasks(prev => prev.map(item => item.id === t.id ? { ...item, done: !item.done } : item))}
-              className={`p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/80 ${t.color} flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-100/60 dark:hover:bg-slate-850/60 transition-colors`}
+              className={`p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 ${t.color} flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-100/60 dark:hover:bg-slate-850/60 transition-colors`}
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold whitespace-nowrap min-w-[125px]">
@@ -796,7 +796,7 @@ export const RecruiterDashboard: React.FC = () => {
         <div className="w-full space-y-6 animate-in fade-in duration-300">
 
             {/* 1. HERO RECRUITER PROFILE BANNER */}
-            <div className="w-full bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
                     <div className="relative">
                         <img
@@ -811,7 +811,7 @@ export const RecruiterDashboard: React.FC = () => {
                             <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                                 {displayName}
                             </h2>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-300 dark:border-blue-700">
                                 {displayRole}
                             </span>
                         </div>
@@ -910,7 +910,7 @@ export const RecruiterDashboard: React.FC = () => {
                 <ConcentricFormatRings />
                 
                 {/* Weekly Recruitment Velocity Arc & Split Format */}
-                <div className="bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm h-full flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-3xl p-6 shadow-sm h-full flex flex-col justify-between">
                     <div>
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
@@ -932,19 +932,19 @@ export const RecruiterDashboard: React.FC = () => {
                         </div>
 
                         {/* Working Format Split Cards */}
-                        <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div className="mt-5 pt-4 border-t border-slate-300 dark:border-slate-700">
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2.5">
                                 Candidate Work Preference
                             </span>
                             <div className="grid grid-cols-2 gap-3">
-                                <div className="flex items-center justify-between p-3 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40">
+                                <div className="flex items-center justify-between p-3 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-700">
                                     <div className="flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-emerald-500" />
                                         <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Remote</span>
                                     </div>
                                     <span className="text-xs font-black text-emerald-700 dark:text-emerald-400">42%</span>
                                 </div>
-                                <div className="flex items-center justify-between p-3 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-800/40">
+                                <div className="flex items-center justify-between p-3 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-300 dark:border-blue-700">
                                     <div className="flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-blue-500" />
                                         <span className="text-xs font-bold text-blue-800 dark:text-blue-300">Hybrid</span>

@@ -4,6 +4,7 @@
  */
 
 const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 const Interview = require('../models/Interview');
 const TestSession = require('../models/TestSession');
 const Job = require('../models/Job');
@@ -342,6 +343,87 @@ exports.getInterviewById = async (req, res) => {
   } catch (err) {
     console.error('[InterviewController][getInterviewById] Error:', err.message);
     res.status(500).json({ message: 'Failed to fetch interview' });
+  }
+};
+
+// @desc    Get dynamic ICE/TURN credentials for WebRTC room (RFC 5766 coturn standard)
+// @route   GET /api/interviews/:id/turn-credentials
+// @access  Private
+exports.getTurnCredentials = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const interview = await Interview.findOne({
+      $or: [
+        ...(id.match(/^[0-9a-fA-F]{24}$/) ? [{ _id: id }] : []),
+        { meetingId: id },
+      ],
+    });
+
+    if (!interview) {
+      return res.status(404).json({ message: 'Interview not found' });
+    }
+
+    const userId = (req.user._id || req.user.id).toString();
+    const isRecruiter = interview.recruiterId?.toString() === userId;
+    const isCandidate = interview.candidateId?.toString() === userId;
+    const isInterviewer = interview.interviewerId?.toString() === userId;
+    const isOrgAdminOfInterview = await isOrgAdminOfTarget(req.user, interview.recruiterId);
+    const isAdmin = (req.user.role || '').toUpperCase() === 'ADMIN';
+
+    if (!isRecruiter && !isCandidate && !isInterviewer && !isOrgAdminOfInterview && !isAdmin) {
+      return res.status(403).json({ message: 'You are not authorized to access TURN credentials for this interview' });
+    }
+
+    const turnSecret = process.env.TURN_SECRET || process.env.COTURN_SECRET;
+    const defaultStunUrls = [
+      'stun:stun.l.google.com:19302',
+      'stun:stun1.l.google.com:19302',
+    ];
+
+    if (turnSecret) {
+      const ttl = parseInt(process.env.TURN_TTL_SECONDS || '86400', 10);
+      const timestamp = Math.floor(Date.now() / 1000) + ttl;
+      const username = `${timestamp}:${userId}`;
+      const credential = crypto
+        .createHmac('sha1', turnSecret)
+        .update(username)
+        .digest('base64');
+
+      const rawTurnUrls = process.env.TURN_URLS || process.env.TURN_URL || 'turn:turn.axiocruit.com:3478?transport=udp,turn:turn.axiocruit.com:3478?transport=tcp';
+      const turnUrls = rawTurnUrls.split(',').map((u) => u.trim()).filter(Boolean);
+      const rawStunUrls = process.env.STUN_URLS || process.env.STUN_URL;
+      const stunUrls = rawStunUrls ? rawStunUrls.split(',').map((u) => u.trim()).filter(Boolean) : defaultStunUrls;
+
+      const iceServers = [
+        { urls: stunUrls },
+        {
+          urls: turnUrls,
+          username,
+          credential,
+        },
+      ];
+
+      return res.json({
+        iceServers,
+        ttl,
+        expiresAt: new Date(timestamp * 1000).toISOString(),
+        relayActive: true,
+      });
+    }
+
+    // Default public STUN fallback if TURN secret is unconfigured
+    return res.json({
+      iceServers: [
+        { urls: defaultStunUrls },
+      ],
+      ttl: 86400,
+      expiresAt: new Date(Date.now() + 86400000).toISOString(),
+      relayActive: false,
+    });
+  } catch (err) {
+    console.error('[InterviewController][getTurnCredentials] Error:', err.message);
+    res.status(500).json({ message: 'Failed to generate TURN credentials' });
   }
 };
 

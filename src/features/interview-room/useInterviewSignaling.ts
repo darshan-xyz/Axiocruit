@@ -5,12 +5,13 @@ import { useToast } from '@/components/Toast';
 import { apiRequest } from '@/utils/api';
 import { getRoleHome } from '@/types';
 
-const ICE_SERVERS: RTCConfiguration = {
+export const DEFAULT_ICE_SERVERS: RTCConfiguration = {
     iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' },
     ],
 };
+export const ICE_SERVERS = DEFAULT_ICE_SERVERS;
 
 export interface PeerUser {
     socketId: string;
@@ -44,6 +45,32 @@ export const useInterviewSignaling = ({
 }: UseInterviewSignalingProps) => {
     const navigate = useNavigate();
     const { addToast } = useToast();
+
+    // Dynamic ICE & TURN server configuration
+    const [iceServersConfig, setIceServersConfig] = useState<RTCConfiguration>(DEFAULT_ICE_SERVERS);
+    const iceServersRef = useRef<RTCConfiguration>(DEFAULT_ICE_SERVERS);
+    useEffect(() => {
+        iceServersRef.current = iceServersConfig;
+    }, [iceServersConfig]);
+
+    // Fetch ephemeral HMAC-SHA1 TURN/STUN credentials from gateway
+    useEffect(() => {
+        if (!interview) return;
+        const targetId = interviewId || interview._id || interview.meetingId;
+        if (!targetId) return;
+
+        apiRequest(`/api/interviews/${targetId}/turn-credentials`)
+            .then((data: any) => {
+                if (data?.iceServers && Array.isArray(data.iceServers) && data.iceServers.length > 0) {
+                    const dynamicConfig: RTCConfiguration = { iceServers: data.iceServers };
+                    setIceServersConfig(dynamicConfig);
+                    iceServersRef.current = dynamicConfig;
+                }
+            })
+            .catch((err: any) => {
+                console.warn('[WebRTC] Could not fetch dynamic TURN credentials, using fallback STUN:', err?.message || err);
+            });
+    }, [interview, interviewId]);
 
     // Waiting Room & Admission Requests
     const [isWaitingForHost, setIsWaitingForHost] = useState(false);
@@ -103,7 +130,7 @@ export const useInterviewSignaling = ({
             return peerConnectionsRef.current.get(remoteSocketId)!;
         }
 
-        const pc = new RTCPeerConnection(ICE_SERVERS);
+        const pc = new RTCPeerConnection(iceServersRef.current);
         peerConnectionsRef.current.set(remoteSocketId, pc);
 
         if (localStreamRef.current) {
@@ -150,7 +177,29 @@ export const useInterviewSignaling = ({
         };
 
         pc.oniceconnectionstatechange = () => {
-            if (pc.iceConnectionState === 'disconnected' || pc.iceConnectionState === 'failed') {
+            if (pc.iceConnectionState === 'failed') {
+                if (typeof pc.restartIce === 'function') {
+                    console.log(`[WebRTC] ICE connection failed for peer ${remoteSocketId}. Initiating ICE restart...`);
+                    try {
+                        pc.restartIce();
+                        pc.createOffer({ iceRestart: true })
+                            .then((offer) => pc.setLocalDescription(offer))
+                            .then(() => {
+                                socket.emit('offer', {
+                                    offer: pc.localDescription,
+                                    to: remoteSocketId,
+                                });
+                            })
+                            .catch((err) => console.warn('[WebRTC] ICE restart renegotiation error:', err));
+                        return;
+                    } catch (e) {
+                        console.warn('[WebRTC] restartIce threw exception, tearing down:', e);
+                    }
+                }
+                addToast('error', 'Connection to peer lost');
+                setRemoteStreams((prev) => prev.filter((rs) => rs.socketId !== remoteSocketId));
+                peerConnectionsRef.current.delete(remoteSocketId);
+            } else if (pc.iceConnectionState === 'disconnected') {
                 addToast('error', 'Connection to peer lost');
                 setRemoteStreams((prev) => prev.filter((rs) => rs.socketId !== remoteSocketId));
                 peerConnectionsRef.current.delete(remoteSocketId);

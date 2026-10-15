@@ -36,7 +36,7 @@ export const InterviewerDashboard: React.FC = () => {
             {/* Top Greeting & Status Banner */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-2">
                 <div>
-                    <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 mb-2">
+                    <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 mb-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                         <span>Domain Expert Active</span>
                     </div>
@@ -48,7 +48,7 @@ export const InterviewerDashboard: React.FC = () => {
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm">
+                    <div className="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm">
                         Rate: <span className="text-emerald-600 dark:text-emerald-400 font-black">${user?.hourlyRate || '0'}/hr</span>
                     </div>
                     <Button
@@ -142,7 +142,7 @@ export const InterviewerDashboard: React.FC = () => {
                                         const company = job?.company || recruiter?.companyName || recruiter?.name || 'Partner Org';
 
                                         return (
-                                            <div key={inv._id} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 flex justify-between items-center gap-4">
+                                            <div key={inv._id} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700 flex justify-between items-center gap-4">
                                                 <div className="flex-1 min-w-0">
                                                     <p className="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-sm truncate">
                                                         <User size={14} className="text-blue-600 flex-shrink-0" />
@@ -176,7 +176,7 @@ export const InterviewerDashboard: React.FC = () => {
 
                                 <Link
                                     to="/interviewer/schedule"
-                                    className="block w-full text-center text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline pt-3 border-t border-slate-100 dark:border-slate-800 transition-colors"
+                                    className="block w-full text-center text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline pt-3 border-t border-slate-300 dark:border-slate-700 transition-colors"
                                 >
                                     Open Full Availability Calendar &rarr;
                                 </Link>
@@ -185,11 +185,11 @@ export const InterviewerDashboard: React.FC = () => {
                     })()}
                 </Card>
 
-                <Card title="Pending Project Requests" className="border-amber-500/20 bg-amber-500/5">
+                <Card title="Pending Project Requests" className="border-amber-500/40 bg-amber-500/5">
                     {pendingDelegations.length === 0 ? <p className="text-neutral-500">No pending projects.</p> : (
                         <div className="space-y-3">
                             {pendingDelegations.map(job => (
-                                <div key={job._id} className="p-4 border border-amber-500/30 rounded-lg bg-neutral-900/50">
+                                <div key={job._id} className="p-4 border border-amber-500/50 rounded-lg bg-neutral-900/50">
                                     <div className="mb-3">
                                         <p className="font-semibold text-white flex gap-2 items-center">
                                             <Briefcase size={16} className="text-amber-400" />
@@ -255,7 +255,7 @@ export const InterviewerDashboard: React.FC = () => {
                             {interviews
                                 .filter(i => (i.status === 'Completed' || i.status === 'Scheduled') && !i.feedback && new Date(i.scheduledTime || Date.now()).getTime() < Date.now())
                                 .map(inv => (
-                                <div key={inv._id} className="p-4 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col justify-between h-full bg-slate-50 dark:bg-slate-900/60">
+                                <div key={inv._id} className="p-4 border border-slate-300 dark:border-slate-700 rounded-2xl flex flex-col justify-between h-full bg-slate-50 dark:bg-slate-900/60">
                                     <div>
                                         <p className="font-bold text-slate-900 dark:text-white mb-1 text-sm">{inv.candidateId?.name || 'Candidate'}</p>
                                         <p className="text-xs text-slate-400 mb-3">

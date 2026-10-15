@@ -6,7 +6,7 @@
 const http = require('http');
 const connectDB = require('../config/db');
 const { createApp } = require('./app');
-const { createSocketServer } = require('../realtime/socketServer');
+const { createSocketServer, closeRedisAdapter } = require('../realtime/socketServer');
 
 const startServer = () => {
   const app = createApp();
@@ -53,6 +53,7 @@ const startServer = () => {
         }
         const { stopMemoryServer } = require('../config/db');
         await stopMemoryServer();
+        await closeRedisAdapter();
       } catch (err) {
         console.error('[Axiocruit Server] Error closing MongoDB connection:', err.message);
       }

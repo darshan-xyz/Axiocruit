@@ -40,7 +40,7 @@ export const AdminApprovals: React.FC = () => {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Freelancer Approvals</h2>
-      <Card className="min-h-[200px] p-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
+      <Card className="min-h-[200px] p-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-300 dark:border-slate-700">
         {pending.length === 0 && (
           <p className="text-slate-400 dark:text-neutral-500 p-4 text-center">No pending freelancer approvals.</p>
         )}
@@ -48,12 +48,12 @@ export const AdminApprovals: React.FC = () => {
           {pending.map((user) => (
             <div
               key={user._id}
-              className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-slate-50 dark:bg-neutral-800/50 rounded-xl border border-slate-200 dark:border-neutral-700 gap-4"
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-slate-50 dark:bg-neutral-800/50 rounded-xl border border-slate-300 dark:border-neutral-700 gap-4"
             >
               <div className="flex items-center gap-4">
                 <img
                   src={user.profilePicture || DEFAULT_AVATAR}
-                  className="w-12 h-12 rounded-full object-cover border border-slate-200 dark:border-slate-700"
+                  className="w-12 h-12 rounded-full object-cover border border-slate-300 dark:border-slate-700"
                   alt={user.name || 'User'}
                 />
                 <div>
@@ -100,10 +100,10 @@ export const AdminApprovals: React.FC = () => {
       <Modal isOpen={!!selectedUser} onClose={() => setSelectedUser(null)} title="Interviewer Application Details">
         {selectedUser && (
           <div className="space-y-5">
-            <div className="flex items-center gap-4 pb-4 border-b border-slate-200 dark:border-slate-700">
+            <div className="flex items-center gap-4 pb-4 border-b border-slate-300 dark:border-slate-700">
               <img
                 src={selectedUser.profilePicture || DEFAULT_AVATAR}
-                className="w-16 h-16 rounded-2xl object-cover border border-slate-200 dark:border-slate-700"
+                className="w-16 h-16 rounded-2xl object-cover border border-slate-300 dark:border-slate-700"
                 alt={selectedUser.name}
               />
               <div>
@@ -117,7 +117,7 @@ export const AdminApprovals: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700">
                 <p className="text-xs text-slate-400 mb-0.5 flex items-center gap-1">
                   <DollarSign size={13} /> Hourly Rate
                 </p>
@@ -125,7 +125,7 @@ export const AdminApprovals: React.FC = () => {
                   {selectedUser.hourlyRate ? `$${selectedUser.hourlyRate}/hr` : (selectedUser.profile?.hourlyRate ? `$${selectedUser.profile.hourlyRate}/hr` : 'Not set')}
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700">
                 <p className="text-xs text-slate-400 mb-0.5 flex items-center gap-1">
                   <Clock size={13} /> Experience
                 </p>
@@ -156,7 +156,7 @@ export const AdminApprovals: React.FC = () => {
                 <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Verified Skills</h4>
                 <div className="flex flex-wrap gap-1.5">
                   {(selectedUser.skills || selectedUser.profile?.skills || []).map((sk: string, idx: number) => (
-                    <span key={idx} className="px-2.5 py-0.5 text-xs rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 font-medium">
+                    <span key={idx} className="px-2.5 py-0.5 text-xs rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-300 dark:border-blue-700 font-medium">
                       {sk}
                     </span>
                   ))}
@@ -175,7 +175,7 @@ export const AdminApprovals: React.FC = () => {
               </a>
             )}
 
-            <div className="flex justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+            <div className="flex justify-end gap-3 pt-3 border-t border-slate-300 dark:border-slate-700">
               <Button variant="ghost" onClick={() => setSelectedUser(null)}>
                 Close
               </Button>

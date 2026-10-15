@@ -122,8 +122,8 @@ export const AdminOverview: React.FC = () => {
       </div>
 
       {/* Tamper-Evident Security Audit Trail */}
-      <Card className="p-6 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+      <Card className="p-6 bg-white dark:bg-slate-900 shadow-sm border border-slate-300 dark:border-slate-700">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-2.5">
             <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             <div>
@@ -139,7 +139,7 @@ export const AdminOverview: React.FC = () => {
         </div>
 
         {logError && (
-          <div className="p-3 mb-4 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-sm flex items-center gap-2 border border-rose-200 dark:border-rose-800">
+          <div className="p-3 mb-4 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-sm flex items-center gap-2 border border-rose-300 dark:border-rose-700">
             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
             <span>{logError}</span>
           </div>
@@ -159,7 +159,7 @@ export const AdminOverview: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="text-xs uppercase text-slate-400 dark:text-neutral-500 border-b border-slate-100 dark:border-slate-800">
+                <tr className="text-xs uppercase text-slate-400 dark:text-neutral-500 border-b border-slate-200 dark:border-slate-700">
                   <th className="py-3 px-4 font-semibold">Timestamp</th>
                   <th className="py-3 px-4 font-semibold">Action</th>
                   <th className="py-3 px-4 font-semibold">Actor</th>
@@ -167,7 +167,7 @@ export const AdminOverview: React.FC = () => {
                   <th className="py-3 px-4 font-semibold">Metadata / IP</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-normal">
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-700 font-normal">
                 {auditLogs.map((log) => (
                   <tr key={log._id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
                     <td className="py-3 px-4 whitespace-nowrap text-xs text-slate-500 dark:text-neutral-400 font-mono">

@@ -5,11 +5,90 @@
 
 const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
+const { createAdapter } = require('@socket.io/redis-adapter');
+const { createClient } = require('redis');
 const { registerChatHandlers } = require('./chatHandler');
 const { registerProctorHandlers } = require('./proctorHandler');
 const { registerInterviewSignalingHandlers } = require('./interviewSignaling');
 const { normalizeRole } = require('../schemas/roleTaxonomy');
 const { getJwtSecret } = require('../config/jwt');
+
+// State tracking for Redis pub/sub clients
+let redisPubClient = null;
+let redisSubClient = null;
+let isRedisAdapterActive = false;
+
+/**
+ * Initialize Redis Adapter for Horizontal Socket.IO Scaling
+ * Gracefully falls back to default in-memory adapter on missing REDIS_URL or connection failure.
+ */
+const initRedisAdapter = async (io, redisUrl = process.env.REDIS_URL) => {
+  if (!redisUrl) {
+    console.log('[Socket.IO] Using in-memory adapter (set REDIS_URL to enable horizontal cluster scaling)');
+    return { active: false, mode: 'memory' };
+  }
+
+  let pubClient = null;
+  let subClient = null;
+
+  try {
+    const clientOptions = {
+      url: redisUrl,
+      socket: {
+        connectTimeout: 1500,
+        reconnectStrategy: false,
+      },
+    };
+
+    pubClient = createClient(clientOptions);
+    subClient = pubClient.duplicate();
+
+    pubClient.on('error', (err) => {
+      console.warn('[Socket.IO Redis Pub Warning]', err.message);
+    });
+    subClient.on('error', (err) => {
+      console.warn('[Socket.IO Redis Sub Warning]', err.message);
+    });
+
+    await Promise.all([pubClient.connect(), subClient.connect()]);
+
+    io.adapter(createAdapter(pubClient, subClient));
+    redisPubClient = pubClient;
+    redisSubClient = subClient;
+    isRedisAdapterActive = true;
+    console.log(`[Socket.IO] Successfully mounted Redis adapter for horizontal cluster scaling (${redisUrl})`);
+    return { active: true, mode: 'redis' };
+  } catch (err) {
+    console.warn(`[Socket.IO Warning] Could not connect to Redis at ${redisUrl} (${err.message}). Falling back to in-memory adapter.`);
+    isRedisAdapterActive = false;
+    if (pubClient) {
+      pubClient.disconnect().catch(() => {});
+    }
+    if (subClient) {
+      subClient.disconnect().catch(() => {});
+    }
+    return { active: false, mode: 'memory', error: err.message };
+  }
+};
+
+/**
+ * Cleanly close active Redis adapter pub/sub connections
+ */
+const closeRedisAdapter = async () => {
+  if (redisPubClient && redisSubClient) {
+    try {
+      await Promise.all([
+        redisPubClient.quit().catch(() => {}),
+        redisSubClient.quit().catch(() => {}),
+      ]);
+    } catch (_) {
+      // Ignore cleanup errors during shutdown
+    }
+    redisPubClient = null;
+    redisSubClient = null;
+    isRedisAdapterActive = false;
+  }
+};
 
 const createSocketServer = (httpServer, options = {}) => {
   const JWT_SECRET = getJwtSecret();
@@ -26,6 +105,14 @@ const createSocketServer = (httpServer, options = {}) => {
     pingInterval: 10000,
     ...options,
   });
+
+  // Attempt Redis adapter attachment if REDIS_URL or options.redisUrl is provided
+  const targetRedisUrl = options.redisUrl !== undefined ? options.redisUrl : process.env.REDIS_URL;
+  if (targetRedisUrl) {
+    initRedisAdapter(io, targetRedisUrl).catch((err) => {
+      console.warn('[Socket.IO] Asynchronous Redis adapter init error:', err.message);
+    });
+  }
 
   // JWT Handshake Authentication Middleware
   io.use((socket, next) => {
@@ -70,9 +157,15 @@ const createSocketServer = (httpServer, options = {}) => {
   return {
     io,
     sharedState,
+    initRedisAdapter: (url) => initRedisAdapter(io, url),
+    closeRedisAdapter,
+    isRedisActive: () => isRedisAdapterActive,
   };
 };
 
 module.exports = {
   createSocketServer,
+  initRedisAdapter,
+  closeRedisAdapter,
+  isRedisActive: () => isRedisAdapterActive,
 };

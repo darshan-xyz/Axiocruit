@@ -46,6 +46,9 @@ router.post('/message', protect, messageController.sendMessage);
 // Single Interview Room Verification & Details
 router.get('/:id', protect, interviewController.getInterviewById);
 
+// Dynamic WebRTC TURN/STUN Relay Credentials
+router.get('/:id/turn-credentials', protect, interviewController.getTurnCredentials);
+
 // Update Status (Accept / Reject / Reschedule)
 router.patch('/:id/status', protect, interviewController.updateInterviewStatus);
 

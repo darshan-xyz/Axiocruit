@@ -70,10 +70,10 @@ export const AdminUsers: React.FC = () => {
           />
         </div>
       </div>
-      <Card className="overflow-hidden bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
+      <Card className="overflow-hidden bg-white dark:bg-slate-900 shadow-sm border border-slate-300 dark:border-slate-700">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 dark:border-neutral-800 text-slate-500 dark:text-neutral-400 bg-slate-50 dark:bg-slate-800/50">
+            <thead className="border-b border-slate-300 dark:border-slate-700 text-slate-500 dark:text-neutral-400 bg-slate-50 dark:bg-slate-800/50">
               <tr>
                 <th className="p-4">Name</th>
                 <th className="p-4">Role</th>
@@ -83,7 +83,7 @@ export const AdminUsers: React.FC = () => {
                 <th className="p-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-neutral-800">
+            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
               {filteredUsers.map((user) => (
                 <tr key={user._id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                   <td className="p-4 font-medium text-slate-900 dark:text-white">{user.name}</td>

@@ -445,7 +445,7 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
 
             {/* ── Interview History (inline, no modal) ────── */}
             {pastInterviews.length > 0 && (
-                <section className="pt-6 mt-2 border-t border-neutral-800">
+                <section className="pt-6 mt-2 border-t border-slate-300 dark:border-slate-700">
                     {/* Section header */}
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
@@ -465,7 +465,7 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                             value={historySearch}
                             onChange={(e) => setHistorySearch(e.target.value)}
                             placeholder="Search by name, date, status, or job title…"
-                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 pl-9 pr-9 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none"
+                            className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl py-2.5 pl-9 pr-9 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none"
                         />
                         {historySearch && (
                             <button
@@ -490,7 +490,7 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                                 return (
                                     <div
                                         key={interview._id}
-                                        className="flex items-center justify-between gap-4 px-4 py-3 rounded-xl bg-neutral-900/50 border border-neutral-800/60 hover:border-neutral-700 transition-all"
+                                        className="flex items-center justify-between gap-4 px-4 py-3 rounded-xl bg-neutral-900/50 border border-slate-300 dark:border-neutral-700 hover:border-slate-400 dark:hover:border-neutral-600 transition-all"
                                     >
                                         {/* Left: avatar + info */}
                                         <div className="flex items-center gap-3 min-w-0">
@@ -557,7 +557,7 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                 >
                     <div className="bg-neutral-900 border border-neutral-700 rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto">
                         {/* Header */}
-                        <div className="sticky top-0 bg-neutral-900/95 backdrop-blur-md px-6 py-4 border-b border-neutral-800 flex items-center justify-between z-10">
+                        <div className="sticky top-0 bg-neutral-900/95 backdrop-blur-md px-6 py-4 border-b border-neutral-700 flex items-center justify-between z-10">
                             <div className="flex items-center gap-3">
                                 <Avatar
                                     name={getOtherPerson(selectedReport)?.name}
@@ -625,7 +625,7 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                                     setJobs(allJobs);
                                 }
                             }}
-                            className="w-full bg-slate-900/50 border border-neutral-800 rounded-lg py-2.5 px-4 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none"
+                            className="w-full bg-slate-900/50 border border-neutral-700 rounded-lg py-2.5 px-4 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none"
                         >
                             <option value="">Select a candidate...</option>
                             {candidates.map((c) => (
@@ -640,7 +640,7 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                         <select
                             value={formData.jobId}
                             onChange={(e) => setFormData({ ...formData, jobId: e.target.value })}
-                            className="w-full bg-slate-900/50 border border-neutral-800 rounded-lg py-2.5 px-4 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none"
+                            className="w-full bg-slate-900/50 border border-neutral-700 rounded-lg py-2.5 px-4 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none"
                         >
                             <option value="">No specific job</option>
                             {jobs.map((j) => (
@@ -674,7 +674,7 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                             rows={3}
                             placeholder="Interview focus areas, preparation instructions..."
-                            className="w-full bg-slate-900/50 border border-neutral-800 rounded-lg py-2.5 px-4 text-white placeholder-neutral-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none resize-none"
+                            className="w-full bg-slate-900/50 border border-neutral-700 rounded-lg py-2.5 px-4 text-white placeholder-neutral-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none resize-none"
                         />
                     </div>
 
