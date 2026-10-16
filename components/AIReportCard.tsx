@@ -136,13 +136,13 @@ const AIReportCard: React.FC<AIReportCardProps> = ({
                         {/* Coding Score Badge */}
                         <div className="flex items-center gap-3">
                             {codingTestConducted ? (
-                                <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800/80 border border-neutral-700 rounded-lg">
+                                <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800/80 border border-slate-300 dark:border-slate-700 rounded-lg">
                                     <Code size={14} className="text-blue-600 dark:text-blue-400" />
                                     <span className="text-xs text-neutral-300">Coding Score:</span>
                                     <span className="text-sm font-bold text-white">{evaluation.codingScore}%</span>
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800/80 border border-neutral-700 rounded-lg">
+                                <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800/80 border border-slate-300 dark:border-slate-700 rounded-lg">
                                     <Code size={14} className="text-neutral-500" />
                                     <span className="text-xs text-neutral-500">No coding test conducted</span>
                                 </div>
