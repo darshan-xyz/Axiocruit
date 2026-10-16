@@ -117,7 +117,7 @@ export const ApplyWithCVModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, j
                             </div>
                         ) : (
                             <div className="space-y-6">
-                                <div className="border border-neutral-700 rounded-xl p-5 bg-neutral-800/20">
+                                <div className="border border-slate-300 dark:border-slate-700 rounded-xl p-5 bg-neutral-800/20">
                                     <div className="flex items-center gap-4 mb-4">
                                         <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
                                             <FileText size={24} />
@@ -158,7 +158,7 @@ export const ApplyWithCVModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, j
                 {state === 'analyzing' && (
                     <div className="text-center py-12">
                         <div className="relative w-20 h-20 mx-auto mb-6">
-                            <div className="absolute inset-0 rounded-full border-4 border-neutral-800"></div>
+                            <div className="absolute inset-0 rounded-full border-4 border-slate-300 dark:border-slate-700"></div>
                             <div className="absolute inset-0 rounded-full border-4 border-t-blue-600 dark:border-t-blue-400 border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
                             <div className="absolute inset-3 rounded-full bg-blue-500/10 flex items-center justify-center">
                                 <Sparkles className="w-6 h-6 text-blue-600 dark:text-blue-400 animate-pulse" />
@@ -193,7 +193,7 @@ export const ApplyWithCVModal: React.FC<ApplyModalProps> = ({ isOpen, onClose, j
 
                         {aiResult.aiAnalyzed && aiResult.aiScore !== null && (
                             <>
-                                <div className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700">
+                                <div className="bg-neutral-800/50 rounded-xl p-6 border border-slate-300 dark:border-slate-700">
                                     <div className="flex items-center justify-between mb-4">
                                         <span className="text-sm font-medium text-neutral-300">AI Suitability Score</span>
                                         <span className={`text-sm font-medium px-3 py-1 rounded-full border ${getScoreBadge(aiResult.aiScore).color}`}>
