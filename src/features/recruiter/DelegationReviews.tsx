@@ -123,7 +123,7 @@ export const CompletedDelegations: React.FC = () => {
                                     </div>
 
                                     {/* Freelancer Info */}
-                                    <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-lg border border-slate-300 dark:border-neutral-700">
+                                    <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-lg border border-slate-300 dark:border-slate-700">
                                         <img
                                             src={freelancer.profilePicture || DEFAULT_AVATAR}
                                             alt={freelancer.name}
@@ -177,13 +177,13 @@ export const CompletedDelegations: React.FC = () => {
 
                                     {/* Profile Data: Experience */}
                                     {candidate.profile?.experience?.length > 0 && (
-                                        <div className="p-4 bg-neutral-900/80 rounded-xl border border-neutral-800">
+                                        <div className="p-4 bg-neutral-900/80 rounded-xl border border-slate-300 dark:border-slate-700">
                                             <h4 className="text-sm font-bold text-neutral-300 flex items-center gap-2 mb-3">
                                                 <Briefcase size={16} className="text-blue-400" /> Work Experience
                                             </h4>
                                             <div className="space-y-4">
                                                 {candidate.profile.experience.map((exp: any, i: number) => (
-                                                    <div key={i} className="pl-4 border-l-2 border-neutral-700">
+                                                    <div key={i} className="pl-4 border-l-2 border-slate-400 dark:border-slate-600">
                                                         <p className="font-semibold text-white text-sm">{exp.designation}</p>
                                                         <p className="text-xs text-blue-400">{exp.company}</p>
                                                         <p className="text-[10px] text-neutral-500 mt-0.5">{exp.from} - {exp.to || 'Present'}</p>
@@ -195,13 +195,13 @@ export const CompletedDelegations: React.FC = () => {
 
                                     {/* Profile Data: Education */}
                                     {candidate.profile?.education?.length > 0 && (
-                                        <div className="p-4 bg-neutral-900/80 rounded-xl border border-neutral-800">
+                                        <div className="p-4 bg-neutral-900/80 rounded-xl border border-slate-300 dark:border-slate-700">
                                             <h4 className="text-sm font-bold text-neutral-300 flex items-center gap-2 mb-3">
                                                 <GraduationCap size={16} className="text-blue-400" /> Education
                                             </h4>
                                             <div className="space-y-4">
                                                 {candidate.profile.education.map((edu: any, i: number) => (
-                                                    <div key={i} className="pl-4 border-l-2 border-neutral-700">
+                                                    <div key={i} className="pl-4 border-l-2 border-slate-400 dark:border-slate-600">
                                                         <p className="font-semibold text-white text-sm">{edu.degree} in {edu.fieldOfStudy}</p>
                                                         <p className="text-xs text-blue-400">{edu.institution}</p>
                                                         <p className="text-[10px] text-neutral-500 mt-0.5">{edu.from} - {edu.to || 'Present'}</p>
@@ -270,7 +270,7 @@ export const CompletedDelegations: React.FC = () => {
                                     </Button>
                                     <Button
                                         variant="outline"
-                                        className="border-neutral-700 text-neutral-300 hover:text-white"
+                                        className="border-slate-300 dark:border-slate-700 text-neutral-300 hover:text-white"
                                         onClick={() => window.location.href = `#/recruiter/ranked/${job._id}`}
                                     >
                                         View Pipeline
@@ -301,9 +301,9 @@ export const CompletedDelegations: React.FC = () => {
                     style={{ backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}
                     onClick={(e) => { if (e.target === e.currentTarget) setSelectedReportProps(null); }}
                 >
-                    <div className="bg-neutral-900 border border-neutral-700 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="bg-neutral-900 border border-slate-300 dark:border-slate-700 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="flex-shrink-0 bg-neutral-900/95 backdrop-blur-md px-6 py-4 border-b border-neutral-800 flex items-center justify-between z-20">
+                        <div className="flex-shrink-0 bg-neutral-900/95 backdrop-blur-md px-6 py-4 border-b border-slate-300 dark:border-slate-700 flex items-center justify-between z-20">
                             <div>
                                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
                                     <Award className="text-blue-600 dark:text-blue-400" />
@@ -332,7 +332,7 @@ export const CompletedDelegations: React.FC = () => {
                             />
                             
                             {selectedReportProps.fullAnalysis && (
-                                <div className="mt-4 p-4 bg-neutral-900/50 rounded-xl border border-neutral-800">
+                                <div className="mt-4 p-4 bg-neutral-900/50 rounded-xl border border-slate-300 dark:border-slate-700">
                                     <h4 className="text-sm font-semibold text-neutral-400 mb-2">Original Technical Evaluation</h4>
                                     <div className="text-sm text-neutral-300 whitespace-pre-wrap font-mono text-[11px] bg-black/40 p-3 rounded overflow-auto max-h-48">
                                         {typeof selectedReportProps.fullAnalysis === 'string' 

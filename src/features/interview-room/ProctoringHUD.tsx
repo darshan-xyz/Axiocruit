@@ -95,9 +95,9 @@ export const ProctoringHUD: React.FC<ProctoringHUDProps> = ({
 
             {/* Dropdown panel */}
             {isAlertDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-96 max-h-80 overflow-y-auto bg-neutral-900/95 border border-neutral-700 rounded-xl shadow-2xl backdrop-blur-md z-[10000]">
+                <div className="absolute right-0 top-full mt-2 w-96 max-h-80 overflow-y-auto bg-neutral-900/95 border border-slate-700 rounded-xl shadow-2xl backdrop-blur-md z-[10000]">
                     {/* Header */}
-                    <div className="sticky top-0 bg-neutral-900/95 backdrop-blur-md px-4 py-3 border-b border-neutral-800 flex items-center justify-between">
+                    <div className="sticky top-0 bg-neutral-900/95 backdrop-blur-md px-4 py-3 border-b border-slate-700 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <ShieldAlert size={14} className="text-amber-400" />
                             <span className="text-sm font-semibold text-white">Proctoring Alerts</span>

@@ -28,11 +28,11 @@ export const EndInterviewModal: React.FC<EndInterviewModalProps> = ({
             style={{ backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
         >
             <div
-                className="bg-neutral-900 border border-neutral-700 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-in zoom-in-95"
+                className="bg-neutral-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-in zoom-in-95"
                 style={{ animationDuration: '0.2s' }}
             >
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-neutral-800 flex items-center justify-between">
+                <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg shadow-blue-500/20">
                             <ClipboardCheck size={20} className="text-white" />
@@ -65,7 +65,7 @@ export const EndInterviewModal: React.FC<EndInterviewModalProps> = ({
                             onChange={(e) => onRemarksChange(e.target.value)}
                             rows={4}
                             placeholder="e.g. Candidate showed strong analytical skills but struggled with system design concepts. Communication was clear and professional..."
-                            className="w-full bg-slate-900/50 border border-neutral-700 rounded-xl py-3 px-4 text-white text-sm placeholder-neutral-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none resize-none leading-relaxed"
+                            className="w-full bg-slate-900/50 border border-slate-700 rounded-xl py-3 px-4 text-white text-sm placeholder-neutral-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none resize-none leading-relaxed"
                         />
                     </div>
 
@@ -101,7 +101,7 @@ export const EndInterviewModal: React.FC<EndInterviewModalProps> = ({
                         {/* Just Leave */}
                         <button
                             onClick={onJustLeave}
-                            className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-neutral-700 bg-neutral-800/50 text-neutral-300 rounded-xl font-medium text-sm hover:bg-neutral-800 hover:text-white transition-all duration-200"
+                            className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-slate-700 bg-neutral-800/50 text-neutral-300 rounded-xl font-medium text-sm hover:bg-neutral-800 hover:text-white transition-all duration-200"
                         >
                             <PhoneOff size={16} />
                             Just Leave (Don't Complete)

@@ -540,7 +540,7 @@ export const RankedCandidates: React.FC = () => {
       <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl p-5 sm:p-7 shadow-sm">
         
         {/* Top Navbar: Brand Logo, Pill Tabs, Settings, Bell, Avatar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-700">
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-300 dark:border-slate-700">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/recruiter')}>
             <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-sm shadow-sm shadow-blue-500/25">
               A
@@ -649,7 +649,7 @@ export const RankedCandidates: React.FC = () => {
             <div className="border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50/70 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  <tr className="bg-slate-50/70 dark:bg-slate-900/50 border-b border-slate-300 dark:border-slate-700 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                     <th className="py-3 px-4">Candidate</th>
                     <th className="py-3 px-3">Position</th>
                     <th className="py-3 px-3">Stage</th>
@@ -657,7 +657,7 @@ export const RankedCandidates: React.FC = () => {
                     <th className="py-3 pr-4 text-right">Applied</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-slate-700 text-xs">
+                <tbody className="divide-y divide-slate-300 dark:divide-slate-700 text-xs">
                   {filteredCandidates.map((app) => {
                     const isSelected = selectedCandidate?._id === app._id;
                     const score = app.aiScore ?? 80;
@@ -741,7 +741,7 @@ export const RankedCandidates: React.FC = () => {
               </table>
 
               {/* Table Footer matching Reference 1 */}
-              <div className="px-5 py-3.5 bg-white dark:bg-[#111726] border-t border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+              <div className="px-5 py-3.5 bg-white dark:bg-[#111726] border-t border-slate-300 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
                 <span>Showing 1 to {filteredCandidates.length} of 455 candidates</span>
 
                 <div className="flex items-center gap-1.5">
@@ -803,7 +803,7 @@ export const RankedCandidates: React.FC = () => {
                 </h3>
 
                 {/* Subtitle Row: Left Department Icon / Right Match Score 83% */}
-                <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 text-left">
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-300 dark:border-slate-700 text-left">
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
                       <Box size={14} />
@@ -839,7 +839,7 @@ export const RankedCandidates: React.FC = () => {
               </div>
 
               {/* Sub-Navigation Tabs: Overview, Profile, Activity, Notes, Files */}
-              <div className="flex items-center gap-4 border-b border-slate-200 dark:border-slate-700 pb-2 mb-4 text-xs font-bold text-slate-400">
+              <div className="flex items-center gap-4 border-b border-slate-300 dark:border-slate-700 pb-2 mb-4 text-xs font-bold text-slate-400">
                 {(['Overview', 'Profile', 'Activity', 'Notes', 'Files'] as const).map(tab => (
                   <button
                     key={tab}

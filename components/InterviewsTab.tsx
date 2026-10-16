@@ -68,7 +68,7 @@ const Avatar: React.FC<{
                 src={photoUrl}
                 alt={name || 'User'}
                 onError={() => setImgError(true)}
-                className={`${dim} rounded-full object-cover flex-shrink-0 border border-slate-300 dark:border-neutral-700`}
+                className={`${dim} rounded-full object-cover flex-shrink-0 border border-slate-300 dark:border-slate-700`}
             />
         );
     }
@@ -401,7 +401,7 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                className="border-slate-300 dark:border-neutral-700 text-neutral-300 hover:text-white hover:border-blue-500"
+                                                className="border-slate-300 dark:border-slate-700 text-neutral-300 hover:text-white hover:border-blue-500"
                                                 onClick={() => {
                                                     const otherId = other?._id;
                                                     if (!otherId) return;
@@ -490,7 +490,7 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                                 return (
                                     <div
                                         key={interview._id}
-                                        className="flex items-center justify-between gap-4 px-4 py-3 rounded-xl bg-neutral-900/50 border border-slate-300 dark:border-neutral-700 hover:border-slate-400 dark:hover:border-neutral-600 transition-all"
+                                        className="flex items-center justify-between gap-4 px-4 py-3 rounded-xl bg-neutral-900/50 border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 transition-all"
                                     >
                                         {/* Left: avatar + info */}
                                         <div className="flex items-center gap-3 min-w-0">
@@ -555,9 +555,9 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                     style={{ backgroundColor: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)' }}
                     onClick={(e) => { if (e.target === e.currentTarget) setSelectedReport(null); }}
                 >
-                    <div className="bg-neutral-900 border border-neutral-700 rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto">
+                    <div className="bg-neutral-900 border border-slate-300 dark:border-slate-700 rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto">
                         {/* Header */}
-                        <div className="sticky top-0 bg-neutral-900/95 backdrop-blur-md px-6 py-4 border-b border-neutral-700 flex items-center justify-between z-10">
+                        <div className="sticky top-0 bg-neutral-900/95 backdrop-blur-md px-6 py-4 border-b border-slate-300 dark:border-slate-700 flex items-center justify-between z-10">
                             <div className="flex items-center gap-3">
                                 <Avatar
                                     name={getOtherPerson(selectedReport)?.name}
@@ -625,7 +625,7 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                                     setJobs(allJobs);
                                 }
                             }}
-                            className="w-full bg-slate-900/50 border border-neutral-700 rounded-lg py-2.5 px-4 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none"
+                            className="w-full bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded-lg py-2.5 px-4 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none"
                         >
                             <option value="">Select a candidate...</option>
                             {candidates.map((c) => (
@@ -640,7 +640,7 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                         <select
                             value={formData.jobId}
                             onChange={(e) => setFormData({ ...formData, jobId: e.target.value })}
-                            className="w-full bg-slate-900/50 border border-neutral-700 rounded-lg py-2.5 px-4 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none"
+                            className="w-full bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded-lg py-2.5 px-4 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none"
                         >
                             <option value="">No specific job</option>
                             {jobs.map((j) => (
@@ -674,7 +674,7 @@ const InterviewsTab: React.FC<InterviewsTabProps> = ({ role }) => {
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                             rows={3}
                             placeholder="Interview focus areas, preparation instructions..."
-                            className="w-full bg-slate-900/50 border border-neutral-700 rounded-lg py-2.5 px-4 text-white placeholder-neutral-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none resize-none"
+                            className="w-full bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded-lg py-2.5 px-4 text-white placeholder-neutral-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none resize-none"
                         />
                     </div>
 

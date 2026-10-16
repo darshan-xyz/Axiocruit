@@ -71,7 +71,7 @@ export const AdaptiveResultReview: React.FC = () => {
     return (
       <div className="flex items-center justify-center py-32">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-full border-4 border-slate-300 dark:border-neutral-700 border-t-blue-600 dark:border-t-blue-400 animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 rounded-full border-4 border-slate-300 dark:border-slate-700 border-t-blue-600 dark:border-t-blue-400 animate-spin mx-auto mb-4" />
           <p className="text-neutral-400">Loading candidate performance...</p>
         </div>
       </div>
@@ -116,7 +116,7 @@ export const AdaptiveResultReview: React.FC = () => {
 
         {/* Global Score Badges */}
         <div className="flex gap-4">
-          <div className="bg-neutral-900 border border-neutral-800 rounded-xl px-5 py-3 flex items-center gap-4 shadow-lg shadow-black/20">
+          <div className="bg-neutral-900 border border-slate-700 rounded-xl px-5 py-3 flex items-center gap-4 shadow-lg shadow-black/20">
             <div>
               <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider mb-1">Status</p>
               <Badge variant={status === 'completed' ? 'success' : 'warning'}>
@@ -162,11 +162,11 @@ export const AdaptiveResultReview: React.FC = () => {
                 className={`relative p-4 rounded-xl border transition-all cursor-pointer ${
                   isSelected
                     ? 'bg-blue-500/10 border-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.15)]'
-                    : 'bg-neutral-900 border-neutral-800 hover:border-neutral-700'
+                    : 'bg-neutral-900 border-slate-700 hover:border-slate-600'
                 }`}
               >
                 {i > 0 && (
-                  <div className="absolute top-0 left-9 -translate-x-1/2 -translate-y-full h-4 border-l-2 border-dashed border-neutral-700" />
+                  <div className="absolute top-0 left-9 -translate-x-1/2 -translate-y-full h-4 border-l-2 border-dashed border-slate-600" />
                 )}
 
                 <div className="flex gap-4 items-start relative z-10">
@@ -190,7 +190,7 @@ export const AdaptiveResultReview: React.FC = () => {
                         className={`px-2 py-0.5 text-[10px] font-bold rounded uppercase border ${
                           DIFFICULTY_CONFIG[q.difficulty]?.color || 'text-neutral-400'
                         } ${DIFFICULTY_CONFIG[q.difficulty]?.bg || 'bg-neutral-800'} ${
-                          DIFFICULTY_CONFIG[q.difficulty]?.border || 'border-neutral-700'
+                          DIFFICULTY_CONFIG[q.difficulty]?.border || 'border-slate-600'
                         }`}
                       >
                         {q.difficulty.replace('_', ' ')}
@@ -222,10 +222,10 @@ export const AdaptiveResultReview: React.FC = () => {
         </div>
 
         {/* Right: Code Viewer */}
-        <div className="flex-1 flex flex-col bg-slate-900/40 border border-neutral-800 rounded-xl overflow-hidden shadow-2xl">
+        <div className="flex-1 flex flex-col bg-slate-900/40 border border-slate-700 rounded-xl overflow-hidden shadow-2xl">
           {selectedQuestion ? (
             <>
-              <div className="px-6 py-4 border-b border-neutral-800 bg-neutral-900/50 flex justify-between items-center shrink-0">
+              <div className="px-6 py-4 border-b border-slate-700 bg-neutral-900/50 flex justify-between items-center shrink-0">
                 <h3 className="font-bold text-lg text-white">
                   Q{selectedIndex + 1}: {selectedQuestion.title}
                 </h3>

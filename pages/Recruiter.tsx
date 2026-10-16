@@ -1683,7 +1683,7 @@ export const FindInterviewers: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="flex justify-end pt-4 border-t border-slate-300 dark:border-neutral-700">
+                        <div className="flex justify-end pt-4 border-t border-slate-300 dark:border-slate-700">
                             <Button onClick={() => {
                                 setIsDetailsOpen(false);
                                 setIsMessageOpen(true);
@@ -1951,7 +1951,7 @@ export const ServiceMarketplace: React.FC = () => {
                     ))}
                 </div>
             ) : services.length === 0 ? (
-                <div className="text-center py-20 border border-slate-300 dark:border-neutral-700 rounded-xl">
+                <div className="text-center py-20 border border-slate-300 dark:border-slate-700 rounded-xl">
                     <Briefcase size={48} className="text-neutral-700 mx-auto mb-4" />
                     <p className="text-neutral-500 text-lg font-medium">No services found</p>
                     <p className="text-neutral-600 text-sm mt-1">Try adjusting your skill filter or price range</p>
@@ -1963,7 +1963,7 @@ export const ServiceMarketplace: React.FC = () => {
                             className="group flex flex-col bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden hover:border-blue-500/50 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/10"
                         >
                             {/* Freelancer header */}
-                            <div className="p-5 border-b border-slate-300 dark:border-neutral-700 flex items-center gap-3">
+                            <div className="p-5 border-b border-slate-300 dark:border-slate-700 flex items-center gap-3">
                                 <img
                                     src={svc.freelancerId.profilePicture || DEFAULT_AVATAR}
                                     alt={svc.freelancerId.name}
@@ -2000,7 +2000,7 @@ export const ServiceMarketplace: React.FC = () => {
                                 {svc.skills.length > 0 && (
                                     <div className="flex flex-wrap gap-1.5">
                                         {svc.skills.slice(0, 4).map((sk, i) => (
-                                            <span key={i} className="text-[10px] px-2 py-0.5 bg-neutral-800 text-neutral-300 rounded-full border border-neutral-700">
+                                            <span key={i} className="text-[10px] px-2 py-0.5 bg-neutral-800 text-neutral-300 rounded-full border border-slate-300 dark:border-slate-700">
                                                 {sk}
                                             </span>
                                         ))}
@@ -2052,7 +2052,7 @@ export const ServiceMarketplace: React.FC = () => {
                 {selected && (
                     <div className="space-y-5">
                         {/* Freelancer summary */}
-                        <div className="flex items-center gap-3 p-4 bg-neutral-900 rounded-xl border border-slate-300 dark:border-neutral-700">
+                        <div className="flex items-center gap-3 p-4 bg-neutral-900 rounded-xl border border-slate-300 dark:border-slate-700">
                             <img
                                 src={selected.freelancerId.profilePicture || DEFAULT_AVATAR}
                                 className="w-12 h-12 rounded-full object-cover border-2 border-blue-500/30"
@@ -2106,7 +2106,7 @@ export const ServiceMarketplace: React.FC = () => {
                                 <option value="">Choose a job to delegate...</option>
                                 {availableJobs.map(j => (
                                     <option key={j._id || j.id} value={j._id || j.id}>
-                                        {j.title} — {j.company} ({j.applicantCount ?? 0} applicants)
+                                         {j.title} — {j.company} ({j.applicantCount ?? 0} applicants)
                                     </option>
                                 ))}
                             </select>
@@ -2120,7 +2120,7 @@ export const ServiceMarketplace: React.FC = () => {
 
                         {/* Selected Job Summary */}
                         {selectedJob && (
-                            <div className="p-3.5 bg-neutral-900/80 rounded-xl border border-slate-300 dark:border-neutral-700 space-y-2">
+                            <div className="p-3.5 bg-neutral-900/80 rounded-xl border border-slate-300 dark:border-slate-700 space-y-2">
                                 <div className="flex items-start justify-between">
                                     <div>
                                         <p className="text-sm font-semibold text-white">{selectedJob.title}</p>
@@ -2153,7 +2153,7 @@ export const ServiceMarketplace: React.FC = () => {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex justify-end gap-3 pt-1 border-t border-slate-300 dark:border-neutral-700">
+                        <div className="flex justify-end gap-3 pt-1 border-t border-slate-300 dark:border-slate-700">
                             <Button variant="ghost" onClick={() => setSelected(null)}>Cancel</Button>
                             <Button
                                 onClick={handleDelegate}
@@ -2276,7 +2276,7 @@ export const CompletedDelegations: React.FC = () => {
                                     </div>
 
                                     {/* Freelancer Info */}
-                                    <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-lg border border-slate-300 dark:border-neutral-700">
+                                    <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-lg border border-slate-300 dark:border-slate-700">
                                         <img
                                             src={freelancer.profilePicture || DEFAULT_AVATAR}
                                             alt={freelancer.name}
@@ -2330,13 +2330,13 @@ export const CompletedDelegations: React.FC = () => {
 
                                     {/* Profile Data: Experience */}
                                     {candidate.profile?.experience?.length > 0 && (
-                                        <div className="p-4 bg-neutral-900/80 rounded-xl border border-slate-300 dark:border-neutral-700">
+                                        <div className="p-4 bg-neutral-900/80 rounded-xl border border-slate-300 dark:border-slate-700">
                                             <h4 className="text-sm font-bold text-neutral-300 flex items-center gap-2 mb-3">
                                                 <Briefcase size={16} className="text-blue-400" /> Work Experience
                                             </h4>
                                             <div className="space-y-4">
                                                 {candidate.profile.experience.map((exp: any, i: number) => (
-                                                    <div key={i} className="pl-4 border-l-2 border-neutral-700">
+                                                    <div key={i} className="pl-4 border-l-2 border-slate-400 dark:border-slate-600">
                                                         <p className="font-semibold text-white text-sm">{exp.designation}</p>
                                                         <p className="text-xs text-blue-400">{exp.company}</p>
                                                         <p className="text-[10px] text-neutral-500 mt-0.5">{exp.from} - {exp.to || 'Present'}</p>
@@ -2348,13 +2348,13 @@ export const CompletedDelegations: React.FC = () => {
 
                                     {/* Profile Data: Education */}
                                     {candidate.profile?.education?.length > 0 && (
-                                        <div className="p-4 bg-neutral-900/80 rounded-xl border border-slate-300 dark:border-neutral-700">
+                                        <div className="p-4 bg-neutral-900/80 rounded-xl border border-slate-300 dark:border-slate-700">
                                             <h4 className="text-sm font-bold text-neutral-300 flex items-center gap-2 mb-3">
                                                 <GraduationCap size={16} className="text-blue-400" /> Education
                                             </h4>
                                             <div className="space-y-4">
                                                 {candidate.profile.education.map((edu: any, i: number) => (
-                                                    <div key={i} className="pl-4 border-l-2 border-neutral-700">
+                                                    <div key={i} className="pl-4 border-l-2 border-slate-400 dark:border-slate-600">
                                                         <p className="font-semibold text-white text-sm">{edu.degree} in {edu.fieldOfStudy}</p>
                                                         <p className="text-xs text-blue-400">{edu.institution}</p>
                                                         <p className="text-[10px] text-neutral-500 mt-0.5">{edu.from} - {edu.to || 'Present'}</p>
@@ -2418,7 +2418,7 @@ export const CompletedDelegations: React.FC = () => {
                                     </Button>
                                     <Button
                                         variant="outline"
-                                        className="border-slate-300 dark:border-neutral-700 text-neutral-300 hover:text-white"
+                                        className="border-slate-300 dark:border-slate-700 text-neutral-300 hover:text-white"
                                         onClick={() => window.location.href = `#/recruiter/ranked/${job._id}`}
                                     >
                                         View Pipeline
@@ -2449,9 +2449,9 @@ export const CompletedDelegations: React.FC = () => {
                     style={{ backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}
                     onClick={(e) => { if (e.target === e.currentTarget) setSelectedReportProps(null); }}
                 >
-                    <div className="bg-neutral-900 border border-neutral-700 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="bg-neutral-900 border border-slate-300 dark:border-slate-700 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="flex-shrink-0 bg-neutral-900/95 backdrop-blur-md px-6 py-4 border-b border-slate-300 dark:border-neutral-700 flex items-center justify-between z-20">
+                        <div className="flex-shrink-0 bg-neutral-900/95 backdrop-blur-md px-6 py-4 border-b border-slate-300 dark:border-slate-700 flex items-center justify-between z-20">
                             <div>
                                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
                                     <Award className="text-blue-600 dark:text-blue-400" />
@@ -2480,7 +2480,7 @@ export const CompletedDelegations: React.FC = () => {
                             />
                             
                             {selectedReportProps.fullAnalysis && (
-                                <div className="mt-4 p-4 bg-neutral-900/50 rounded-xl border border-slate-300 dark:border-neutral-700">
+                                <div className="mt-4 p-4 bg-neutral-900/50 rounded-xl border border-slate-300 dark:border-slate-700">
                                     <h4 className="text-sm font-semibold text-neutral-400 mb-2">Original Technical Evaluation</h4>
                                     <div className="text-sm text-neutral-300 whitespace-pre-wrap font-mono text-[11px] bg-black/40 p-3 rounded overflow-auto max-h-48">
                                         {typeof selectedReportProps.fullAnalysis === 'string' 
@@ -2565,7 +2565,7 @@ export const NewHirings: React.FC = () => {
                         return (
                             <div
                                 key={hiring.jobId}
-                                className="group flex flex-col bg-neutral-900 border border-slate-300 dark:border-neutral-700 rounded-2xl overflow-hidden hover:border-emerald-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10"
+                                className="group flex flex-col bg-neutral-900 border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden hover:border-emerald-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10"
                             >
                                 {/* Hired Banner */}
                                 <div className="px-5 py-2.5 flex items-center justify-between border-b border-emerald-500/15" style={{ background: 'rgba(16,185,129,0.05)' }}>
@@ -2686,9 +2686,9 @@ export const NewHirings: React.FC = () => {
                     style={{ backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}
                     onClick={(e) => { if (e.target === e.currentTarget) setSelectedReportProps(null); }}
                 >
-                    <div className="bg-neutral-900 border border-neutral-700 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="bg-neutral-900 border border-slate-300 dark:border-slate-700 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="flex-shrink-0 bg-neutral-900/95 backdrop-blur-md px-6 py-4 border-b border-slate-300 dark:border-neutral-700 flex items-center justify-between z-20">
+                        <div className="flex-shrink-0 bg-neutral-900/95 backdrop-blur-md px-6 py-4 border-b border-slate-300 dark:border-slate-700 flex items-center justify-between z-20">
                             <div>
                                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
                                     <Award className="text-blue-600 dark:text-blue-400" />
@@ -2717,7 +2717,7 @@ export const NewHirings: React.FC = () => {
                             />
                             
                             {selectedReportProps.fullAnalysis && (
-                                <div className="mt-4 p-4 bg-neutral-900/50 rounded-xl border border-slate-300 dark:border-neutral-700">
+                                <div className="mt-4 p-4 bg-neutral-900/50 rounded-xl border border-slate-300 dark:border-slate-700">
                                     <h4 className="text-sm font-semibold text-neutral-400 mb-2">Original Technical Evaluation</h4>
                                     <div className="text-sm text-neutral-300 whitespace-pre-wrap font-mono text-[11px] bg-black/40 p-3 rounded overflow-auto max-h-48">
                                         {typeof selectedReportProps.fullAnalysis === 'string' 
@@ -2801,7 +2801,7 @@ export const PastJobs: React.FC = () => {
                     {jobs.map((job: any, idx: number) => (
                         <div
                             key={job._id}
-                            className="flex items-center gap-4 p-4 bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl shadow-sm hover:border-neutral-700 transition-all duration-200 group"
+                            className="flex items-center gap-4 p-4 bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl shadow-sm hover:border-slate-400 dark:hover:border-slate-600 transition-all duration-200 group"
                         >
                             {/* Index */}
                             <div className="w-8 h-8 rounded-lg bg-neutral-800 flex items-center justify-center text-xs font-bold text-neutral-500 flex-shrink-0">
@@ -2839,7 +2839,7 @@ export const PastJobs: React.FC = () => {
 
                             {/* Date & Status */}
                             <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                                <Badge variant="outline" className="text-[10px] bg-neutral-800/50 text-neutral-500 border-neutral-700 py-0.5">
+                                <Badge variant="outline" className="text-[10px] bg-neutral-800/50 text-neutral-500 border-slate-700 py-0.5">
                                     <Archive size={9} className="mr-1" />Closed
                                 </Badge>
                                 <span className="text-[10px] text-neutral-600">

@@ -80,7 +80,7 @@ export const FreelancerPublicProfileModal: React.FC<{
                         <img 
                             src={profile.profilePicture || DEFAULT_AVATAR} 
                             alt={profile.name}
-                            className="w-20 h-20 rounded-full border-4 border-neutral-800 object-cover"
+                            className="w-20 h-20 rounded-full border-4 border-slate-300 dark:border-slate-700 object-cover"
                         />
                         <div>
                             <h2 className="text-2xl font-bold text-white mb-1">{profile.name}</h2>
@@ -99,7 +99,7 @@ export const FreelancerPublicProfileModal: React.FC<{
                     {profile.bio && (
                         <div>
                             <h3 className="text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-2">About</h3>
-                            <p className="text-neutral-300 leading-relaxed text-sm bg-neutral-900/50 p-4 rounded-xl border border-neutral-800">
+                            <p className="text-neutral-300 leading-relaxed text-sm bg-neutral-900/50 p-4 rounded-xl border border-slate-300 dark:border-slate-700">
                                 {profile.bio}
                             </p>
                         </div>
@@ -111,7 +111,7 @@ export const FreelancerPublicProfileModal: React.FC<{
                             <h3 className="text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-2">Technical Skills</h3>
                             <div className="flex flex-wrap gap-2">
                                 {profile.skills.map((skill: string, i: number) => (
-                                    <Badge key={i} variant="neutral" className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20 px-3 py-1 text-xs">
+                                    <Badge key={i} variant="neutral" className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/40 px-3 py-1 text-xs">
                                         {skill}
                                     </Badge>
                                 ))}
@@ -127,8 +127,8 @@ export const FreelancerPublicProfileModal: React.FC<{
                             </h3>
                             <div className="space-y-4">
                                 {profile.experience.map((exp: Experience, idx: number) => (
-                                    <div key={idx} className="relative pl-6 border-l-2 border-neutral-800">
-                                        <div className="absolute w-3 h-3 bg-neutral-800 rounded-full -left-[7px] top-1.5 border-2 border-[#121212]"></div>
+                                    <div key={idx} className="relative pl-6 border-l-2 border-slate-300 dark:border-slate-700">
+                                        <div className="absolute w-3 h-3 bg-slate-400 dark:bg-slate-600 rounded-full -left-[7px] top-1.5 border-2 border-white dark:border-[#121212]"></div>
                                         <h4 className="text-white font-semibold text-base">{exp.designation || exp.title}</h4>
                                         <div className="flex items-center gap-2 text-sm text-neutral-400 mt-1 mb-2">
                                              <span className="font-medium text-blue-600 dark:text-blue-400">{exp.company}</span>
@@ -141,7 +141,7 @@ export const FreelancerPublicProfileModal: React.FC<{
                                          {(exp.work || exp.description) && (
                                              <p className="text-sm text-neutral-500 leading-relaxed">{exp.work || exp.description}</p>
                                          )}
-                                    </div>
+                                     </div>
                                 ))}
                             </div>
                         </div>
@@ -155,7 +155,7 @@ export const FreelancerPublicProfileModal: React.FC<{
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {profile.projects.map((proj: Project, idx: number) => (
-                                    <div key={idx} className="bg-neutral-900 border border-neutral-800 p-4 rounded-xl">
+                                    <div key={idx} className="bg-neutral-900 border border-slate-300 dark:border-slate-700 p-4 rounded-xl">
                                         <h4 className="text-white font-semibold mb-1 truncate">{proj.title}</h4>
                                         <p className="text-sm text-blue-600 dark:text-blue-400 mb-2">{proj.role}</p>
                                         {proj.description && (

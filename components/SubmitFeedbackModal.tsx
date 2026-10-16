@@ -71,7 +71,7 @@ export const SubmitFeedbackModal: React.FC<SubmitFeedbackModalProps> = ({ isOpen
         >
             <div className="space-y-6">
                 <ToastContainer />
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-300 dark:border-blue-700">
                     <p className="text-sm text-blue-800 dark:text-blue-300">
                         Please provide your honest, professional evaluation. This structured feedback will help the hiring team make an informed decision on <strong>{candidateName}</strong>. 
                         Once submitted, this interview will be marked as Completed.
@@ -135,7 +135,7 @@ export const SubmitFeedbackModal: React.FC<SubmitFeedbackModalProps> = ({ isOpen
                                 className={`flex-1 flex items-center justify-center p-3 border rounded-xl cursor-pointer transition-all ${
                                     recommendation === rec 
                                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 shadow-sm' 
-                                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-blue-300'
+                                        : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-800 hover:border-blue-300'
                                 }`}
                             >
                                 <input 
@@ -164,7 +164,7 @@ export const SubmitFeedbackModal: React.FC<SubmitFeedbackModalProps> = ({ isOpen
                         Detailed Feedback & Notes
                     </label>
                     <textarea 
-                        className="w-full rounded-lg py-3 px-4 transition-shadow outline-none border bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[140px] resize-y"
+                        className="w-full rounded-lg py-3 px-4 transition-shadow outline-none border bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[140px] resize-y"
                         placeholder="Provide detailed context on the scores above. What were their technical strengths? Where did they struggle? (e.g., 'Candidate struggled with graph algorithms but provided excellent system design insights...')"
                         value={detailedFeedback}
                         onChange={(e) => setDetailedFeedback(e.target.value)}

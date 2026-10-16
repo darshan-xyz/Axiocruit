@@ -276,7 +276,7 @@ export const FindInterviewers: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="flex justify-end pt-4 border-t border-neutral-800">
+                        <div className="flex justify-end pt-4 border-t border-slate-300 dark:border-slate-700">
                             <Button onClick={() => {
                                 setIsDetailsOpen(false);
                                 setIsMessageOpen(true);
@@ -449,7 +449,7 @@ export const ServiceMarketplace: React.FC = () => {
                     ))}
                 </div>
             ) : services.length === 0 ? (
-                <div className="text-center py-20 border border-neutral-800 rounded-xl">
+                <div className="text-center py-20 border border-slate-300 dark:border-slate-700 rounded-xl">
                     <Briefcase size={48} className="text-neutral-700 mx-auto mb-4" />
                     <p className="text-neutral-500 text-lg font-medium">No services found</p>
                     <p className="text-neutral-600 text-sm mt-1">Try adjusting your skill filter or price range</p>
@@ -461,7 +461,7 @@ export const ServiceMarketplace: React.FC = () => {
                             className="group flex flex-col bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden hover:border-blue-500/50 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/10"
                         >
                             {/* Freelancer header */}
-                            <div className="p-5 border-b border-slate-300 dark:border-neutral-700 flex items-center gap-3">
+                            <div className="p-5 border-b border-slate-300 dark:border-slate-700 flex items-center gap-3">
                                 <img
                                     src={svc.freelancerId.profilePicture || DEFAULT_AVATAR}
                                     alt={svc.freelancerId.name}
@@ -498,7 +498,7 @@ export const ServiceMarketplace: React.FC = () => {
                                 {svc.skills.length > 0 && (
                                     <div className="flex flex-wrap gap-1.5">
                                         {svc.skills.slice(0, 4).map((sk, i) => (
-                                            <span key={i} className="text-[10px] px-2 py-0.5 bg-neutral-800 text-neutral-300 rounded-full border border-neutral-700">
+                                            <span key={i} className="text-[10px] px-2 py-0.5 bg-neutral-800 text-neutral-300 rounded-full border border-slate-300 dark:border-slate-700">
                                                 {sk}
                                             </span>
                                         ))}
@@ -550,7 +550,7 @@ export const ServiceMarketplace: React.FC = () => {
                 {selected && (
                     <div className="space-y-5">
                         {/* Freelancer summary */}
-                        <div className="flex items-center gap-3 p-4 bg-neutral-900 rounded-xl border border-slate-300 dark:border-neutral-700">
+                        <div className="flex items-center gap-3 p-4 bg-neutral-900 rounded-xl border border-slate-300 dark:border-slate-700">
                             <img
                                 src={selected.freelancerId.profilePicture || DEFAULT_AVATAR}
                                 className="w-12 h-12 rounded-full object-cover border-2 border-blue-500/30"
@@ -618,7 +618,7 @@ export const ServiceMarketplace: React.FC = () => {
 
                         {/* Selected Job Summary */}
                         {selectedJob && (
-                            <div className="p-3.5 bg-neutral-900/80 rounded-xl border border-slate-300 dark:border-neutral-700 space-y-2">
+                            <div className="p-3.5 bg-neutral-900/80 rounded-xl border border-slate-300 dark:border-slate-700 space-y-2">
                                 <div className="flex items-start justify-between">
                                     <div>
                                         <p className="text-sm font-semibold text-white">{selectedJob.title}</p>
@@ -651,7 +651,7 @@ export const ServiceMarketplace: React.FC = () => {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex justify-end gap-3 pt-1 border-t border-slate-300 dark:border-neutral-700">
+                        <div className="flex justify-end gap-3 pt-1 border-t border-slate-300 dark:border-slate-700">
                             <Button variant="ghost" onClick={() => setSelected(null)}>Cancel</Button>
                             <Button
                                 onClick={handleDelegate}

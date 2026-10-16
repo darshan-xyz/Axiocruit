@@ -48,7 +48,7 @@ export const AdminApprovals: React.FC = () => {
           {pending.map((user) => (
             <div
               key={user._id}
-              className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-slate-50 dark:bg-neutral-800/50 rounded-xl border border-slate-300 dark:border-neutral-700 gap-4"
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-slate-50 dark:bg-neutral-800/50 rounded-xl border border-slate-300 dark:border-slate-700 gap-4"
             >
               <div className="flex items-center gap-4">
                 <img

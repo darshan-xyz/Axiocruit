@@ -40,7 +40,7 @@ export const MonacoCodeEditor: React.FC<MonacoCodeEditorProps> = ({
             style={{ minWidth: 0 }}
         >
             {/* Editor Header */}
-            <div className={`h-10 border-b flex items-center justify-between px-4 ${isDark ? 'bg-neutral-900 border-neutral-700' : 'bg-white border-slate-300'}`}>
+            <div className={`h-10 border-b flex items-center justify-between px-4 ${isDark ? 'bg-neutral-900 border-slate-700' : 'bg-white border-slate-300'}`}>
                 <div className="flex items-center gap-2">
                     <Code size={14} className="text-blue-600 dark:text-blue-400" />
                     <span className={`text-xs font-medium ${isDark ? 'text-neutral-400' : 'text-slate-600'}`}>Coding Sandbox</span>
@@ -60,7 +60,7 @@ export const MonacoCodeEditor: React.FC<MonacoCodeEditorProps> = ({
                         value={language}
                         onChange={(e) => onLanguageChange && onLanguageChange(e.target.value)}
                         disabled={!onLanguageChange}
-                        className={`border text-xs rounded px-2 py-1 outline-none font-medium transition ${!onLanguageChange ? 'opacity-80 cursor-not-allowed' : 'cursor-pointer hover:border-blue-500'} ${isDark ? 'bg-neutral-800 border-neutral-700 text-neutral-200' : 'bg-blue-50 border-blue-200 text-blue-700'}`}
+                        className={`border text-xs rounded px-2 py-1 outline-none font-medium transition ${!onLanguageChange ? 'opacity-80 cursor-not-allowed' : 'cursor-pointer hover:border-blue-500'} ${isDark ? 'bg-neutral-800 border-slate-600 text-neutral-200' : 'bg-blue-50 border-blue-200 text-blue-700'}`}
                     >
                         <option value="python">Python</option>
                         <option value="javascript">JavaScript</option>

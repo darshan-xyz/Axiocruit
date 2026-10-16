@@ -325,7 +325,7 @@ export const InterviewRoomContainer: React.FC = () => {
             <ToastContainer />
 
             {/* Top Bar */}
-            <header className={`relative z-[100] h-14 flex items-center justify-between px-4 flex-shrink-0 backdrop-blur-sm border-b ${isDark ? 'bg-neutral-900/80 border-neutral-700' : 'bg-white/80 border-slate-300'}`}>
+            <header className={`relative z-[100] h-14 flex items-center justify-between px-4 flex-shrink-0 backdrop-blur-sm border-b ${isDark ? 'bg-neutral-900/80 border-slate-700' : 'bg-white/80 border-slate-300'}`}>
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-xs font-bold shadow-lg shadow-blue-500/20 text-white">
                         AI
@@ -359,8 +359,8 @@ export const InterviewRoomContainer: React.FC = () => {
                             onClick={() => setIsParticipantDropdownOpen((prev) => !prev)}
                             className={`flex items-center gap-2 px-3 py-1 rounded-full cursor-pointer transition-all duration-200 ${
                                 isParticipantDropdownOpen
-                                    ? 'bg-neutral-700 border border-neutral-600 ring-1 ring-neutral-500/30'
-                                    : 'bg-neutral-800 border border-neutral-700 hover:bg-neutral-700'
+                                    ? 'bg-neutral-700 border border-slate-600 ring-1 ring-neutral-500/30'
+                                    : 'bg-neutral-800 border border-slate-700 hover:bg-neutral-700'
                             }`}
                             title="View Participants"
                         >
@@ -371,14 +371,14 @@ export const InterviewRoomContainer: React.FC = () => {
                         </button>
 
                         {isParticipantDropdownOpen && (
-                            <div className="absolute left-0 top-full mt-2 w-64 max-h-80 overflow-y-auto bg-neutral-900/95 border border-neutral-700 rounded-xl shadow-2xl backdrop-blur-md z-[10000]">
-                                <div className="sticky top-0 bg-neutral-900/95 backdrop-blur-md px-4 py-3 border-b border-neutral-800 flex items-center justify-between">
+                            <div className="absolute left-0 top-full mt-2 w-64 max-h-80 overflow-y-auto bg-neutral-900/95 border border-slate-700 rounded-xl shadow-2xl backdrop-blur-md z-[10000]">
+                                <div className="sticky top-0 bg-neutral-900/95 backdrop-blur-md px-4 py-3 border-b border-slate-700 flex items-center justify-between">
                                     <span className="text-sm font-semibold text-white">In this call</span>
                                     <span className="text-[11px] text-neutral-500">{totalConnected}</span>
                                 </div>
                                 <div className="px-2 py-2 flex flex-col gap-1.5">
                                     <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-neutral-800/60 transition-colors">
-                                        <div className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center flex-shrink-0 border border-neutral-700">
+                                        <div className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center flex-shrink-0 border border-slate-700">
                                             <Users size={14} className="text-neutral-400" />
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -390,7 +390,7 @@ export const InterviewRoomContainer: React.FC = () => {
                                     </div>
                                     {signaling.remoteStreams.map((rs, i) => (
                                         <div key={i} className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-neutral-800/60 transition-colors">
-                                            <div className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center flex-shrink-0 border border-neutral-700">
+                                            <div className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center flex-shrink-0 border border-slate-700">
                                                 <Users size={14} className="text-neutral-400" />
                                             </div>
                                             <div className="flex-1 min-w-0">

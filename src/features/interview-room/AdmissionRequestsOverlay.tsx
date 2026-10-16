@@ -20,7 +20,7 @@ export const AdmissionRequestsOverlay: React.FC<AdmissionRequestsOverlayProps> =
             {(requests || []).map((req) => (
                 <div
                     key={req.socketId}
-                    className="bg-neutral-900 border border-neutral-700 p-4 rounded-xl shadow-2xl w-80 flex flex-col gap-3"
+                    className="bg-neutral-900 border border-slate-700 p-4 rounded-xl shadow-2xl w-80 flex flex-col gap-3"
                 >
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
@@ -34,7 +34,7 @@ export const AdmissionRequestsOverlay: React.FC<AdmissionRequestsOverlayProps> =
                     <div className="flex gap-2">
                         <button
                             onClick={() => onDeny(req.socketId)}
-                            className="flex-1 py-1.5 px-3 rounded text-sm font-medium bg-neutral-800 text-neutral-300 hover:bg-neutral-700 transition border border-neutral-700"
+                            className="flex-1 py-1.5 px-3 rounded text-sm font-medium bg-neutral-800 text-neutral-300 hover:bg-neutral-700 transition border border-slate-700"
                         >
                             Deny
                         </button>

@@ -31,7 +31,7 @@ export const NotesPanel: React.FC<NotesPanelProps> = ({
                 placeholder="Type technical observations, behavioral impressions, or quick notes..."
                 className={`flex-1 w-full p-3 text-sm rounded-xl border outline-none resize-none transition leading-relaxed ${
                     isDark
-                        ? 'bg-neutral-950 border-neutral-700 text-white placeholder-neutral-600 focus:border-blue-500'
+                        ? 'bg-neutral-950 border-slate-700 text-white placeholder-neutral-600 focus:border-blue-500'
                         : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-blue-500'
                 }`}
             />

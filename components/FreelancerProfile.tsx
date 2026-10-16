@@ -136,7 +136,7 @@ export const FreelancerProfile: React.FC = () => {
     };
 
     return (
-        <Card className="w-full border border-slate-300 dark:border-neutral-700 dark:bg-neutral-900 shadow-xl">
+        <Card className="w-full border border-slate-300 dark:border-slate-700 dark:bg-neutral-900 shadow-xl">
             <ToastContainer />
             <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -153,7 +153,7 @@ export const FreelancerProfile: React.FC = () => {
                         Professional Bio
                     </label>
                     <textarea 
-                        className="w-full rounded-lg py-3 px-4 transition-shadow outline-none border bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[120px] resize-y"
+                        className="w-full rounded-lg py-3 px-4 transition-shadow outline-none border bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[120px] resize-y"
                         placeholder="Tell companies about your experience as a technical interviewer..."
                         value={bio}
                         onChange={(e) => setBio(e.target.value)}
@@ -180,7 +180,7 @@ export const FreelancerProfile: React.FC = () => {
                         <div className="relative flex-1">
                             <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 size-4" />
                             <input 
-                                className="w-full rounded-lg py-2.5 pl-9 pr-4 transition-shadow outline-none border bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full rounded-lg py-2.5 pl-9 pr-4 transition-shadow outline-none border bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Add skills (e.g. React, Node.js, System Design) and press Enter"
                                 value={skillInput}
                                 onChange={(e) => setSkillInput(e.target.value)}
@@ -196,7 +196,7 @@ export const FreelancerProfile: React.FC = () => {
                         </Button>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border border-slate-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-neutral-800/50">
+                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-gray-50 dark:bg-neutral-800/50">
                         {skills.length === 0 && <span className="text-gray-400 dark:text-neutral-500 text-sm italic m-1">No skills added yet</span>}
                         {skills.map((skill, idx) => (
                             <span key={idx} className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 rounded-full text-sm font-medium shadow-sm">
@@ -213,7 +213,7 @@ export const FreelancerProfile: React.FC = () => {
                 </div>
 
                 {/* WORK EXPERIENCE */}
-                <div className="pt-6 border-t border-slate-300 dark:border-neutral-700">
+                <div className="pt-6 border-t border-slate-300 dark:border-slate-700">
                     <div className="flex justify-between items-center mb-4">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                             <Briefcase size={16} /> Work Experience
@@ -223,7 +223,7 @@ export const FreelancerProfile: React.FC = () => {
                     <div className="space-y-4">
                         {experience.length === 0 && <p className="text-sm text-gray-400">No experience added.</p>}
                         {experience.map((exp, idx) => (
-                            <div key={idx} className="p-4 border border-slate-300 dark:border-neutral-700 rounded-lg relative bg-gray-50 dark:bg-neutral-800/20">
+                            <div key={idx} className="p-4 border border-slate-300 dark:border-slate-700 rounded-lg relative bg-gray-50 dark:bg-neutral-800/20">
                                 <button onClick={() => handleRemoveExperience(idx)} className="absolute top-3 right-3 text-red-500 hover:text-red-700"><Trash2 size={16} /></button>
                                 <div className="grid grid-cols-2 gap-3 mb-3 pr-6">
                                     <Input label="Job Title / Designation" value={exp.designation || exp.title || ''} onChange={e => handleExperienceChange(idx, 'designation', e.target.value)} />
@@ -240,7 +240,7 @@ export const FreelancerProfile: React.FC = () => {
                 </div>
 
                 {/* PROJECTS */}
-                <div className="pt-6 border-t border-slate-300 dark:border-neutral-700">
+                <div className="pt-6 border-t border-slate-300 dark:border-slate-700">
                     <div className="flex justify-between items-center mb-4">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                             <LinkIcon size={16} /> Notable Projects
@@ -250,7 +250,7 @@ export const FreelancerProfile: React.FC = () => {
                     <div className="space-y-4">
                         {projects.length === 0 && <p className="text-sm text-gray-400">No projects added.</p>}
                         {projects.map((proj, idx) => (
-                            <div key={idx} className="p-4 border border-slate-300 dark:border-neutral-700 rounded-lg relative bg-gray-50 dark:bg-neutral-800/20">
+                            <div key={idx} className="p-4 border border-slate-300 dark:border-slate-700 rounded-lg relative bg-gray-50 dark:bg-neutral-800/20">
                                 <button onClick={() => handleRemoveProject(idx)} className="absolute top-3 right-3 text-red-500 hover:text-red-700"><Trash2 size={16} /></button>
                                 <div className="grid grid-cols-2 gap-3 mb-3 pr-6">
                                     <Input label="Project Title" value={proj.title} onChange={e => handleProjectChange(idx, 'title', e.target.value)} />
@@ -263,7 +263,7 @@ export const FreelancerProfile: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="pt-6 border-t border-slate-300 dark:border-neutral-700 flex justify-end">
+                <div className="pt-6 border-t border-slate-300 dark:border-slate-700 flex justify-end">
                     <Button 
                         className="bg-blue-600 hover:bg-blue-700 border-none text-white shadow-lg"
                         size="lg"

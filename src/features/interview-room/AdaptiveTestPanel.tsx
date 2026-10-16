@@ -61,7 +61,7 @@ export const AdaptiveTestPanel: React.FC<AdaptiveTestPanelProps> = ({
 
     if (adaptiveSession.status === 'in_progress') {
         return (
-            <div className="bg-neutral-800 border-b border-neutral-700 p-4 max-h-48 overflow-y-auto shrink-0 transition-all">
+            <div className="bg-neutral-800 border-b border-slate-700 p-4 max-h-48 overflow-y-auto shrink-0 transition-all">
                 <div className="flex justify-between items-start mb-2">
                     <div>
                         <h3 className="font-bold text-white text-base">
@@ -71,7 +71,7 @@ export const AdaptiveTestPanel: React.FC<AdaptiveTestPanelProps> = ({
                             <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-600 dark:text-blue-400 uppercase font-bold border border-blue-500/30">
                                 {adaptiveSession.difficulty?.replace('_', ' ')}
                             </span>
-                            <span className="px-1.5 py-0.5 rounded bg-neutral-700 text-neutral-300 border border-neutral-600">
+                            <span className="px-1.5 py-0.5 rounded bg-neutral-700 text-neutral-300 border border-slate-600">
                                 {adaptiveSession.currentQuestion?.category}
                             </span>
                         </div>

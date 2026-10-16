@@ -157,7 +157,7 @@ export const WhiteboardCanvas: React.FC<WhiteboardCanvasProps> = ({
     return (
         <div className={`relative flex flex-col h-full ${isDark ? 'bg-neutral-900 text-white' : 'bg-white text-slate-900'}`}>
             {/* Toolbar */}
-            <div className={`flex items-center gap-3 px-4 py-2 border-b ${isDark ? 'border-neutral-700 bg-neutral-950' : 'border-slate-300 bg-slate-50'}`}>
+            <div className={`flex items-center gap-3 px-4 py-2 border-b ${isDark ? 'border-slate-700 bg-neutral-950' : 'border-slate-300 bg-slate-50'}`}>
                 <button
                     onClick={() => setMode('pen')}
                     className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${

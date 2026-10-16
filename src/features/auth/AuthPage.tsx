@@ -86,14 +86,14 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type }) => {
         </div>
 
         <div className={`${
-          isDark ? 'bg-[#111726] border-slate-800 text-slate-100 shadow-black/60' : 'bg-white border-slate-200/80 text-slate-900'
+          isDark ? 'bg-[#111726] border-slate-700 text-slate-100 shadow-black/60' : 'bg-white border-slate-300 text-slate-900'
         } rounded-[28px] p-6 sm:p-8 border shadow-xl transition-colors`}>
           <form onSubmit={handleSubmit} className="space-y-4">
 
             {type === 'signup' && (
               <div>
                 <label className={`block text-xs font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-2`}>Select Your Role</label>
-                <div className={`grid grid-cols-3 gap-1.5 p-1 rounded-2xl ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-100 border-slate-200'} border transition-colors`}>
+                <div className={`grid grid-cols-3 gap-1.5 p-1 rounded-2xl ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-slate-100 border-slate-300'} border transition-colors`}>
                   {(['CANDIDATE', 'RECRUITER', 'INTERVIEWER'] as UserRole[]).map((r) => (
                     <button
                       key={r}
@@ -156,7 +156,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type }) => {
             )}
 
             {error && (
-              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs font-semibold">
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-400 text-xs font-semibold">
                 {error}
               </div>
             )}

@@ -481,7 +481,7 @@ export const CodingTestPage: React.FC = () => {
     <div className="w-full min-h-screen bg-[#07000F] flex flex-col overflow-hidden">
 
       {/* ── Top Nav Bar ─────────────────────────────────────────────────────── */}
-      <header className="flex items-center justify-between px-6 py-3 border-b border-neutral-800/80 bg-[#0D0117]/90 backdrop-blur-md shrink-0">
+      <header className="flex items-center justify-between px-6 py-3 border-b border-slate-700 bg-[#0D0117]/90 backdrop-blur-md shrink-0">
         {/* Left: Logo + title */}
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 rounded-md bg-gradient-to-br from-blue-600 to-blue-400 flex items-center justify-center">
@@ -504,10 +504,10 @@ export const CodingTestPage: React.FC = () => {
       <div className="flex flex-1 overflow-hidden">
 
         {/* LEFT PANE — Question Description */}
-        <aside className="w-[38%] min-w-[320px] max-w-[480px] flex flex-col border-r border-neutral-800/60 overflow-hidden bg-[#0a001a]/40">
+        <aside className="w-[38%] min-w-[320px] max-w-[480px] flex flex-col border-r border-slate-700 overflow-hidden bg-[#0a001a]/40">
 
           {/* Question header */}
-          <div className="px-6 pt-5 pb-4 border-b border-neutral-800/40 shrink-0">
+          <div className="px-6 pt-5 pb-4 border-b border-slate-700 shrink-0">
             <div className="flex items-start justify-between gap-3 mb-3">
               <h2 className="text-lg font-bold text-white leading-snug">
                 {question?.title}
@@ -536,7 +536,7 @@ export const CodingTestPage: React.FC = () => {
                   <BookOpen size={14} className="text-blue-600 dark:text-blue-400" />
                   <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Problem</span>
                 </div>
-                <div className="text-sm text-neutral-300 leading-relaxed whitespace-pre-wrap bg-[#0D0117]/60 rounded-xl p-4 border border-neutral-800/50">
+                <div className="text-sm text-neutral-300 leading-relaxed whitespace-pre-wrap bg-[#0D0117]/60 rounded-xl p-4 border border-slate-700">
                   {question.description}
                 </div>
               </div>
@@ -551,8 +551,8 @@ export const CodingTestPage: React.FC = () => {
                 </div>
                 <div className="space-y-3">
                   {question.visibleTestCases.map((tc, i) => (
-                    <div key={i} className="rounded-xl border border-neutral-800/50 overflow-hidden">
-                      <div className="grid grid-cols-2 divide-x divide-neutral-800/50">
+                    <div key={i} className="rounded-xl border border-slate-700 overflow-hidden">
+                      <div className="grid grid-cols-2 divide-x divide-slate-700">
                         <div className="p-3">
                           <p className="text-[10px] text-neutral-500 font-semibold uppercase mb-1.5">Input</p>
                           <pre className="text-xs text-neutral-300 font-mono whitespace-pre-wrap break-all">
@@ -694,7 +694,7 @@ export const CodingTestPage: React.FC = () => {
         <main className="flex-1 flex flex-col overflow-hidden">
 
           {/* Editor toolbar */}
-          <div className="flex items-center justify-between px-4 py-2.5 border-b border-neutral-800/60 bg-[#0a001a]/20 shrink-0">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-700 bg-[#0a001a]/20 shrink-0">
             <div className="flex items-center gap-2">
               <span className="text-xs text-neutral-400 font-mono font-medium">
                 {language === 'python' ? 'solution.py' :
@@ -708,7 +708,7 @@ export const CodingTestPage: React.FC = () => {
                 value={language}
                 onChange={(e) => handleLanguageChange(e.target.value as SupportedLanguage)}
                 disabled={isResultPhase}
-                className="text-[11px] bg-neutral-800/80 text-neutral-200 border border-neutral-700/60 rounded px-2 py-0.5 outline-none cursor-pointer hover:border-neutral-500 transition"
+                className="text-[11px] bg-neutral-800/80 text-neutral-200 border border-slate-600 rounded px-2 py-0.5 outline-none cursor-pointer hover:border-slate-500 transition"
               >
                 <option value="python">Python 3</option>
                 <option value="javascript">JavaScript (Node.js)</option>
@@ -772,7 +772,7 @@ export const CodingTestPage: React.FC = () => {
 
           {/* Submit footer */}
           {!isResultPhase && (
-            <div className="shrink-0 px-5 py-3.5 border-t border-neutral-800/60 bg-[#0a001a]/40 flex items-center justify-between gap-4">
+            <div className="shrink-0 px-5 py-3.5 border-t border-slate-700 bg-[#0a001a]/40 flex items-center justify-between gap-4">
               <div className="flex items-center gap-2 text-xs text-neutral-500">
                 <RefreshCw size={12} />
                 <span>Code auto-saves as you type</span>

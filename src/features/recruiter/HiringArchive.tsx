@@ -70,7 +70,7 @@ export const NewHirings: React.FC = () => {
                         return (
                             <div
                                 key={hiring.jobId}
-                                className="group flex flex-col bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden hover:border-emerald-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10"
+                                className="group flex flex-col bg-neutral-900 border border-slate-700 rounded-2xl overflow-hidden hover:border-emerald-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10"
                             >
                                 {/* Hired Banner */}
                                 <div className="px-5 py-2.5 flex items-center justify-between border-b border-emerald-500/15" style={{ background: 'rgba(16,185,129,0.05)' }}>
@@ -191,9 +191,9 @@ export const NewHirings: React.FC = () => {
                     style={{ backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}
                     onClick={(e) => { if (e.target === e.currentTarget) setSelectedReportProps(null); }}
                 >
-                    <div className="bg-neutral-900 border border-neutral-700 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="bg-neutral-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="flex-shrink-0 bg-neutral-900/95 backdrop-blur-md px-6 py-4 border-b border-neutral-800 flex items-center justify-between z-20">
+                        <div className="flex-shrink-0 bg-neutral-900/95 backdrop-blur-md px-6 py-4 border-b border-slate-700 flex items-center justify-between z-20">
                             <div>
                                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
                                     <Award className="text-blue-600 dark:text-blue-400" />
@@ -222,7 +222,7 @@ export const NewHirings: React.FC = () => {
                             />
                             
                             {selectedReportProps.fullAnalysis && (
-                                <div className="mt-4 p-4 bg-neutral-900/50 rounded-xl border border-neutral-800">
+                                <div className="mt-4 p-4 bg-neutral-900/50 rounded-xl border border-slate-700">
                                     <h4 className="text-sm font-semibold text-neutral-400 mb-2">Original Technical Evaluation</h4>
                                     <div className="text-sm text-neutral-300 whitespace-pre-wrap font-mono text-[11px] bg-black/40 p-3 rounded overflow-auto max-h-48">
                                         {typeof selectedReportProps.fullAnalysis === 'string' 
@@ -341,7 +341,7 @@ export const PastJobs: React.FC = () => {
 
                             {/* Date & Status */}
                             <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                                <Badge variant="outline" className="text-[10px] bg-neutral-800/50 text-neutral-500 border-neutral-700 py-0.5">
+                                <Badge variant="outline" className="text-[10px] bg-neutral-800/50 text-neutral-500 border-slate-700 py-0.5">
                                     <Archive size={9} className="mr-1" />Closed
                                 </Badge>
                                 <span className="text-[10px] text-neutral-600">

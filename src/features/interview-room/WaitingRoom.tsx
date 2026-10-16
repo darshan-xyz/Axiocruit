@@ -93,7 +93,7 @@ export const WaitingRoom: React.FC<WaitingRoomProps> = ({
 
             <button
                 onClick={onLeave}
-                className="px-6 py-2 border border-neutral-700 text-neutral-300 rounded-lg hover:bg-neutral-800 transition-colors text-sm"
+                className="px-6 py-2 border border-slate-700 text-neutral-300 rounded-lg hover:bg-neutral-800 transition-colors text-sm"
             >
                 Leave Waiting Room
             </button>

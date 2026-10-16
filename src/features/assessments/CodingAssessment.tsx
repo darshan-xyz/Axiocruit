@@ -527,7 +527,7 @@ export const CodingAssessment: React.FC = () => {
             { label: 'Questions',   value: `${questionNumber}`,    icon: <BookOpen size={18} /> },
             { label: 'Grade',       value: grade.label,            icon: <Trophy size={18} />   },
           ].map(item => (
-            <div key={item.label} className={`rounded-xl p-4 text-center backdrop-blur-sm border ${isDark ? 'bg-slate-900/80 border-neutral-800/50' : 'bg-white/80 border-slate-200/50'}`}>
+            <div key={item.label} className={`rounded-xl p-4 text-center backdrop-blur-sm border ${isDark ? 'bg-slate-900/80 border-slate-700' : 'bg-white/80 border-slate-300'}`}>
               <div className="text-blue-600 dark:text-blue-400 flex justify-center mb-1">{item.icon}</div>
               <div className={`font-bold text-lg leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>{item.value}</div>
               <div className={`text-xs mt-0.5 ${isDark ? 'text-slate-500' : 'text-slate-600'}`}>{item.label}</div>
@@ -555,7 +555,7 @@ export const CodingAssessment: React.FC = () => {
 
       {/* ── Top Navigation Bar ──────────────────────────────────────────────── */}
       <header
-        className={`border-b backdrop-blur-md ${isDark ? 'border-neutral-800/80 bg-slate-900/90' : 'border-slate-200 bg-white/90'}`}
+        className={`border-b backdrop-blur-md ${isDark ? 'border-slate-700 bg-slate-900/90' : 'border-slate-300 bg-white/90'}`}
         style={{ flexShrink: 0, padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
       >
         {/* Left: Logo */}
@@ -600,10 +600,10 @@ export const CodingAssessment: React.FC = () => {
         {/* ════════════════════════════════════════════════════════════════════ */}
         <div
           style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
-          className={`border-r ${isDark ? 'border-neutral-800/60 bg-slate-900/40' : 'border-slate-200 bg-white/60'}`}
+          className={`border-r ${isDark ? 'border-slate-700 bg-slate-900/40' : 'border-slate-300 bg-white/60'}`}
         >
           {/* Question header */}
-          <div className={`px-6 pt-5 pb-4 border-b ${isDark ? 'border-neutral-800/40' : 'border-slate-200/40'}`} style={{ flexShrink: 0 }}>
+          <div className={`px-6 pt-5 pb-4 border-b ${isDark ? 'border-slate-700' : 'border-slate-300'}`} style={{ flexShrink: 0 }}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <h2 className={`text-lg font-bold leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 {currentQuestion?.title || 'Loading...'}
@@ -625,7 +625,7 @@ export const CodingAssessment: React.FC = () => {
                   <BookOpen size={14} className="text-blue-600 dark:text-blue-400" />
                   <span className={`text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Problem</span>
                 </div>
-                <div className={`text-sm leading-relaxed whitespace-pre-wrap rounded-xl p-4 border ${isDark ? 'text-neutral-300 bg-slate-900/60 border-neutral-800/50' : 'text-slate-900 bg-blue-50 border-slate-200/50'}`}>
+                <div className={`text-sm leading-relaxed whitespace-pre-wrap rounded-xl p-4 border ${isDark ? 'text-neutral-300 bg-slate-900/60 border-slate-700' : 'text-slate-900 bg-blue-50 border-slate-300'}`}>
                   {currentQuestion.description}
                 </div>
               </div>
@@ -640,8 +640,8 @@ export const CodingAssessment: React.FC = () => {
                 </div>
                 <div className="space-y-3">
                   {currentQuestion.visibleTestCases.map((tc, i) => (
-                    <div key={i} className={`rounded-xl border overflow-hidden ${isDark ? 'border-neutral-800/50' : 'border-slate-200/50'}`}>
-                      <div className={`grid grid-cols-2 divide-x ${isDark ? 'divide-neutral-800/50' : 'divide-slate-200/50'}`}>
+                    <div key={i} className={`rounded-xl border overflow-hidden ${isDark ? 'border-slate-700' : 'border-slate-300'}`}>
+                      <div className={`grid grid-cols-2 divide-x ${isDark ? 'divide-slate-700' : 'divide-slate-300'}`}>
                         <div className="p-3">
                           <p className={`text-[10px] font-semibold uppercase mb-1.5 ${isDark ? 'text-slate-500' : 'text-slate-600'}`}>Input</p>
                           <pre className={`text-xs font-mono whitespace-pre-wrap break-all ${isDark ? 'text-slate-300' : 'text-slate-900'}`}>
@@ -681,7 +681,7 @@ export const CodingAssessment: React.FC = () => {
                 </div>
 
                 {/* Hidden tests bar */}
-                <div className={`rounded-xl p-4 border ${isDark ? 'bg-slate-900/60 border-neutral-800/50' : 'bg-white/80 border-slate-200/50'}`}>
+                <div className={`rounded-xl p-4 border ${isDark ? 'bg-slate-900/60 border-slate-700' : 'bg-white/80 border-slate-300'}`}>
                   <p className={`text-xs font-semibold uppercase tracking-wider mb-3 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Hidden Tests</p>
                   <div className="flex items-center gap-3">
                     <div className={`flex-1 h-2 rounded-full overflow-hidden ${isDark ? 'bg-neutral-800' : 'bg-blue-100'}`}>
@@ -717,7 +717,7 @@ export const CodingAssessment: React.FC = () => {
 
           {/* Editor toolbar */}
           <div
-            className={`border-b ${isDark ? 'border-neutral-800/60 bg-slate-900/20' : 'border-slate-200 bg-slate-50/60'}`}
+            className={`border-b ${isDark ? 'border-slate-700 bg-slate-900/20' : 'border-slate-300 bg-slate-50/60'}`}
             style={{ flexShrink: 0, padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
           >
             <div className="flex items-center gap-2">
@@ -734,7 +734,7 @@ export const CodingAssessment: React.FC = () => {
                 onChange={(e) => handleLanguageChange(e.target.value)}
                 disabled={hasSubmitted}
                 className={`text-[11px] rounded px-2 py-0.5 outline-none cursor-pointer transition ${
-                  isDark ? 'bg-neutral-800 text-neutral-200 border border-neutral-700' : 'bg-white text-slate-700 border border-slate-300'
+                  isDark ? 'bg-neutral-800 text-neutral-200 border border-slate-600' : 'bg-white text-slate-700 border border-slate-300'
                 }`}
               >
                 <option value="python">Python 3</option>
@@ -781,12 +781,12 @@ export const CodingAssessment: React.FC = () => {
 
           {/* Console Output — 30% of right panel */}
           <div
-            className={`border-t ${isDark ? 'border-neutral-800/60' : 'border-slate-200'}`}
+            className={`border-t ${isDark ? 'border-slate-700' : 'border-slate-300'}`}
             style={{ flex: 3, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}
           >
             {/* Console header */}
             <div
-              className={`border-b ${isDark ? 'bg-slate-900/80 border-neutral-800/40' : 'bg-blue-50 border-slate-200/40'}`}
+              className={`border-b ${isDark ? 'bg-slate-900/80 border-slate-700' : 'bg-blue-50 border-slate-300'}`}
               style={{ flexShrink: 0, padding: '6px 16px', display: 'flex', alignItems: 'center', gap: '8px' }}
             >
               <Terminal size={13} className={isDark ? 'text-neutral-500' : 'text-slate-600'} />
@@ -808,7 +808,7 @@ export const CodingAssessment: React.FC = () => {
 
           {/* Action Buttons Footer */}
           <div
-            className={`border-t ${isDark ? 'border-neutral-800/60 bg-slate-900/60' : 'border-slate-200 bg-slate-50/60'}`}
+            className={`border-t ${isDark ? 'border-slate-700 bg-slate-900/60' : 'border-slate-300 bg-slate-50/60'}`}
             style={{ flexShrink: 0, padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}
           >
             <div className={`flex items-center gap-2 text-xs ${isDark ? 'text-slate-500' : 'text-slate-600'}`}>

@@ -159,7 +159,7 @@ export const WebRTCVideoGrid: React.FC<WebRTCVideoGridProps> = ({
             isCodingTestVisible
                 ? 'w-[320px] min-w-[280px] max-w-[380px] border-l'
                 : 'flex-1'
-        } overflow-hidden relative transition-all duration-500 ${isDark ? 'bg-neutral-900 border-neutral-700' : 'bg-slate-100 border-slate-300'}`}>
+        } overflow-hidden relative transition-all duration-500 ${isDark ? 'bg-neutral-900 border-slate-700' : 'bg-slate-100 border-slate-300'}`}>
             <style>{VIDEO_GRID_STYLES}</style>
 
             {/* "Start Coding Test" Button — Host only, shown in full video view */}
@@ -167,7 +167,7 @@ export const WebRTCVideoGrid: React.FC<WebRTCVideoGridProps> = ({
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30">
                     <button
                         onClick={onStartCodingTest}
-                        className="flex items-center gap-2.5 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-full shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105 transition-all duration-300 text-sm font-semibold border border-blue-400/20"
+                        className="flex items-center gap-2.5 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-full shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105 transition-all duration-300 text-sm font-semibold border border-blue-400/40"
                     >
                         <PlayCircle size={18} />
                         <span>Start Coding Test</span>
