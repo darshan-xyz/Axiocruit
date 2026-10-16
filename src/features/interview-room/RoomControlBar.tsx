@@ -44,7 +44,7 @@ export const RoomControlBar: React.FC<RoomControlBarProps> = ({
                         ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
                         : isDark
                         ? 'bg-neutral-800 text-white border border-slate-700 hover:bg-neutral-700'
-                        : 'bg-blue-50 text-slate-800 border border-blue-200 hover:bg-blue-100'
+                        : 'bg-blue-50 text-slate-800 border border-blue-300 hover:bg-blue-100'
                 }`}
                 title={isMuted ? 'Unmute' : 'Mute'}
             >
@@ -59,7 +59,7 @@ export const RoomControlBar: React.FC<RoomControlBarProps> = ({
                         ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
                         : isDark
                         ? 'bg-neutral-800 text-white border border-slate-700 hover:bg-neutral-700'
-                        : 'bg-blue-50 text-slate-800 border border-blue-200 hover:bg-blue-100'
+                        : 'bg-blue-50 text-slate-800 border border-blue-300 hover:bg-blue-100'
                 }`}
                 title={isVideoOff ? 'Turn on Video' : 'Turn off Video'}
             >
@@ -74,7 +74,7 @@ export const RoomControlBar: React.FC<RoomControlBarProps> = ({
                         ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 hover:bg-blue-500/30'
                         : isDark
                         ? 'bg-neutral-800 text-white border border-slate-700 hover:bg-neutral-700'
-                        : 'bg-blue-50 text-slate-800 border border-blue-200 hover:bg-blue-100'
+                        : 'bg-blue-50 text-slate-800 border border-blue-300 hover:bg-blue-100'
                 }`}
                 title={isScreenSharing ? 'Stop Screen Share' : 'Share Screen'}
             >

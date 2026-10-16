@@ -187,7 +187,7 @@ export const ApplicantReviewModal: React.FC<ApplicantReviewModalProps> = ({
                             ⭐ Propose as Final Hire
                         </Button>
                     )}
-                    <Button variant="outline" className="border-red-800 dark:border-red-900/60 text-red-400 hover:bg-red-900/20 hover:border-red-900" onClick={() => onStatusUpdate(application?._id, 'Rejected')}>Reject</Button>
+                    <Button variant="outline" className="border-rose-400 dark:border-rose-700 text-rose-500 hover:bg-rose-500/10 hover:border-rose-500" onClick={() => onStatusUpdate(application?._id, 'Rejected')}>Reject</Button>
                 </div>
             </div>
         </Modal>

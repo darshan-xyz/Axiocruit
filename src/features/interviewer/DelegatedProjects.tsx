@@ -28,10 +28,10 @@ export interface DelegatedJob {
 }
 
 const STATUS_STYLES: Record<string, { bg: string; text: string; border: string; label: string }> = {
-    pending:   { bg: 'bg-amber-500/10',   text: 'text-amber-400',   border: 'border-amber-500/20',   label: 'Pending Approval' },
-    accepted:  { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20', label: 'Active Project' },
-    reviewing: { bg: 'bg-purple-500/10',  text: 'text-purple-400',  border: 'border-purple-500/20',  label: 'Reviewing Proposed Hire' },
-    completed: { bg: 'bg-blue-500/10',    text: 'text-blue-400',    border: 'border-blue-500/20',    label: 'Completed' },
+    pending:   { bg: 'bg-amber-500/10',   text: 'text-amber-400',   border: 'border-amber-500/40',   label: 'Pending Approval' },
+    accepted:  { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/40', label: 'Active Project' },
+    reviewing: { bg: 'bg-purple-500/10',  text: 'text-purple-400',  border: 'border-purple-500/40',  label: 'Reviewing Proposed Hire' },
+    completed: { bg: 'bg-blue-500/10',    text: 'text-blue-400',    border: 'border-blue-500/40',    label: 'Completed' },
 };
 
 export const DelegatedProjects: React.FC = () => {
@@ -98,19 +98,19 @@ export const DelegatedProjects: React.FC = () => {
 
             {/* Stats Bar */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-4 bg-neutral-900 border border-slate-300 dark:border-neutral-800 rounded-xl text-center">
+                <div className="p-4 bg-neutral-900 border border-slate-300 dark:border-slate-700 rounded-xl text-center">
                     <p className="text-2xl font-bold text-amber-400">{pendingCount}</p>
                     <p className="text-xs text-neutral-400 mt-1">Pending</p>
                 </div>
-                <div className="p-4 bg-neutral-900 border border-slate-300 dark:border-neutral-800 rounded-xl text-center">
+                <div className="p-4 bg-neutral-900 border border-slate-300 dark:border-slate-700 rounded-xl text-center">
                     <p className="text-2xl font-bold text-emerald-400">{activeCount}</p>
                     <p className="text-xs text-neutral-400 mt-1">Active</p>
                 </div>
-                <div className="p-4 bg-neutral-900 border border-slate-300 dark:border-neutral-800 rounded-xl text-center">
+                <div className="p-4 bg-neutral-900 border border-slate-300 dark:border-slate-700 rounded-xl text-center">
                     <p className="text-2xl font-bold text-purple-400">{reviewingCount}</p>
                     <p className="text-xs text-neutral-400 mt-1">Under Review</p>
                 </div>
-                <div className="p-4 bg-neutral-900 border border-slate-300 dark:border-neutral-800 rounded-xl text-center">
+                <div className="p-4 bg-neutral-900 border border-slate-300 dark:border-slate-700 rounded-xl text-center">
                     <p className="text-2xl font-bold text-blue-400">{completedCount}</p>
                     <p className="text-xs text-neutral-400 mt-1">Completed</p>
                 </div>
@@ -120,11 +120,11 @@ export const DelegatedProjects: React.FC = () => {
             {loading ? (
                 <div className="grid md:grid-cols-2 gap-6">
                     {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="h-56 bg-neutral-900 border border-slate-300 dark:border-neutral-800 rounded-xl animate-pulse" />
+                        <div key={i} className="h-56 bg-neutral-900 border border-slate-300 dark:border-slate-700 rounded-xl animate-pulse" />
                     ))}
                 </div>
             ) : jobs.length === 0 ? (
-                <div className="text-center py-20 border border-slate-300 dark:border-neutral-800 rounded-xl">
+                <div className="text-center py-20 border border-slate-300 dark:border-slate-700 rounded-xl">
                     <Briefcase size={48} className="text-neutral-700 mx-auto mb-4" />
                     <p className="text-neutral-500 text-lg font-medium">No delegated projects yet</p>
                     <p className="text-neutral-600 text-sm mt-1">
@@ -145,7 +145,7 @@ export const DelegatedProjects: React.FC = () => {
                                         ? 'border-amber-500/30 hover:shadow-amber-900/10'
                                         : job.delegationStatus === 'accepted'
                                             ? 'border-emerald-500/20 hover:shadow-emerald-900/10'
-                                            : 'border-neutral-800 hover:shadow-purple-900/10'
+                                            : 'border-slate-300 dark:border-slate-700 hover:shadow-purple-900/10'
                                 }`}
                             >
                                 {/* Status banner */}
@@ -190,7 +190,7 @@ export const DelegatedProjects: React.FC = () => {
                                     {job.skills.length > 0 && (
                                         <div className="flex flex-wrap gap-1.5">
                                             {job.skills.slice(0, 5).map((sk, i) => (
-                                                <span key={i} className="text-[10px] px-2 py-0.5 bg-neutral-800 text-neutral-300 rounded-full border border-neutral-700">
+                                                <span key={i} className="text-[10px] px-2 py-0.5 bg-neutral-800 text-neutral-300 rounded-full border border-slate-300 dark:border-slate-700">
                                                     {sk}
                                                 </span>
                                             ))}
@@ -203,11 +203,11 @@ export const DelegatedProjects: React.FC = () => {
                                     )}
 
                                     {/* Recruiter info */}
-                                    <div className="flex items-center gap-2.5 pt-2 border-t border-neutral-800">
+                                    <div className="flex items-center gap-2.5 pt-2 border-t border-slate-300 dark:border-slate-700">
                                         <img
                                             src={job.postedBy?.profilePicture || DEFAULT_AVATAR}
                                             alt={job.postedBy?.name}
-                                            className="w-8 h-8 rounded-full object-cover border border-neutral-700"
+                                            className="w-8 h-8 rounded-full object-cover border border-slate-300 dark:border-slate-700"
                                         />
                                         <div className="min-w-0">
                                             <p className="text-xs font-semibold text-white truncate">
@@ -229,7 +229,7 @@ export const DelegatedProjects: React.FC = () => {
                                     <div className="px-5 pb-5">
                                         <Button
                                             variant="secondary"
-                                            className="w-full mb-3 gap-1.5 border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400"
+                                            className="w-full mb-3 gap-1.5 border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400"
                                             onClick={() => setSelectedJobToReview(job)}
                                         >
                                             <Search size={15} />
@@ -246,7 +246,7 @@ export const DelegatedProjects: React.FC = () => {
                                             </Button>
                                             <Button
                                                 variant="outline"
-                                                className="flex-1 border-red-900/50 text-red-400 hover:bg-red-900/20 gap-1.5"
+                                                className="flex-1 border-rose-400 dark:border-rose-700 text-rose-400 hover:bg-rose-500/10 gap-1.5"
                                                 onClick={() => handleReject(job._id)}
                                                 disabled={isProcessing}
                                             >

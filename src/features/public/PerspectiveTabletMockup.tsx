@@ -39,7 +39,7 @@ export const PerspectiveTabletMockup: React.FC<PerspectiveTabletMockupProps> = (
         {/* Tablet Screen Surface */}
         <div
           className={`relative rounded-[30px] sm:rounded-[36px] ${
-            isDark ? 'bg-[#0F172A] border-slate-800 text-slate-100' : 'bg-[#D4F882] border-[#111111]/10 text-left'
+            isDark ? 'bg-[#0F172A] border-slate-700 text-slate-100' : 'bg-[#D4F882] border-[#111111]/20 text-left'
           } overflow-hidden border transition-colors`}
         >
           {children}

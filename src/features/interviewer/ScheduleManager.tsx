@@ -39,7 +39,7 @@ export const InterviewerRequests: React.FC = () => {
             ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {pendingRequests.map(inv => (
-                        <Card key={inv._id} className="flex flex-col h-full border border-slate-300 dark:border-neutral-700 hover:border-blue-500/40 transition-all">
+                        <Card key={inv._id} className="flex flex-col h-full border border-slate-300 dark:border-slate-700 hover:border-blue-500/40 transition-all">
                             <div className="flex-1 space-y-4">
                                 <div className="flex justify-between items-start">
                                     <Badge variant="warning">Pending Request</Badge>
@@ -68,14 +68,14 @@ export const InterviewerRequests: React.FC = () => {
                                 </div>
 
                                 {inv.notes && (
-                                    <div className="text-sm text-neutral-300 bg-neutral-800/50 p-3 rounded-lg border border-neutral-700">
+                                    <div className="text-sm text-neutral-300 bg-neutral-800/50 p-3 rounded-lg border border-slate-300 dark:border-slate-700">
                                         <span className="text-blue-600 dark:text-blue-400 font-bold block mb-1">Notes from Recruiter:</span>
                                         {inv.notes}
                                     </div>
                                 )}
                             </div>
 
-                            <div className="flex gap-3 mt-6 pt-4 border-t border-neutral-800">
+                            <div className="flex gap-3 mt-6 pt-4 border-t border-slate-300 dark:border-slate-700">
                                 <Button
                                     className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                                     onClick={async () => {
@@ -92,7 +92,7 @@ export const InterviewerRequests: React.FC = () => {
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    className="flex-1 border-red-900/50 text-red-500 hover:bg-red-900/20 hover:text-red-400"
+                                    className="flex-1 border-rose-400 dark:border-rose-700 text-rose-500 hover:bg-rose-500/10 hover:text-rose-400"
                                     onClick={async () => {
                                         try {
                                             await apiRequest(`/freelancers/requests/${inv._id}/reject`, 'PUT');

@@ -106,10 +106,10 @@ export const FreelancerServiceManager: React.FC = () => {
 
             {loading ? (
                 <div className="grid md:grid-cols-2 gap-4">
-                    {[1, 2].map(i => <div key={i} className="h-36 bg-neutral-900 border border-neutral-800 rounded-xl animate-pulse" />)}
+                    {[1, 2].map(i => <div key={i} className="h-36 bg-neutral-900 border border-slate-300 dark:border-slate-700 rounded-xl animate-pulse" />)}
                 </div>
             ) : services.length === 0 ? (
-                <div className="text-center py-20 border border-neutral-800 rounded-xl">
+                <div className="text-center py-20 border border-slate-300 dark:border-slate-700 rounded-xl">
                     <Briefcase size={48} className="text-neutral-700 mx-auto mb-4" />
                     <p className="text-neutral-500 text-lg font-medium">No services yet</p>
                     <p className="text-neutral-600 text-sm mt-1 mb-6">Create your first service so recruiters can find and book you.</p>
@@ -121,7 +121,7 @@ export const FreelancerServiceManager: React.FC = () => {
                         <div key={svc._id} className={`p-5 rounded-xl border transition-all ${
                             svc.isActive
                                 ? 'bg-white dark:bg-[#111726] border-slate-300 dark:border-slate-700 hover:border-blue-500/40 shadow-sm'
-                                : 'bg-neutral-950 border-slate-300 dark:border-neutral-700 opacity-60'
+                                : 'bg-neutral-950 border-slate-300 dark:border-slate-700 opacity-60'
                         }`}>
                             <div className="flex justify-between items-start gap-3">
                                 <div className="flex-1 min-w-0">
@@ -136,7 +136,7 @@ export const FreelancerServiceManager: React.FC = () => {
                                     <p className="text-sm text-neutral-400 line-clamp-1">{svc.description}</p>
                                     <div className="flex flex-wrap gap-1.5 mt-2">
                                         {svc.skills.slice(0, 4).map((s, i) => (
-                                            <span key={i} className="text-[10px] px-2 py-0.5 bg-neutral-800 text-neutral-400 rounded-full border border-neutral-700">{s}</span>
+                                            <span key={i} className="text-[10px] px-2 py-0.5 bg-neutral-800 text-neutral-400 rounded-full border border-slate-300 dark:border-slate-700">{s}</span>
                                         ))}
                                     </div>
                                 </div>
@@ -145,7 +145,7 @@ export const FreelancerServiceManager: React.FC = () => {
                                     <p className="text-xs text-neutral-500">{svc.durationMinutes} min</p>
                                 </div>
                             </div>
-                            <div className="flex gap-2 mt-4 pt-4 border-t border-neutral-800">
+                            <div className="flex gap-2 mt-4 pt-4 border-t border-slate-300 dark:border-slate-700">
                                 <Button size="sm" variant="outline" className="flex-1 gap-1.5" onClick={() => openEdit(svc)}>
                                     <Edit2 size={12} /> Edit
                                 </Button>
@@ -153,7 +153,7 @@ export const FreelancerServiceManager: React.FC = () => {
                                     {svc.isActive ? <ToggleRight size={14} className="text-green-400" /> : <ToggleLeft size={14} />}
                                     {svc.isActive ? 'Pause' : 'Activate'}
                                 </Button>
-                                <Button size="sm" variant="outline" className="text-red-400 border-red-900/40 hover:bg-red-900/20" onClick={() => handleDelete(svc)}>
+                                <Button size="sm" variant="outline" className="text-rose-500 border-rose-400 dark:border-rose-700 hover:bg-rose-500/10" onClick={() => handleDelete(svc)}>
                                     <Trash2 size={13} />
                                 </Button>
                             </div>
@@ -192,7 +192,7 @@ export const FreelancerServiceManager: React.FC = () => {
                             </select>
                         </div>
                     </div>
-                    <div className="flex justify-end gap-3 pt-2 border-t border-slate-300 dark:border-neutral-700">
+                    <div className="flex justify-end gap-3 pt-2 border-t border-slate-300 dark:border-slate-700">
                         <Button variant="ghost" onClick={() => setFormOpen(false)}>Cancel</Button>
                         <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : editing ? 'Save Changes' : 'Publish Service'}</Button>
                     </div>

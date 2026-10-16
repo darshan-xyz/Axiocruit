@@ -18,8 +18,8 @@ export const SegmentedToggle: React.FC<SegmentedToggleProps> = ({
       <div
         className={`inline-flex p-1.5 rounded-full border shadow-sm transition-all duration-200 ${
           isDark
-            ? 'bg-slate-900/90 border-slate-800'
-            : 'bg-white/90 border-[#111111]/10'
+            ? 'bg-slate-900/90 border-slate-700'
+            : 'bg-white/90 border-slate-300'
         }`}
         role="tablist"
       >

@@ -78,7 +78,7 @@ export const PublicLayout: React.FC = () => {
       <header className={`sticky top-0 z-40 w-full px-4 sm:px-6 lg:px-8 pt-3 pb-2 transition-colors duration-200 ${
         /* Matches Hero: isHomePage ? 'bg-[#D4F882]' */
         isHomePage ? (isDark ? 'bg-[#0A0E1A]' : 'bg-[#D4F882]') : (isDark ? 'bg-slate-900' : 'bg-white')
-      } ${isHomePage && isScrolled ? (isDark ? 'bg-[#0A0E1A]/90 backdrop-blur-md border-b border-slate-800' : 'bg-[#D4F882]/90 backdrop-blur-md border-b border-[#111111]/10') : ''}`}>
+      } ${isHomePage && isScrolled ? (isDark ? 'bg-[#0A0E1A]/90 backdrop-blur-md border-b border-slate-700' : 'bg-[#D4F882]/90 backdrop-blur-md border-b border-[#111111]/10') : ''}`}>
         <nav className={`max-w-6xl mx-auto rounded-full px-5 py-2.5 flex items-center justify-between border transition-all shadow-sm ${
           isDark
             ? (isHomePage && !isScrolled
@@ -175,7 +175,7 @@ export const PublicLayout: React.FC = () => {
       </main>
 
       {/* Enterprise Footer */}
-      <footer className={`border-t py-12 ${isDark ? 'border-slate-700 bg-[#0A0E1A]' : 'border-neutral-800 bg-[#050505] text-white'}`}>
+      <footer className={`border-t py-12 ${isDark ? 'border-slate-700 bg-[#0A0E1A]' : 'border-neutral-700 bg-[#050505] text-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2.5 mb-4">
@@ -502,7 +502,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
 
             {/* Iridescent AI Assistant Card */}
             <div className="p-3.5">
-              <div className="rounded-3xl p-4 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white shadow-md relative overflow-hidden group border border-blue-400/30 dark:border-indigo-400/30">
+              <div className="rounded-3xl p-4 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white shadow-md relative overflow-hidden group border border-blue-300/50 dark:border-indigo-400/50">
                 <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 rounded-full blur-xl pointer-events-none" />
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-1.5">

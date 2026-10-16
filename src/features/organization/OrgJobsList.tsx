@@ -253,7 +253,7 @@ export const OrgJobsList: React.FC = () => {
                   <p className={`text-xs font-bold ${textPrimary} mb-2`}>Required Skills</p>
                   <div className="flex flex-wrap gap-1.5">
                     {selectedJob.skills.map((s, idx) => (
-                      <span key={idx} className="px-2.5 py-1 text-xs rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/60 font-medium">
+                      <span key={idx} className="px-2.5 py-1 text-xs rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-300 dark:border-blue-700 font-medium">
                         {s}
                       </span>
                     ))}

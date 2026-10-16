@@ -15,7 +15,7 @@ export const HeroHerbSection: React.FC = () => {
     <section
       id="platform"
       className={`relative pt-10 pb-20 md:pt-16 md:pb-28 px-4 sm:px-6 lg:px-12 overflow-hidden border-b border-[#111111]/10 transition-colors duration-200 ${
-        isDark ? 'bg-[#0A0E1A] border-slate-800 text-slate-100' : 'bg-[#D4F882] text-[#111111]'
+        isDark ? 'bg-[#0A0E1A] border-slate-700 text-slate-100' : 'bg-[#D4F882] text-[#111111]'
       }`}
     >
       {/* Background glow effects */}
@@ -31,7 +31,7 @@ export const HeroHerbSection: React.FC = () => {
         <div className="flex justify-center mb-6">
           <div
             className={`${
-              isDark ? 'bg-[#111726] border border-slate-800 text-slate-200 shadow-xl' : 'bg-[#111111] text-white'
+              isDark ? 'bg-[#111726] border border-slate-700 text-slate-200 shadow-xl' : 'bg-[#111111] text-white'
             } px-4 py-2 rounded-2xl shadow-md text-center inline-flex items-center gap-2 cursor-pointer transition-transform hover:scale-105`}
             onClick={() => navigate('/')}
           >
@@ -128,7 +128,7 @@ export const HeroHerbSection: React.FC = () => {
           <PerspectiveTabletMockup isDark={isDark}>
             {/* Tablet Screen Surface Header */}
             <div className={`flex flex-wrap items-center justify-between px-5 sm:px-8 pt-5 pb-3 border-b ${
-              isDark ? 'border-slate-800/80 bg-[#111726]' : 'border-slate-100 bg-white'
+              isDark ? 'border-slate-700 bg-[#111726]' : 'border-slate-300 bg-white'
             }`}>
               <div className="flex items-center gap-3">
                 <div className={`w-7 h-7 rounded-lg ${
@@ -146,7 +146,7 @@ export const HeroHerbSection: React.FC = () => {
 
               <div className="flex items-center gap-2.5">
                 <div className={`${
-                  isDark ? 'bg-slate-800 text-slate-200 border-slate-700' : 'bg-slate-50 text-slate-800 border-slate-200'
+                  isDark ? 'bg-slate-800 text-slate-200 border-slate-600' : 'bg-slate-50 text-slate-800 border-slate-300'
                 } font-black text-xs px-3 py-1 rounded-full shadow-xs border flex items-center gap-1.5`}>
                   <span className="w-3.5 h-3.5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[9px] font-black">
                     ↑
@@ -167,7 +167,7 @@ export const HeroHerbSection: React.FC = () => {
             <div className={`p-4 sm:p-7 ${isDark ? 'bg-[#0F172A]' : 'bg-[#FAFAFA]'}`}>
               {/* Tabs row */}
               <div className={`flex items-center gap-4 text-[11px] font-bold ${
-                isDark ? 'text-slate-400 border-slate-800' : 'text-slate-500 border-slate-200'
+                isDark ? 'text-slate-400 border-slate-700' : 'text-slate-500 border-slate-300'
               } border-b pb-2.5 mb-5 overflow-x-auto text-left`}>
                 <span className={`${
                   isDark ? 'text-white border-emerald-400' : 'text-slate-900 border-emerald-600'
@@ -188,19 +188,19 @@ export const HeroHerbSection: React.FC = () => {
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4 text-[11px] text-left">
-                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'} border shadow-xs`}>
+                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-700' : 'bg-white border-slate-300'} border shadow-xs`}>
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Resolved Candidates</span>
                       <div className={`text-base sm:text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>3,639</div>
                     </div>
-                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'} border shadow-xs`}>
+                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-700' : 'bg-white border-slate-300'} border shadow-xs`}>
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Inbound Reach</span>
                       <div className={`text-base sm:text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>84.5k</div>
                     </div>
-                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'} border shadow-xs`}>
+                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-700' : 'bg-white border-slate-300'} border shadow-xs`}>
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Interviews Conducted</span>
                       <div className={`text-base sm:text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>1,248</div>
                     </div>
-                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'} border shadow-xs`}>
+                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-700' : 'bg-white border-slate-300'} border shadow-xs`}>
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Avg AI Match Score</span>
                       <div className={`text-base sm:text-lg font-black text-emerald-500 mt-0.5`}>88.4%</div>
                     </div>
@@ -214,19 +214,19 @@ export const HeroHerbSection: React.FC = () => {
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4 text-[11px] text-left">
-                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'} border shadow-xs`}>
+                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-700' : 'bg-white border-slate-300'} border shadow-xs`}>
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Design Submissions</span>
                       <div className={`text-base sm:text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>842</div>
                     </div>
-                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'} border shadow-xs`}>
+                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-700' : 'bg-white border-slate-300'} border shadow-xs`}>
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Figma & UI Audits</span>
                       <div className={`text-base sm:text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>629</div>
                     </div>
-                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'} border shadow-xs`}>
+                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-700' : 'bg-white border-slate-300'} border shadow-xs`}>
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Senior Design Reviews</span>
                       <div className={`text-base sm:text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>312</div>
                     </div>
-                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'} border shadow-xs`}>
+                    <div className={`p-3 rounded-xl ${isDark ? 'bg-slate-900/80 border-slate-700' : 'bg-white border-slate-300'} border shadow-xs`}>
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Creative Benchmarks</span>
                       <div className="text-base sm:text-lg font-black text-emerald-500 mt-0.5">96.8%</div>
                     </div>
@@ -235,7 +235,7 @@ export const HeroHerbSection: React.FC = () => {
               )}
 
               {/* Candidate Match Score Distribution Bar Chart */}
-              <div className={`p-4 rounded-2xl ${isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'} border shadow-xs text-left`}>
+              <div className={`p-4 rounded-2xl ${isDark ? 'bg-slate-900/80 border-slate-700' : 'bg-white border-slate-300'} border shadow-xs text-left`}>
                 <div className={`flex justify-between items-center mb-3 text-[10px] font-bold ${
                   isDark ? 'text-slate-400' : 'text-slate-500'
                 }`}>
@@ -267,7 +267,7 @@ export const HeroHerbSection: React.FC = () => {
         {/* Bottom Segmented Pill Toggle: Sourcing vs Live Proctoring */}
         <div
           className={`inline-flex items-center gap-1.5 ${
-            isDark ? 'bg-[#111726] border-slate-800' : 'bg-[#1C241E] border-[#111111]/20'
+            isDark ? 'bg-[#111726] border-slate-700' : 'bg-[#1C241E] border-[#111111]/30'
           } p-1.5 rounded-full border shadow-lg transition-colors`}
         >
           <button
@@ -305,8 +305,8 @@ export const HeroHerbSection: React.FC = () => {
               <div
                 className={`${
                   isDark
-                    ? 'bg-[#111726]/90 border-slate-800 text-slate-200'
-                    : 'bg-white/90 border-[#111111]/10 text-[#111111]'
+                    ? 'bg-[#111726]/90 border-slate-700 text-slate-200'
+                    : 'bg-white/90 border-slate-300 text-[#111111]'
                 } backdrop-blur-md p-4 rounded-2xl border shadow-sm transition-colors`}
               >
                 <div className="flex items-center gap-2 mb-1.5">
@@ -332,8 +332,8 @@ export const HeroHerbSection: React.FC = () => {
               <div
                 className={`${
                   isDark
-                    ? 'bg-[#111726]/90 border-slate-800 text-slate-200'
-                    : 'bg-white/90 border-[#111111]/10 text-[#111111]'
+                    ? 'bg-[#111726]/90 border-slate-700 text-slate-200'
+                    : 'bg-white/90 border-slate-300 text-[#111111]'
                 } backdrop-blur-md p-4 rounded-2xl border shadow-sm transition-colors`}
               >
                 <div className="flex items-center gap-2 mb-1.5">
@@ -359,8 +359,8 @@ export const HeroHerbSection: React.FC = () => {
               <div
                 className={`${
                   isDark
-                    ? 'bg-[#111726]/90 border-slate-800 text-slate-200'
-                    : 'bg-white/90 border-[#111111]/10 text-[#111111]'
+                    ? 'bg-[#111726]/90 border-slate-700 text-slate-200'
+                    : 'bg-white/90 border-slate-300 text-[#111111]'
                 } backdrop-blur-md p-4 rounded-2xl border shadow-sm transition-colors`}
               >
                 <div className="flex items-center gap-2 mb-1.5">
@@ -388,8 +388,8 @@ export const HeroHerbSection: React.FC = () => {
               <div
                 className={`${
                   isDark
-                    ? 'bg-[#111726]/90 border-slate-800 text-slate-200'
-                    : 'bg-white/90 border-[#111111]/10 text-[#111111]'
+                    ? 'bg-[#111726]/90 border-slate-700 text-slate-200'
+                    : 'bg-white/90 border-slate-300 text-[#111111]'
                 } backdrop-blur-md p-4 rounded-2xl border shadow-sm transition-colors`}
               >
                 <div className="flex items-center gap-2 mb-1.5">
@@ -415,8 +415,8 @@ export const HeroHerbSection: React.FC = () => {
               <div
                 className={`${
                   isDark
-                    ? 'bg-[#111726]/90 border-slate-800 text-slate-200'
-                    : 'bg-white/90 border-[#111111]/10 text-[#111111]'
+                    ? 'bg-[#111726]/90 border-slate-700 text-slate-200'
+                    : 'bg-white/90 border-slate-300 text-[#111111]'
                 } backdrop-blur-md p-4 rounded-2xl border shadow-sm transition-colors`}
               >
                 <div className="flex items-center gap-2 mb-1.5">
@@ -442,8 +442,8 @@ export const HeroHerbSection: React.FC = () => {
               <div
                 className={`${
                   isDark
-                    ? 'bg-[#111726]/90 border-slate-800 text-slate-200'
-                    : 'bg-white/90 border-[#111111]/10 text-[#111111]'
+                    ? 'bg-[#111726]/90 border-slate-700 text-slate-200'
+                    : 'bg-white/90 border-slate-300 text-[#111111]'
                 } backdrop-blur-md p-4 rounded-2xl border shadow-sm transition-colors`}
               >
                 <div className="flex items-center gap-2 mb-1.5">

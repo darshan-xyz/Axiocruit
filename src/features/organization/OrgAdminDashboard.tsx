@@ -154,7 +154,7 @@ export const OrgAdminDashboard: React.FC = () => {
             onChange={(e) => setNewRecruiter({ ...newRecruiter, password: e.target.value })}
           />
           {addError && (
-            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 dark:text-red-400 text-xs flex items-center gap-2">
+            <div className="p-3 bg-red-500/10 border border-red-400 dark:border-red-700 rounded-xl text-red-600 dark:text-red-400 text-xs flex items-center gap-2">
               <AlertCircle size={14} className="flex-shrink-0" />
               <span>{addError}</span>
             </div>

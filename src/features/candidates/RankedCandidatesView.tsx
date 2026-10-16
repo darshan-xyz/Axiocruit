@@ -143,7 +143,7 @@ export const RankedCandidates: React.FC = () => {
     return (
       <div className="flex items-center justify-center py-28">
         <div className="text-center">
-          <div className="w-10 h-10 rounded-full border-3 border-slate-200 dark:border-slate-700 border-t-blue-600 animate-spin mx-auto mb-4" />
+          <div className="w-10 h-10 rounded-full border-3 border-slate-300 dark:border-slate-700 border-t-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-sm font-bold text-slate-600 dark:text-slate-400">Loading candidate ranking & AI metrics...</p>
         </div>
       </div>
@@ -177,7 +177,7 @@ export const RankedCandidates: React.FC = () => {
             <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
               {jobTitle}
             </h1>
-            <span className="px-3 py-1 rounded-full text-xs font-black bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/80">
+            <span className="px-3 py-1 rounded-full text-xs font-black bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-300 dark:border-blue-700">
               AI Ranked
             </span>
           </div>

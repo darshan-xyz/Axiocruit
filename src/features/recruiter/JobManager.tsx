@@ -93,7 +93,7 @@ export const MyJobs: React.FC = () => {
                                 <div className="flex gap-4 text-xs text-slate-500 dark:text-slate-400 items-center">
                                     <span className="flex items-center gap-1"><MapPin size={14} /> {job.location} | {job.type}</span>
                                     <span className="flex items-center gap-1"><Clock size={14} /> Posted {new Date(job.createdAt || Date.now()).toLocaleDateString()}</span>
-                                    <span className="bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/60 px-3 py-0.5 text-xs rounded-full font-extrabold ml-2">
+                                    <span className="bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-300 dark:border-blue-700 px-3 py-0.5 text-xs rounded-full font-extrabold ml-2">
                                         {job.applicantCount || 0} Applicants
                                     </span>
                                 </div>
@@ -105,7 +105,7 @@ export const MyJobs: React.FC = () => {
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            className="text-xs text-amber-500 border-amber-500/30 hover:bg-amber-500/10"
+                                            className="text-xs text-amber-500 border-amber-400 dark:border-amber-600 hover:bg-amber-500/10"
                                             onClick={() => handleRevokeDelegation(job._id)}
                                         >
                                             Revoke Delegation

@@ -101,9 +101,9 @@ export const CompletedDelegations: React.FC = () => {
                         const isProcessing = approving === job._id;
 
                         return (
-                            <Card key={job._id} className="flex flex-col border-amber-500/20 bg-gradient-to-br from-neutral-900 to-amber-900/5 overflow-hidden">
+                            <Card key={job._id} className="flex flex-col border-amber-500/40 bg-gradient-to-br from-neutral-900 to-amber-900/5 overflow-hidden">
                                 {/* Status Banner */}
-                                <div className="px-5 py-2.5 flex items-center justify-between border-b border-amber-500/20 bg-amber-500/5">
+                                <div className="px-5 py-2.5 flex items-center justify-between border-b border-amber-500/40 bg-amber-500/5">
                                     <div className="flex items-center gap-2">
                                         <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
                                         <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
@@ -137,7 +137,7 @@ export const CompletedDelegations: React.FC = () => {
 
                                     {/* --- THE FULL DOSSIER --- */}
                                     {/* Proposed Candidate Header */}
-                                    <div className="flex items-center gap-4 p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                                    <div className="flex items-center gap-4 p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/40">
                                         <img
                                             src={candidate.profilePicture || DEFAULT_AVATAR}
                                             alt={candidate.name}
@@ -168,7 +168,7 @@ export const CompletedDelegations: React.FC = () => {
                                             href={candidate.resumeUrl} 
                                             target="_blank" 
                                             rel="noreferrer"
-                                            className="flex items-center justify-center gap-2 w-full py-3 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-xl transition-all font-semibold"
+                                            className="flex items-center justify-center gap-2 w-full py-3 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 border border-blue-300 dark:border-blue-700 rounded-xl transition-all font-semibold"
                                         >
                                             <FileText size={18} />
                                             📄 View Original CV / Resume
@@ -236,7 +236,7 @@ export const CompletedDelegations: React.FC = () => {
                                                         codingTestConducted: !!aiData.codingTestResults,
                                                         fullAnalysis: aiData.fullAnalysis
                                                     })}
-                                                    className="flex items-center justify-center gap-2 w-full py-3 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-xl transition-all font-semibold cursor-pointer"
+                                                    className="flex items-center justify-center gap-2 w-full py-3 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 border border-blue-300 dark:border-blue-700 rounded-xl transition-all font-semibold cursor-pointer"
                                                 >
                                                     <Award size={18} />
                                                     View Detailed AI Evaluation

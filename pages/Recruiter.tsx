@@ -1351,7 +1351,7 @@ export const Applicants: React.FC = () => {
                         return (
                             <Card key={app._id} className="flex flex-col gap-4 group hover:border-blue-500/50 cursor-pointer relative" onClick={() => setSelectedApp(app)}>
                                 <div className="absolute top-4 right-4">
-                                    <Badge variant={app.status === 'Applied' ? 'neutral' : app.status === 'Rejected' ? 'outline' : 'neutral'} className={app.status === 'Rejected' ? 'text-red-400 border-red-900' : 'text-blue-600 dark:text-blue-400'}>
+                                    <Badge variant={app.status === 'Applied' ? 'neutral' : app.status === 'Rejected' ? 'outline' : 'neutral'} className={app.status === 'Rejected' ? 'text-rose-500 dark:text-rose-400 border-rose-300 dark:border-rose-700' : 'text-blue-600 dark:text-blue-400'}>
                                         {app.status}
                                     </Badge>
                                 </div>
@@ -2126,7 +2126,7 @@ export const ServiceMarketplace: React.FC = () => {
                                         <p className="text-sm font-semibold text-white">{selectedJob.title}</p>
                                         <p className="text-xs text-neutral-400 mt-0.5">{selectedJob.company} · {selectedJob.location}</p>
                                     </div>
-                                    <Badge variant="neutral" className="text-[10px] bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                                    <Badge variant="neutral" className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/40">
                                         {selectedJob.type}
                                     </Badge>
                                 </div>
@@ -2254,9 +2254,9 @@ export const CompletedDelegations: React.FC = () => {
                         const isProcessing = approving === job._id;
 
                         return (
-                            <Card key={job._id} className="flex flex-col border-amber-500/20 bg-gradient-to-br from-neutral-900 to-amber-900/5 overflow-hidden">
+                            <Card key={job._id} className="flex flex-col border-amber-500/40 bg-gradient-to-br from-neutral-900 to-amber-900/5 overflow-hidden">
                                 {/* Status Banner */}
-                                <div className="px-5 py-2.5 flex items-center justify-between border-b border-amber-500/20 bg-amber-500/5">
+                                <div className="px-5 py-2.5 flex items-center justify-between border-b border-amber-500/40 bg-amber-500/5">
                                     <div className="flex items-center gap-2">
                                         <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
                                         <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
@@ -2290,7 +2290,7 @@ export const CompletedDelegations: React.FC = () => {
 
                                     {/* --- THE FULL DOSSIER --- */}
                                     {/* Proposed Candidate Header */}
-                                    <div className="flex items-center gap-4 p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                                    <div className="flex items-center gap-4 p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/40">
                                         <img
                                             src={candidate.profilePicture || DEFAULT_AVATAR}
                                             alt={candidate.name}
@@ -2520,9 +2520,9 @@ export const NewHirings: React.FC = () => {
     };
 
     const getScoreBg = (score: number) => {
-        if (score >= 75) return 'bg-emerald-500/10 border-emerald-500/20';
-        if (score >= 50) return 'bg-amber-500/10 border-amber-500/20';
-        return 'bg-red-500/10 border-red-500/20';
+        if (score >= 75) return 'bg-emerald-500/10 border-emerald-500/40';
+        if (score >= 50) return 'bg-amber-500/10 border-amber-500/40';
+        return 'bg-red-500/10 border-red-500/40';
     };
 
     return (
@@ -2568,7 +2568,7 @@ export const NewHirings: React.FC = () => {
                                 className="group flex flex-col bg-neutral-900 border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden hover:border-emerald-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10"
                             >
                                 {/* Hired Banner */}
-                                <div className="px-5 py-2.5 flex items-center justify-between border-b border-emerald-500/15" style={{ background: 'rgba(16,185,129,0.05)' }}>
+                                <div className="px-5 py-2.5 flex items-center justify-between border-b border-emerald-500/40" style={{ background: 'rgba(16,185,129,0.05)' }}>
                                     <div className="flex items-center gap-2">
                                         <div className="w-2 h-2 rounded-full bg-emerald-400" />
                                         <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400">Hired</span>
@@ -2586,7 +2586,7 @@ export const NewHirings: React.FC = () => {
                                     </div>
 
                                     {/* Candidate Card */}
-                                    <div className="flex items-center gap-3 p-3.5 rounded-xl border border-emerald-500/15" style={{ background: 'linear-gradient(to right, rgba(16,185,129,0.05), transparent)' }}>
+                                    <div className="flex items-center gap-3 p-3.5 rounded-xl border border-emerald-500/40" style={{ background: 'linear-gradient(to right, rgba(16,185,129,0.05), transparent)' }}>
                                         <div className="relative flex-shrink-0">
                                             <img
                                                 src={candidate.profilePicture || DEFAULT_AVATAR}

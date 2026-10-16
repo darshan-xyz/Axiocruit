@@ -60,7 +60,7 @@ export const MonacoCodeEditor: React.FC<MonacoCodeEditorProps> = ({
                         value={language}
                         onChange={(e) => onLanguageChange && onLanguageChange(e.target.value)}
                         disabled={!onLanguageChange}
-                        className={`border text-xs rounded px-2 py-1 outline-none font-medium transition ${!onLanguageChange ? 'opacity-80 cursor-not-allowed' : 'cursor-pointer hover:border-blue-500'} ${isDark ? 'bg-neutral-800 border-slate-600 text-neutral-200' : 'bg-blue-50 border-blue-200 text-blue-700'}`}
+                        className={`border text-xs rounded px-2 py-1 outline-none font-medium transition ${!onLanguageChange ? 'opacity-80 cursor-not-allowed' : 'cursor-pointer hover:border-blue-500'} ${isDark ? 'bg-neutral-800 border-slate-600 text-neutral-200' : 'bg-blue-50 border-blue-300 text-blue-700'}`}
                     >
                         <option value="python">Python</option>
                         <option value="javascript">JavaScript</option>

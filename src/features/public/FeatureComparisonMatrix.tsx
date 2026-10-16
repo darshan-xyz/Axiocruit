@@ -14,7 +14,7 @@ export const FeatureComparisonMatrix: React.FC = () => {
 
   return (
     <section id="features" className={`py-24 px-4 ${
-      isDark ? 'bg-[#080C14] border-slate-800' : 'bg-[#FAF9F5] border-slate-200/80'
+      isDark ? 'bg-[#080C14] border-slate-700' : 'bg-[#FAF9F5] border-slate-300'
     } border-b transition-colors duration-200`}>
       <div className="max-w-6xl mx-auto">
 
@@ -43,7 +43,7 @@ export const FeatureComparisonMatrix: React.FC = () => {
 
           {/* CARD 1: Clean White in Light / Deep Slate in Dark */}
           <div id="ats-engine" className={`${
-            isDark ? 'bg-[#111726] border-slate-800 text-slate-100' : 'bg-white border-slate-200/80 text-[#111111]'
+            isDark ? 'bg-[#111726] border-slate-700 text-slate-100' : 'bg-white border-slate-300 text-[#111111]'
           } rounded-[32px] p-8 border shadow-md flex flex-col justify-between group hover:shadow-xl transition-all duration-300 scroll-mt-24`}>
             <div className="flex justify-between items-start">
               <div className="max-w-[280px]">
@@ -61,7 +61,7 @@ export const FeatureComparisonMatrix: React.FC = () => {
               </div>
             </div>
 
-            <div className={`pt-6 mt-4 border-t ${isDark ? 'border-slate-800' : 'border-slate-100'} flex items-center gap-3`}>
+            <div className={`pt-6 mt-4 border-t ${isDark ? 'border-slate-700' : 'border-slate-300'} flex items-center gap-3`}>
               <button
                 onClick={() => navigate('/signup')}
                 className={`w-8 h-8 rounded-full ${
@@ -76,7 +76,7 @@ export const FeatureComparisonMatrix: React.FC = () => {
 
           {/* CARD 2: Light Grey-Blue (#CBD5E1) in Light / Dark Steel (#1E293B) in Dark */}
           <div id="assessments" className={`${
-            isDark ? 'bg-[#1E293B] border border-slate-700/70 text-slate-100' : 'bg-[#CBD5E1] text-[#111111]'
+            isDark ? 'bg-[#1E293B] border border-slate-600 text-slate-100' : 'bg-[#CBD5E1] border border-slate-400 text-[#111111]'
           } rounded-[32px] p-8 shadow-md flex flex-col justify-between group hover:shadow-xl transition-all duration-300 scroll-mt-24`}>
             <div className="flex justify-between items-start">
               <div className="max-w-[280px]">
@@ -94,7 +94,7 @@ export const FeatureComparisonMatrix: React.FC = () => {
               </div>
             </div>
 
-            <div className={`pt-6 mt-4 border-t ${isDark ? 'border-slate-700/50' : 'border-[#111111]/10'} flex items-center gap-3`}>
+            <div className={`pt-6 mt-4 border-t ${isDark ? 'border-slate-700' : 'border-[#111111]/20'} flex items-center gap-3`}>
               <button
                 onClick={() => navigate('/signup')}
                 className="w-8 h-8 rounded-full bg-white text-[#111111] flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform shadow-sm cursor-pointer"
@@ -107,7 +107,7 @@ export const FeatureComparisonMatrix: React.FC = () => {
 
           {/* CARD 3: Deep Forest (#587150) in Light / Deep Emerald (#064E3B) in Dark */}
           <div id="ai-proctoring" className={`${
-            isDark ? 'bg-[#064E3B] border border-emerald-800/80' : 'bg-[#587150]'
+            isDark ? 'bg-[#064E3B] border border-emerald-700' : 'bg-[#587150] border border-emerald-900/40'
           } text-white rounded-[32px] p-8 shadow-md flex flex-col justify-between group hover:shadow-xl transition-all duration-300 scroll-mt-24`}>
             <div className="flex justify-between items-start">
               <div className="max-w-[280px]">
@@ -138,7 +138,7 @@ export const FeatureComparisonMatrix: React.FC = () => {
 
           {/* CARD 4: Pitch Dark Charcoal (#212121) in Light / Pitch Obsidian (#0B0F19) in Dark */}
           <div className={`${
-            isDark ? 'bg-[#0B0F19] border border-slate-800' : 'bg-[#212121]'
+            isDark ? 'bg-[#0B0F19] border border-slate-700' : 'bg-[#212121] border border-neutral-700'
           } text-white rounded-[32px] p-8 shadow-md flex flex-col justify-between group hover:shadow-xl transition-all duration-300`}>
             <div className="flex justify-between items-start">
               <div className="max-w-[280px]">

@@ -130,13 +130,13 @@ export const HomePage: React.FC = () => {
 
       {/* ── SECTION 1: HERO (Herb Agency Light-Lime Canvas & 3D Tablet Mockup) ── */}
       <section className={`relative pt-10 pb-20 md:pt-14 md:pb-24 px-4 overflow-hidden border-b border-[#111111]/10 transition-colors duration-200 ${
-        isDark ? 'bg-[#0A0E1A] border-slate-800' : 'bg-[#D4F882]'
+        isDark ? 'bg-[#0A0E1A] border-slate-700' : 'bg-[#D4F882]'
       }`}>
         {/* Top Axiocruit Platform Badge */}
         <div className="flex justify-center mb-8">
           <div
             className={`${
-              isDark ? 'bg-[#111726] border border-slate-800 shadow-xl' : 'bg-[#111111]'
+              isDark ? 'bg-[#111726] border border-slate-700 shadow-xl' : 'bg-[#111111]'
             } text-white px-5 py-2.5 rounded-2xl shadow-md text-center inline-block cursor-pointer transition-colors`}
             onClick={() => navigate('/')}
           >
@@ -159,7 +159,7 @@ export const HomePage: React.FC = () => {
 
             {/* Floating 3D Metric Card 1: Total Income (bottom-left) */}
             <div className={`absolute -left-6 sm:-left-12 -bottom-6 sm:-bottom-8 z-20 hidden sm:block [transform:translateZ(50px)] ${
-              isDark ? 'bg-[#141B2D]/95 border-slate-700/80 text-white' : 'bg-white/95 border-neutral-200/80 text-[#111111]'
+              isDark ? 'bg-[#141B2D]/95 border-slate-700 text-white' : 'bg-white/95 border-slate-300 text-[#111111]'
             } backdrop-blur-md border rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 min-w-[170px] sm:min-w-[210px] shadow-2xl pointer-events-auto text-left`}>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-[10px] sm:text-xs font-semibold text-neutral-500 uppercase tracking-wider">Total Income</span>
@@ -172,7 +172,7 @@ export const HomePage: React.FC = () => {
 
             {/* Floating 3D Metric Card 2: Top Pill (top-right) */}
             <div className={`absolute -right-4 sm:-right-8 -top-4 sm:-top-6 z-20 hidden md:block [transform:translateZ(65px)] ${
-              isDark ? 'bg-[#141B2D]/95 border-slate-700/80 text-white' : 'bg-white/95 border-neutral-200/80 text-[#111111]'
+              isDark ? 'bg-[#141B2D]/95 border-slate-700 text-white' : 'bg-white/95 border-slate-300 text-[#111111]'
             } backdrop-blur-md border rounded-full px-3.5 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2 shadow-xl pointer-events-auto`}>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-xs sm:text-sm font-black bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
@@ -182,7 +182,7 @@ export const HomePage: React.FC = () => {
 
             {/* Floating 3D Metric Card 3: Resolved Identities (right) */}
             <div className={`absolute -right-6 sm:-right-12 bottom-12 sm:bottom-16 z-20 hidden sm:block [transform:translateZ(55px)] ${
-              isDark ? 'bg-[#141B2D]/95 border-slate-700/80 text-white' : 'bg-white/95 border-neutral-200/80 text-[#111111]'
+              isDark ? 'bg-[#141B2D]/95 border-slate-700 text-white' : 'bg-white/95 border-slate-300 text-[#111111]'
             } backdrop-blur-md border rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 min-w-[170px] sm:min-w-[200px] shadow-2xl pointer-events-auto text-left`}>
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[10px] sm:text-xs font-semibold text-neutral-500 uppercase tracking-wider">Resolved Identities</span>
@@ -211,7 +211,7 @@ export const HomePage: React.FC = () => {
 
               {/* Tablet Screen Surface */}
               <div className={`relative rounded-[30px] sm:rounded-[36px] ${
-                isDark ? 'bg-[#0F172A] border-slate-800 text-slate-100' : 'bg-[#D4F882] border-[#111111]/10 text-left'
+                isDark ? 'bg-[#0F172A] border-slate-700 text-slate-100' : 'bg-[#D4F882] border-[#111111]/20 text-left'
               } overflow-hidden border transition-colors`}>
 
                 {/* 1. Header inside Tablet Screen */}
@@ -300,7 +300,7 @@ export const HomePage: React.FC = () => {
 
                   {/* Segmented Pill Toggle */}
                   <div className="flex items-center justify-center my-6">
-                    <div className={`p-1.5 rounded-full border inline-flex ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-[#111111]/10'}`}>
+                    <div className={`p-1.5 rounded-full border inline-flex ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}>
                       <button
                         type="button"
                         onClick={() => setActiveSegment('marketing')}
@@ -338,11 +338,11 @@ export const HomePage: React.FC = () => {
 
                   {/* 4. Dashboard Window rising up inside the tablet */}
                   <div className={`relative z-10 ${
-                    isDark ? 'bg-[#111726] border-slate-800 text-slate-100 shadow-2xl' : 'bg-white border-slate-200/90 text-slate-900'
+                    isDark ? 'bg-[#111726] border-slate-700 text-slate-100 shadow-2xl' : 'bg-white border-slate-300 text-slate-900'
                   } rounded-t-[28px] sm:rounded-t-[34px] p-4 sm:p-7 shadow-2xl border-t border-x max-w-4xl mx-auto transition-colors`}>
                     <div className="absolute -top-4 left-10 sm:left-16 z-30">
                       <div className={`${
-                        isDark ? 'bg-slate-800 text-white border-slate-700' : 'bg-white text-slate-900 border-slate-200'
+                        isDark ? 'bg-slate-800 text-white border-slate-700' : 'bg-white text-slate-900 border-slate-300'
                       } font-black text-xs px-3.5 py-1.5 rounded-full shadow-lg border flex items-center gap-1.5 transition-colors`}>
                         <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-black">
                           ↑
@@ -353,7 +353,7 @@ export const HomePage: React.FC = () => {
 
                     {/* Window Header */}
                     <div className={`flex flex-wrap items-center justify-between pb-3 mb-4 border-b ${
-                      isDark ? 'border-slate-800 text-slate-400' : 'border-slate-100 text-slate-500'
+                      isDark ? 'border-slate-700 text-slate-400' : 'border-slate-300 text-slate-500'
                     } text-xs gap-2`}>
                       <div className="flex items-center gap-3">
                         <div className={`w-6 h-6 rounded-lg ${
@@ -386,7 +386,7 @@ export const HomePage: React.FC = () => {
 
                     {/* Tabs row */}
                     <div className={`flex items-center gap-4 text-[11px] font-bold ${
-                      isDark ? 'text-slate-400 border-slate-800' : 'text-slate-500 border-slate-100'
+                      isDark ? 'text-slate-400 border-slate-700' : 'text-slate-500 border-slate-300'
                     } border-b pb-2.5 mb-4 overflow-x-auto`}>
                       <span className={`${
                         isDark ? 'text-white border-emerald-400' : 'text-slate-900 border-emerald-600'
@@ -404,19 +404,19 @@ export const HomePage: React.FC = () => {
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4 text-[11px]">
-                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-700' : 'bg-slate-50 border-slate-300'} border`}>
                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Resolved Candidates</span>
                             <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>3,639</div>
                           </div>
-                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-700' : 'bg-slate-50 border-slate-300'} border`}>
                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Inbound Reach</span>
                             <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>84.5k</div>
                           </div>
-                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-700' : 'bg-slate-50 border-slate-300'} border`}>
                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Interviews Conducted</span>
                             <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>1,248</div>
                           </div>
-                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-700' : 'bg-slate-50 border-slate-300'} border`}>
                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Avg AI Match Score</span>
                             <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>88.4%</div>
                           </div>
@@ -430,19 +430,19 @@ export const HomePage: React.FC = () => {
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4 text-[11px]">
-                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-700' : 'bg-slate-50 border-slate-300'} border`}>
                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Design Submissions</span>
                             <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>842</div>
                           </div>
-                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-700' : 'bg-slate-50 border-slate-300'} border`}>
                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Figma & UI Audits</span>
                             <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>629</div>
                           </div>
-                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-700' : 'bg-slate-50 border-slate-300'} border`}>
                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Senior Design Reviews</span>
                             <div className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'} mt-0.5`}>312</div>
                           </div>
-                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                          <div className={`p-2.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-700' : 'bg-slate-50 border-slate-300'} border`}>
                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Creative Benchmarks</span>
                             <div className="text-base font-black text-emerald-500 mt-0.5">96.8%</div>
                           </div>
@@ -451,7 +451,7 @@ export const HomePage: React.FC = () => {
                     )}
 
                     {/* Candidate Match Score Distribution Bar Chart */}
-                    <div className={`p-3.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-100'} border`}>
+                    <div className={`p-3.5 rounded-xl ${isDark ? 'bg-slate-900/60 border-slate-700' : 'bg-slate-50 border-slate-300'} border`}>
                       <div className={`flex justify-between items-center mb-2 text-[10px] font-bold ${
                         isDark ? 'text-slate-400' : 'text-slate-500'
                       }`}>
@@ -475,7 +475,7 @@ export const HomePage: React.FC = () => {
               {/* FLOATING 3D METRIC CARDS OVERLAPPING TABLET EDGES */}
               <div className="absolute -left-3 sm:-left-8 md:-left-12 top-[48%] sm:top-[52%] -translate-y-1/2 z-30 hidden sm:block pointer-events-auto">
                 <div className={`${
-                  isDark ? 'bg-[#111726]/95 border-slate-700 text-slate-100 shadow-black/60' : 'bg-white/95 border-slate-200/90 text-slate-900'
+                  isDark ? 'bg-[#111726]/95 border-slate-700 text-slate-100 shadow-black/60' : 'bg-white/95 border-slate-300 text-slate-900'
                 } backdrop-blur-md rounded-2xl p-4 sm:p-5 shadow-2xl border text-left min-w-[210px] transform hover:scale-105 transition-all`}>
                   <div className="flex items-center justify-between gap-3 mb-1">
                     <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider">Active Pipeline</span>
@@ -492,7 +492,7 @@ export const HomePage: React.FC = () => {
 
               <div className="absolute -right-3 sm:-right-8 md:-right-12 top-[40%] sm:top-[44%] -translate-y-1/2 z-30 hidden sm:block pointer-events-auto">
                 <div className={`${
-                  isDark ? 'bg-[#111726]/95 border-slate-700 text-slate-100 shadow-black/60' : 'bg-white/95 border-slate-200/90 text-slate-900'
+                  isDark ? 'bg-[#111726]/95 border-slate-700 text-slate-100 shadow-black/60' : 'bg-white/95 border-slate-300 text-slate-900'
                 } backdrop-blur-md rounded-2xl p-4 sm:p-5 shadow-2xl border text-left min-w-[225px] transform hover:scale-105 transition-all`}>
                   <div className="flex items-center justify-between gap-3 mb-1">
                     <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider">Verified Engineers</span>
@@ -534,7 +534,7 @@ export const HomePage: React.FC = () => {
 
           {/* Bottom Segmented Pill Toggle: Sourcing vs Live Proctoring */}
           <div className={`mt-14 sm:mt-16 inline-flex items-center gap-1.5 ${
-            isDark ? 'bg-[#111726] border-slate-800' : 'bg-[#1C241E] border-[#111111]/20'
+            isDark ? 'bg-[#111726] border-slate-700' : 'bg-[#1C241E] border-[#111111]/30'
           } p-1.5 rounded-full border shadow-lg transition-colors`}>
             <button
               type="button"
@@ -565,7 +565,7 @@ export const HomePage: React.FC = () => {
             {activeSegment === 'ats' ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-left">
                 <div className={`${
-                  isDark ? 'bg-[#111726]/90 border-slate-800 text-slate-200' : 'bg-white/90 border-[#111111]/10 text-[#111111]'
+                  isDark ? 'bg-[#111726]/90 border-slate-700 text-slate-200' : 'bg-white/90 border-slate-300 text-[#111111]'
                 } backdrop-blur-md p-4 rounded-2xl border shadow-sm transition-colors`}>
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="w-2 h-2 rounded-full bg-blue-500" />
@@ -576,7 +576,7 @@ export const HomePage: React.FC = () => {
                   </p>
                 </div>
                 <div className={`${
-                  isDark ? 'bg-[#111726]/90 border-slate-800 text-slate-200' : 'bg-white/90 border-[#111111]/10 text-[#111111]'
+                  isDark ? 'bg-[#111726]/90 border-slate-700 text-slate-200' : 'bg-white/90 border-slate-300 text-[#111111]'
                 } backdrop-blur-md p-4 rounded-2xl border shadow-sm transition-colors`}>
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
@@ -587,7 +587,7 @@ export const HomePage: React.FC = () => {
                   </p>
                 </div>
                 <div className={`${
-                  isDark ? 'bg-[#111726]/90 border-slate-800 text-slate-200' : 'bg-white/90 border-[#111111]/10 text-[#111111]'
+                  isDark ? 'bg-[#111726]/90 border-slate-700 text-slate-200' : 'bg-white/90 border-slate-300 text-[#111111]'
                 } backdrop-blur-md p-4 rounded-2xl border shadow-sm transition-colors`}>
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="w-2 h-2 rounded-full bg-purple-500" />
@@ -601,7 +601,7 @@ export const HomePage: React.FC = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-left">
                 <div className={`${
-                  isDark ? 'bg-[#111726]/90 border-slate-800 text-slate-200' : 'bg-white/90 border-[#111111]/10 text-[#111111]'
+                  isDark ? 'bg-[#111726]/90 border-slate-700 text-slate-200' : 'bg-white/90 border-slate-300 text-[#111111]'
                 } backdrop-blur-md p-4 rounded-2xl border shadow-sm transition-colors`}>
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="w-2 h-2 rounded-full bg-rose-500" />
@@ -612,7 +612,7 @@ export const HomePage: React.FC = () => {
                   </p>
                 </div>
                 <div className={`${
-                  isDark ? 'bg-[#111726]/90 border-slate-800 text-slate-200' : 'bg-white/90 border-[#111111]/10 text-[#111111]'
+                  isDark ? 'bg-[#111726]/90 border-slate-700 text-slate-200' : 'bg-white/90 border-slate-300 text-[#111111]'
                 } backdrop-blur-md p-4 rounded-2xl border shadow-sm transition-colors`}>
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="w-2 h-2 rounded-full bg-amber-500" />
@@ -623,7 +623,7 @@ export const HomePage: React.FC = () => {
                   </p>
                 </div>
                 <div className={`${
-                  isDark ? 'bg-[#111726]/90 border-slate-800 text-slate-200' : 'bg-white/90 border-[#111111]/10 text-[#111111]'
+                  isDark ? 'bg-[#111726]/90 border-slate-700 text-slate-200' : 'bg-white/90 border-slate-300 text-[#111111]'
                 } backdrop-blur-md p-4 rounded-2xl border shadow-sm transition-colors`}>
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="w-2 h-2 rounded-full bg-blue-500" />
@@ -642,7 +642,7 @@ export const HomePage: React.FC = () => {
 
       {/* ── SECTION 2: AXIOCRUIT 4-PILLAR RECRUITMENT CAPABILITIES ── */}
       <section id="features" className={`py-24 px-4 ${
-        isDark ? 'bg-[#080C14] border-slate-800' : 'bg-[#FAF9F5] border-slate-200/80'
+        isDark ? 'bg-[#080C14] border-slate-700' : 'bg-[#FAF9F5] border-slate-300'
       } border-b transition-colors duration-200`}>
         <div className="max-w-6xl mx-auto">
 
@@ -671,7 +671,7 @@ export const HomePage: React.FC = () => {
 
             {/* CARD 1: Clean White in Light / Deep Slate in Dark */}
             <div className={`${
-              isDark ? 'bg-[#111726] border-slate-800 text-slate-100' : 'bg-white border-slate-200/80 text-[#111111]'
+              isDark ? 'bg-[#111726] border-slate-700 text-slate-100' : 'bg-white border-slate-300 text-[#111111]'
             } rounded-[32px] p-8 border shadow-md flex flex-col justify-between group hover:shadow-xl transition-all duration-300`}>
               <div className="flex justify-between items-start">
                 <div className="max-w-[280px]">
@@ -690,7 +690,7 @@ export const HomePage: React.FC = () => {
                 </div>
               </div>
 
-              <div className={`pt-6 mt-4 border-t ${isDark ? 'border-slate-800' : 'border-slate-100'} flex items-center gap-3`}>
+              <div className={`pt-6 mt-4 border-t ${isDark ? 'border-slate-700' : 'border-slate-300'} flex items-center gap-3`}>
                 <button
                   onClick={() => navigate('/signup')}
                   className={`w-8 h-8 rounded-full ${
@@ -705,7 +705,7 @@ export const HomePage: React.FC = () => {
 
             {/* CARD 2: Light Grey-Blue (#CBD5E1) in Light / Dark Steel (#1E293B) in Dark */}
             <div className={`${
-              isDark ? 'bg-[#1E293B] border border-slate-700/70 text-slate-100' : 'bg-[#CBD5E1] text-[#111111]'
+              isDark ? 'bg-[#1E293B] border border-slate-600 text-slate-100' : 'bg-[#CBD5E1] border border-slate-400 text-[#111111]'
             } rounded-[32px] p-8 shadow-md flex flex-col justify-between group hover:shadow-xl transition-all duration-300`}>
               <div className="flex justify-between items-start">
                 <div className="max-w-[280px]">
@@ -724,7 +724,7 @@ export const HomePage: React.FC = () => {
                 </div>
               </div>
 
-              <div className={`pt-6 mt-4 border-t ${isDark ? 'border-slate-700/50' : 'border-[#111111]/10'} flex items-center gap-3`}>
+              <div className={`pt-6 mt-4 border-t ${isDark ? 'border-slate-700' : 'border-[#111111]/20'} flex items-center gap-3`}>
                 <button
                   onClick={() => navigate('/signup')}
                   className="w-8 h-8 rounded-full bg-white text-[#111111] flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform shadow-sm"
@@ -737,7 +737,7 @@ export const HomePage: React.FC = () => {
 
             {/* CARD 3: Deep Forest (#587150) in Light / Deep Emerald (#064E3B) in Dark */}
             <div className={`${
-              isDark ? 'bg-[#064E3B] border border-emerald-800/80' : 'bg-[#587150]'
+              isDark ? 'bg-[#064E3B] border border-emerald-700' : 'bg-[#587150] border border-emerald-900/40'
             } text-white rounded-[32px] p-8 shadow-md flex flex-col justify-between group hover:shadow-xl transition-all duration-300`}>
               <div className="flex justify-between items-start">
                 <div className="max-w-[280px]">
@@ -769,7 +769,7 @@ export const HomePage: React.FC = () => {
 
             {/* CARD 4: Pitch Dark Charcoal (#212121) in Light / Pitch Obsidian (#0B0F19) in Dark */}
             <div className={`${
-              isDark ? 'bg-[#0B0F19] border border-slate-800' : 'bg-[#212121]'
+              isDark ? 'bg-[#0B0F19] border border-slate-700' : 'bg-[#212121] border border-neutral-700'
             } text-white rounded-[32px] p-8 shadow-md flex flex-col justify-between group hover:shadow-xl transition-all duration-300`}>
               <div className="flex justify-between items-start">
                 <div className="max-w-[280px]">
@@ -803,7 +803,7 @@ export const HomePage: React.FC = () => {
 
       {/* ── SECTION 3: BOTTOM CTA BANNER ── */}
       <section className={`py-16 px-4 ${
-        isDark ? 'bg-[#111726] border-slate-800 text-white' : 'bg-[#D4F882] border-[#111111]/10 text-[#111111]'
+        isDark ? 'bg-[#111726] border-slate-700 text-white' : 'bg-[#D4F882] border-[#111111]/20 text-[#111111]'
       } border-t text-center transition-colors duration-200`}>
         <div className="max-w-4xl mx-auto space-y-6">
           <h2 className={`text-3xl sm:text-5xl font-black ${
@@ -828,7 +828,7 @@ export const HomePage: React.FC = () => {
             <button
               onClick={() => navigate('/login')}
               className={`${
-                isDark ? 'bg-slate-800 text-white border-slate-700 hover:bg-slate-700' : 'bg-white text-[#111111] border-[#111111]/10 hover:bg-neutral-100'
+                isDark ? 'bg-slate-800 text-white border-slate-700 hover:bg-slate-700' : 'bg-white text-[#111111] border-[#111111]/20 hover:bg-neutral-100'
               } font-extrabold px-8 py-3.5 rounded-full shadow-sm transition-all text-sm sm:text-base border`}
             >
               Sign In Instead
@@ -922,14 +922,14 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type }) => {
         </div>
 
         <div className={`${
-          isDark ? 'bg-[#111726] border-slate-800 text-slate-100 shadow-black/60' : 'bg-white border-slate-200/80 text-slate-900'
+          isDark ? 'bg-[#111726] border-slate-700 text-slate-100 shadow-black/60' : 'bg-white border-slate-300 text-slate-900'
         } rounded-[28px] p-6 sm:p-8 border shadow-xl transition-colors`}>
           <form onSubmit={handleSubmit} className="space-y-4">
 
             {type === 'signup' && (
               <div>
                 <label className={`block text-xs font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-2`}>Select Your Role</label>
-                <div className={`grid grid-cols-3 gap-1.5 p-1 rounded-2xl ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-100 border-slate-200'} border transition-colors`}>
+                <div className={`grid grid-cols-3 gap-1.5 p-1 rounded-2xl ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-slate-100 border-slate-300'} border transition-colors`}>
                   {(['CANDIDATE', 'RECRUITER', 'INTERVIEWER'] as UserRole[]).map((r) => (
                     <button
                       key={r}
@@ -992,7 +992,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type }) => {
             )}
 
             {error && (
-              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs font-semibold">
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-400 text-xs font-semibold">
                 {error}
               </div>
             )}

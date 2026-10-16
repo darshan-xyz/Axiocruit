@@ -58,7 +58,7 @@ export const OrgSettings: React.FC = () => {
                 </div>
 
                 {successMessage && (
-                    <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-2">
+                    <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-2">
                         <CheckCircle2 size={16} /> {successMessage}
                     </div>
                 )}

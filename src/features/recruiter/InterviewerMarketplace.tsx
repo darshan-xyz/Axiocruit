@@ -482,7 +482,7 @@ export const ServiceMarketplace: React.FC = () => {
                                         View Profile
                                     </button>
                                 </div>
-                                <Badge variant="neutral" className="text-[10px] px-2 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border-blue-200/80 dark:border-blue-800/60">
+                                <Badge variant="neutral" className="text-[10px] px-2 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700">
                                     {svc.durationMinutes} min
                                 </Badge>
                             </div>
@@ -624,7 +624,7 @@ export const ServiceMarketplace: React.FC = () => {
                                         <p className="text-sm font-semibold text-white">{selectedJob.title}</p>
                                         <p className="text-xs text-neutral-400 mt-0.5">{selectedJob.company} · {selectedJob.location}</p>
                                     </div>
-                                    <Badge variant="neutral" className="text-[10px] bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                                    <Badge variant="neutral" className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/40">
                                         {selectedJob.type}
                                     </Badge>
                                 </div>

@@ -155,7 +155,7 @@ export const Applicants: React.FC = () => {
                         return (
                             <Card key={app._id} className="flex flex-col gap-4 group hover:border-blue-500/50 cursor-pointer relative" onClick={() => setSelectedApp(app)}>
                                 <div className="absolute top-4 right-4">
-                                    <Badge variant={app.status === 'Applied' ? 'neutral' : app.status === 'Rejected' ? 'outline' : 'neutral'} className={app.status === 'Rejected' ? 'text-red-400 border-red-900' : 'text-blue-600 dark:text-blue-400'}>
+                                    <Badge variant={app.status === 'Applied' ? 'neutral' : app.status === 'Rejected' ? 'outline' : 'neutral'} className={app.status === 'Rejected' ? 'text-rose-500 dark:text-rose-400 border-rose-300 dark:border-rose-700' : 'text-blue-600 dark:text-blue-400'}>
                                         {app.status}
                                     </Badge>
                                 </div>

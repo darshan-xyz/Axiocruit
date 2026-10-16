@@ -12,8 +12,8 @@ export const MetricCards3D: React.FC<MetricCards3DProps> = ({ isDark = false }) 
       <div
         className={`absolute -left-4 sm:-left-8 lg:-left-12 -bottom-6 sm:-bottom-8 z-20 hidden sm:block [transform:translateZ(50px)] ${
           isDark
-            ? 'bg-[#141B2D]/95 border-slate-700/80 shadow-2xl text-white'
-            : 'bg-white/95 border-neutral-200/80 shadow-2xl text-[#111111]'
+            ? 'bg-[#141B2D]/95 border-slate-700 shadow-2xl text-white'
+            : 'bg-white/95 border-slate-300 shadow-2xl text-[#111111]'
         } backdrop-blur-md border rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 min-w-[170px] sm:min-w-[210px] transform hover:scale-105 transition-all duration-300 pointer-events-auto select-none`}
       >
         <div className="flex items-center justify-between mb-2">
@@ -35,8 +35,8 @@ export const MetricCards3D: React.FC<MetricCards3DProps> = ({ isDark = false }) 
       <div
         className={`absolute -right-3 sm:-right-6 lg:-right-8 -top-4 sm:-top-6 z-20 hidden md:block [transform:translateZ(65px)] ${
           isDark
-            ? 'bg-[#141B2D]/95 border-slate-700/80 shadow-xl text-white'
-            : 'bg-white/95 border-neutral-200/80 shadow-xl text-[#111111]'
+            ? 'bg-[#141B2D]/95 border-slate-700 shadow-xl text-white'
+            : 'bg-white/95 border-slate-300 shadow-xl text-[#111111]'
         } backdrop-blur-md border rounded-full px-3.5 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2 transform hover:scale-105 transition-all duration-300 pointer-events-auto select-none`}
       >
         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -52,8 +52,8 @@ export const MetricCards3D: React.FC<MetricCards3DProps> = ({ isDark = false }) 
       <div
         className={`absolute -right-4 sm:-right-8 lg:-right-12 bottom-12 sm:bottom-16 z-20 hidden sm:block [transform:translateZ(55px)] ${
           isDark
-            ? 'bg-[#141B2D]/95 border-slate-700/80 shadow-2xl text-white'
-            : 'bg-white/95 border-neutral-200/80 shadow-2xl text-[#111111]'
+            ? 'bg-[#141B2D]/95 border-slate-700 shadow-2xl text-white'
+            : 'bg-white/95 border-slate-300 shadow-2xl text-[#111111]'
         } backdrop-blur-md border rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 min-w-[170px] sm:min-w-[200px] transform hover:scale-105 transition-all duration-300 pointer-events-auto select-none`}
       >
         <div className="flex items-center justify-between mb-1.5">

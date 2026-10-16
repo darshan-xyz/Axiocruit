@@ -25,9 +25,9 @@ export const NewHirings: React.FC = () => {
     };
 
     const getScoreBg = (score: number) => {
-        if (score >= 75) return 'bg-emerald-500/10 border-emerald-500/20';
-        if (score >= 50) return 'bg-amber-500/10 border-amber-500/20';
-        return 'bg-red-500/10 border-red-500/20';
+        if (score >= 75) return 'bg-emerald-500/10 border-emerald-500/40';
+        if (score >= 50) return 'bg-amber-500/10 border-amber-500/40';
+        return 'bg-red-500/10 border-red-500/40';
     };
 
     return (
@@ -73,7 +73,7 @@ export const NewHirings: React.FC = () => {
                                 className="group flex flex-col bg-neutral-900 border border-slate-700 rounded-2xl overflow-hidden hover:border-emerald-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10"
                             >
                                 {/* Hired Banner */}
-                                <div className="px-5 py-2.5 flex items-center justify-between border-b border-emerald-500/15" style={{ background: 'rgba(16,185,129,0.05)' }}>
+                                <div className="px-5 py-2.5 flex items-center justify-between border-b border-emerald-500/40" style={{ background: 'rgba(16,185,129,0.05)' }}>
                                     <div className="flex items-center gap-2">
                                         <div className="w-2 h-2 rounded-full bg-emerald-400" />
                                         <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400">Hired</span>
@@ -91,7 +91,7 @@ export const NewHirings: React.FC = () => {
                                     </div>
 
                                     {/* Candidate Card */}
-                                    <div className="flex items-center gap-3 p-3.5 rounded-xl border border-emerald-500/15" style={{ background: 'linear-gradient(to right, rgba(16,185,129,0.05), transparent)' }}>
+                                    <div className="flex items-center gap-3 p-3.5 rounded-xl border border-emerald-500/40" style={{ background: 'linear-gradient(to right, rgba(16,185,129,0.05), transparent)' }}>
                                         <div className="relative flex-shrink-0">
                                             <img
                                                 src={candidate.profilePicture || DEFAULT_AVATAR}
@@ -117,7 +117,7 @@ export const NewHirings: React.FC = () => {
 
                                     {/* Recommendation Block */}
                                     {freelancer?.name && (
-                                        <div className="flex items-center gap-3 p-3 rounded-xl border border-blue-200/60 dark:border-blue-800/40 bg-blue-50/50 dark:bg-blue-950/20">
+                                        <div className="flex items-center gap-3 p-3 rounded-xl border border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-950/20">
                                             <img
                                                 src={freelancer.profilePicture || DEFAULT_AVATAR}
                                                 alt={freelancer.name}
@@ -167,7 +167,7 @@ export const NewHirings: React.FC = () => {
                                                                 codingTestConducted: !!aiData.codingTestResults,
                                                                 fullAnalysis: aiData.fullAnalysis
                                                             })}
-                                                            className="flex items-center justify-center gap-2 w-full py-3 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-xl transition-all font-semibold cursor-pointer"
+                                                            className="flex items-center justify-center gap-2 w-full py-3 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 border border-blue-300 dark:border-blue-700 rounded-xl transition-all font-semibold cursor-pointer"
                                                         >
                                                             <Award size={18} />
                                                             View Detailed AI Evaluation

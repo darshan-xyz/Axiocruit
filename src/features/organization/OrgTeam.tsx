@@ -241,7 +241,7 @@ export const OrgTeam: React.FC = () => {
             Create a recruiter account linked to your organization. They will be able to post jobs and manage applicants.
           </p>
           {inviteError && (
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-400 dark:border-red-700 text-red-500 text-sm">
               <AlertTriangle size={16} />
               {inviteError}
             </div>
@@ -283,7 +283,7 @@ export const OrgTeam: React.FC = () => {
       {/* ====== Remove Confirmation Modal ====== */}
       <Modal isOpen={!!removeTarget} onClose={() => setRemoveTarget(null)} title="Remove Recruiter">
         <div className="space-y-4">
-          <div className={`flex items-start gap-3 p-4 rounded-xl ${isDark ? 'bg-red-500/10 border border-red-500/20' : 'bg-red-50 border border-red-200'}`}>
+          <div className={`flex items-start gap-3 p-4 rounded-xl ${isDark ? 'bg-red-500/10 border border-red-500/40' : 'bg-red-50 border border-red-300'}`}>
             <AlertTriangle size={20} className="text-red-500 flex-shrink-0 mt-0.5" />
             <div>
               <p className={`font-semibold ${textPrimary}`}>Are you sure?</p>

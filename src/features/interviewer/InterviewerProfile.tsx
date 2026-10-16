@@ -80,7 +80,7 @@ export const InterviewerProfile: React.FC = () => {
 
                 <Card className="md:col-span-2 p-8 space-y-6">
                     <div>
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-slate-300 dark:border-neutral-700 pb-2">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-slate-300 dark:border-slate-700 pb-2">
                             <User size={18} className="text-blue-600 dark:text-blue-400" /> Personal
                         </h3>
                         <div className="grid md:grid-cols-2 gap-4">
@@ -90,7 +90,7 @@ export const InterviewerProfile: React.FC = () => {
                     </div>
 
                     <div>
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-slate-300 dark:border-neutral-700 pb-2">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-slate-300 dark:border-slate-700 pb-2">
                             <Briefcase size={18} className="text-blue-600 dark:text-blue-400" /> Expertise
                         </h3>
                         <div className="space-y-4">
@@ -107,7 +107,7 @@ export const InterviewerProfile: React.FC = () => {
                     </div>
 
                     <div>
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-slate-300 dark:border-neutral-700 pb-2">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-slate-300 dark:border-slate-700 pb-2">
                             <DollarSign size={18} className="text-blue-600 dark:text-blue-400" /> Rates & Availability
                         </h3>
                         <div className="grid md:grid-cols-3 gap-4">
