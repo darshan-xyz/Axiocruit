@@ -74,6 +74,23 @@ services:
           - proctor
           - proctoring-service
 
+  # --- Redis (Socket.IO Adapter & Pub/Sub Clustering) ---
+  redis:
+    image: redis:7-alpine
+    container_name: axiocruit-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - axiocruit-network
+
   # --- Core Express Backend & Socket.IO Gateway ---
   backend:
     build:
@@ -87,6 +104,8 @@ services:
       - NODE_ENV=production
       - PORT=5001
       - MONGO_URI=mongodb://mongodb:27017/axiocruit
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - TURN_SECRET=${TURN_SECRET:-}
       - JWT_SECRET=${JWT_SECRET:-axiocruit_enterprise_jwt_secret_change_in_prod}
       - CLIENT_URL=http://localhost:3000
       - AI_SERVICE_URL=http://ai-service:8002
@@ -97,6 +116,8 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
     depends_on:
       mongodb:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       ai-service:
         condition: service_healthy
@@ -125,6 +146,8 @@ services:
 
 volumes:
   mongo-data:
+    driver: local
+  redis-data:
     driver: local
   uploads-data:
     driver: local

@@ -1,0 +1,71 @@
+name: Axiocruit Enterprise CI Production Gate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  production-gate:
+    name: 7-Stage Zero-Regression CI Verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install System Compilers & MediaPipe Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends openjdk-17-jre-headless g++ make curl libgl1 libglib2.0-0
+
+      - name: Install Root Dependencies
+        run: npm ci
+
+      - name: Install Server Dependencies
+        run: |
+          cd server
+          npm ci
+
+      - name: Install Python Microservice Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ai-service/requirements.txt
+          pip install -r proctoring-service/requirements.txt
+
+      - name: "Stage 1: TypeScript Compiler & Vite Production Build"
+        run: |
+          npx tsc --noEmit
+          npm run build
+
+      - name: "Stage 2: Herb Agency Landing & Perspective Invariants"
+        run: node tests/m1_herb_empirical.js
+
+      - name: "Stage 3: Architectural Integrity & IAM Invariants"
+        run: node tests/m2_architect_Verification.js
+
+      - name: "Stage 4: Challenger Adversarial Suite & Chunk Distribution"
+        run: node tests/m3_challenger_adversarial_suite.js
+
+      - name: "Stage 5: Comprehensive Cross-Phase Integration Matrix"
+        run: node tests/comprehensive_test_suite.js
+
+      - name: "Stage 6: Socket.IO Concurrency & Memory Telemetry"
+        run: node tests/load_and_stress_framework.js
+
+      - name: "Stage 7: Full E2E Test Suite (F1-F25, 169 Assertions)"
+        run: node tests/e2e/run_all.js
