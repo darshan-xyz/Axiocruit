@@ -161,7 +161,7 @@ export const Applicants: React.FC = () => {
                                 </div>
                                 <div className="flex items-start justify-between">
                                     <div className="flex gap-3">
-                                        <img src={data.profilePicture || DEFAULT_AVATAR} className="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700" alt="profile" />
+                                        <img src={data.profilePicture || DEFAULT_AVATAR} className="w-12 h-12 rounded-xl object-cover border border-slate-300 dark:border-slate-700" alt="profile" />
                                         <div>
                                             <h3 className="font-extrabold text-slate-900 dark:text-white">{data.name}</h3>
                                             <p className="text-xs text-slate-500 dark:text-slate-400">{data.headline}</p>
@@ -173,7 +173,7 @@ export const Applicants: React.FC = () => {
                                 </div>
                                 <div className="flex gap-2 flex-wrap">
                                     {data.skills?.slice(0, 3).map((s: string, idx: number) => (
-                                        <span key={idx} className="text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded-md text-slate-700 dark:text-slate-300 font-medium">{s}</span>
+                                        <span key={idx} className="text-xs bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-2 py-0.5 rounded-md text-slate-700 dark:text-slate-300 font-medium">{s}</span>
                                     ))}
                                 </div>
                                 <Button size="sm" variant="outline" className="w-full mt-auto" onClick={(e) => {
@@ -219,7 +219,7 @@ export const Applicants: React.FC = () => {
                     <div>
                         <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Message</label>
                         <textarea
-                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm h-32 focus:border-blue-500 outline-none transition-colors"
+                            className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm h-32 focus:border-blue-500 outline-none transition-colors"
                             placeholder="Write your message here..."
                             value={messageData.content}
                             onChange={e => setMessageData({ ...messageData, content: e.target.value })}

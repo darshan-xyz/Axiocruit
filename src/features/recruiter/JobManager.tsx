@@ -80,7 +80,7 @@ export const MyJobs: React.FC = () => {
             </div>
 
             {jobs.length === 0 ? (
-                <div className="text-center py-12 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800">
+                <div className="text-center py-12 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-300 dark:border-slate-700">
                     <p className="text-slate-500 dark:text-slate-400 mb-4 text-sm font-medium">You haven't posted any jobs yet.</p>
                     <Button onClick={() => setIsCreatingJob(true)}>Create First Job</Button>
                 </div>
@@ -228,7 +228,7 @@ export const CreateJob: React.FC<{ onJobCreated?: () => void; onCancel?: () => v
                     <div>
                         <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Employment Type</label>
                         <select
-                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm outline-none focus:border-blue-500 transition-colors"
+                            className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm outline-none focus:border-blue-500 transition-colors"
                             value={formData.type}
                             onChange={e => setFormData({ ...formData, type: e.target.value as any })}
                         >
@@ -256,7 +256,7 @@ export const CreateJob: React.FC<{ onJobCreated?: () => void; onCancel?: () => v
                 <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Job Description</label>
                     <textarea
-                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm h-32 focus:border-blue-500 outline-none transition-colors"
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm h-32 focus:border-blue-500 outline-none transition-colors"
                         placeholder="Describe the role responsibilities..."
                         value={formData.description}
                         onChange={e => setFormData({ ...formData, description: e.target.value })}
@@ -265,7 +265,7 @@ export const CreateJob: React.FC<{ onJobCreated?: () => void; onCancel?: () => v
                 <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Requirements</label>
                     <textarea
-                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm h-32 focus:border-blue-500 outline-none transition-colors"
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm h-32 focus:border-blue-500 outline-none transition-colors"
                         placeholder="List skills and requirements..."
                         value={formData.requirements}
                         onChange={e => setFormData({ ...formData, requirements: e.target.value })}

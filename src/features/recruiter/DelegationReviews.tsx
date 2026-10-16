@@ -81,7 +81,7 @@ export const CompletedDelegations: React.FC = () => {
             {loading ? (
                 <div className="grid md:grid-cols-2 gap-6">
                     {[1, 2].map(i => (
-                        <div key={i} className="h-64 bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-sm animate-pulse" />
+                        <div key={i} className="h-64 bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl shadow-sm animate-pulse" />
                     ))}
                 </div>
             ) : jobs.length === 0 ? (
@@ -123,7 +123,7 @@ export const CompletedDelegations: React.FC = () => {
                                     </div>
 
                                     {/* Freelancer Info */}
-                                    <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-lg border border-neutral-700/50">
+                                    <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-lg border border-slate-300 dark:border-neutral-700">
                                         <img
                                             src={freelancer.profilePicture || DEFAULT_AVATAR}
                                             alt={freelancer.name}

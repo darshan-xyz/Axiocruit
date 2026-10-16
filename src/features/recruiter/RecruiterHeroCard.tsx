@@ -27,8 +27,8 @@ export const RecruiterHeroCard: React.FC<RecruiterHeroCardProps> = ({
     <div
       className={`w-full rounded-2xl p-6 border shadow-sm transition-all duration-200 ${
         isDark
-          ? 'bg-[#111726] border-slate-800 text-white'
-          : 'bg-white border-neutral-200/80 text-[#111111]'
+          ? 'bg-[#111726] border-slate-700 text-white'
+          : 'bg-white border-slate-300 text-[#111111]'
       }`}
     >
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -38,7 +38,7 @@ export const RecruiterHeroCard: React.FC<RecruiterHeroCardProps> = ({
             <img
               src={profilePic}
               alt={currentUser?.name || 'Recruiter'}
-              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover ring-2 ring-slate-200 dark:ring-slate-700 shadow-md"
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover ring-2 ring-slate-300 dark:ring-slate-700 shadow-md"
             />
             <span
               className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 ring-2 ring-white dark:ring-slate-900 rounded-full"
@@ -70,7 +70,7 @@ export const RecruiterHeroCard: React.FC<RecruiterHeroCardProps> = ({
           <a
             href="#/recruiter/applicants"
             onClick={onFindCandidates}
-            className="flex-1 md:flex-initial px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-neutral-100 dark:bg-slate-800 hover:bg-neutral-200 dark:hover:bg-slate-700 text-neutral-800 dark:text-slate-200 transition-all flex items-center justify-center gap-2 border border-neutral-200 dark:border-slate-700"
+            className="flex-1 md:flex-initial px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-neutral-100 dark:bg-slate-800 hover:bg-neutral-200 dark:hover:bg-slate-700 text-neutral-800 dark:text-slate-200 transition-all flex items-center justify-center gap-2 border border-slate-300 dark:border-slate-700"
           >
             <Users size={16} />
             <span>Find Candidates</span>

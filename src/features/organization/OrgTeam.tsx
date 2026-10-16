@@ -91,7 +91,7 @@ export const OrgTeam: React.FC = () => {
 
   const textMuted = isDark ? 'text-neutral-400' : 'text-slate-500';
   const textPrimary = isDark ? 'text-white' : 'text-slate-900';
-  const borderColor = isDark ? 'border-slate-800' : 'border-slate-200';
+  const borderColor = isDark ? 'border-slate-700' : 'border-slate-300';
   const hoverBg = isDark ? 'hover:bg-white/5' : 'hover:bg-slate-50';
   const headerBg = isDark ? 'bg-slate-800/50' : 'bg-slate-50/80';
 
@@ -112,7 +112,7 @@ export const OrgTeam: React.FC = () => {
 
       {/* Stats bar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="!p-4 flex items-center gap-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
+        <Card className="!p-4 flex items-center gap-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-300 dark:border-slate-700">
           <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
             <Users size={20} />
           </div>
@@ -121,7 +121,7 @@ export const OrgTeam: React.FC = () => {
             <p className={`text-xl font-bold ${textPrimary}`}>{recruiters.length}</p>
           </div>
         </Card>
-        <Card className="!p-4 flex items-center gap-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
+        <Card className="!p-4 flex items-center gap-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-300 dark:border-slate-700">
           <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
             <Users size={20} />
           </div>
@@ -130,7 +130,7 @@ export const OrgTeam: React.FC = () => {
             <p className={`text-xl font-bold ${textPrimary}`}>{recruiters.length}</p>
           </div>
         </Card>
-        <Card className="!p-4 flex items-center gap-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
+        <Card className="!p-4 flex items-center gap-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-300 dark:border-slate-700">
           <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
             <Mail size={20} />
           </div>
@@ -160,7 +160,7 @@ export const OrgTeam: React.FC = () => {
       </div>
 
       {/* Data Table */}
-      <Card className="!p-0 overflow-hidden bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
+      <Card className="!p-0 overflow-hidden bg-white dark:bg-slate-900 shadow-sm border border-slate-300 dark:border-slate-700">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

@@ -63,7 +63,7 @@ export const RecruiterProfile: React.FC = () => {
                 <Card className="md:col-span-1 text-center p-6 h-fit">
                     <div className="relative w-32 h-32 mx-auto mb-4 group">
                         <img src={profilePicture || DEFAULT_AVATAR} className="w-full h-full rounded-full object-cover border-4 border-blue-600 dark:border-blue-500 shadow-md" alt="Profile" />
-                        <label className="absolute bottom-0 right-0 p-2 bg-white dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer">
+                        <label className="absolute bottom-0 right-0 p-2 bg-white dark:bg-slate-800 rounded-full border border-slate-300 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer">
                             <Upload size={16} />
                             <input type="file" className="hidden" accept="image/*" onChange={handleProfilePictureChange} />
                         </label>
@@ -74,7 +74,7 @@ export const RecruiterProfile: React.FC = () => {
 
                 <Card className="md:col-span-2 p-8 space-y-8">
                     <div>
-                        <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-4 flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+                        <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-4 flex items-center gap-2 border-b border-slate-300 dark:border-slate-700 pb-2">
                             <User size={18} className="text-blue-600 dark:text-blue-400" /> Personal
                         </h3>
                         <div className="grid md:grid-cols-2 gap-4">
@@ -83,7 +83,7 @@ export const RecruiterProfile: React.FC = () => {
                         </div>
                     </div>
                     <div>
-                        <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-4 flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+                        <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-4 flex items-center gap-2 border-b border-slate-300 dark:border-slate-700 pb-2">
                             <Briefcase size={18} className="text-blue-600 dark:text-blue-400" /> Company
                         </h3>
                         <div className="space-y-4">
@@ -91,7 +91,7 @@ export const RecruiterProfile: React.FC = () => {
                             <Input label="Website" value={formData.website} onChange={e => setFormData({ ...formData, website: e.target.value })} />
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Company Description</label>
-                                <textarea className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm h-24 focus:border-blue-500 outline-none transition-colors"
+                                <textarea className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm h-24 focus:border-blue-500 outline-none transition-colors"
                                     value={formData.companyDescription} onChange={e => setFormData({ ...formData, companyDescription: e.target.value })}
                                 />
                             </div>
@@ -101,7 +101,7 @@ export const RecruiterProfile: React.FC = () => {
                         <Button onClick={handleSave}>Save Changes</Button>
                     </div>
 
-                    <div className="border-t border-slate-200 dark:border-slate-800 pt-8 mt-8">
+                    <div className="border-t border-slate-300 dark:border-slate-700 pt-8 mt-8">
                         <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                             <Lock size={18} className="text-blue-600 dark:text-blue-400" /> Password & Security
                         </h3>

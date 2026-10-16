@@ -40,7 +40,7 @@ export const MonacoCodeEditor: React.FC<MonacoCodeEditorProps> = ({
             style={{ minWidth: 0 }}
         >
             {/* Editor Header */}
-            <div className={`h-10 border-b flex items-center justify-between px-4 ${isDark ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-slate-200'}`}>
+            <div className={`h-10 border-b flex items-center justify-between px-4 ${isDark ? 'bg-neutral-900 border-neutral-700' : 'bg-white border-slate-300'}`}>
                 <div className="flex items-center gap-2">
                     <Code size={14} className="text-blue-600 dark:text-blue-400" />
                     <span className={`text-xs font-medium ${isDark ? 'text-neutral-400' : 'text-slate-600'}`}>Coding Sandbox</span>

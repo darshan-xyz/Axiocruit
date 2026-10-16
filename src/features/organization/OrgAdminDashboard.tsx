@@ -74,7 +74,7 @@ export const OrgAdminDashboard: React.FC = () => {
       <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Organization Dashboard</h1>
 
       <div className="grid md:grid-cols-3 gap-6">
-        <Card className="p-6 flex items-center gap-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
+        <Card className="p-6 flex items-center gap-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-300 dark:border-slate-700">
           <div className="p-3 bg-blue-500/10 rounded-xl text-blue-600 dark:text-blue-400">
             <Users size={24} />
           </div>
@@ -83,7 +83,7 @@ export const OrgAdminDashboard: React.FC = () => {
             <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{stats.totalRecruiters}</h3>
           </div>
         </Card>
-        <Card className="p-6 flex items-center gap-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
+        <Card className="p-6 flex items-center gap-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-300 dark:border-slate-700">
           <div className="p-3 bg-purple-500/10 rounded-xl text-purple-600 dark:text-purple-400">
             <Briefcase size={24} />
           </div>
@@ -92,7 +92,7 @@ export const OrgAdminDashboard: React.FC = () => {
             <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{stats.activeJobs}</h3>
           </div>
         </Card>
-        <Card className="p-6 flex items-center gap-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
+        <Card className="p-6 flex items-center gap-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-300 dark:border-slate-700">
           <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-600 dark:text-emerald-400">
             <Building size={24} />
           </div>
@@ -113,7 +113,7 @@ export const OrgAdminDashboard: React.FC = () => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {recruiters.map((rec) => (
-            <Card key={rec._id} className="flex items-center gap-4 p-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
+            <Card key={rec._id} className="flex items-center gap-4 p-4 bg-white dark:bg-slate-900 shadow-sm border border-slate-300 dark:border-slate-700">
               <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-white flex items-center justify-center text-lg font-bold">
                 {rec.name?.charAt(0) || 'U'}
               </div>
@@ -127,7 +127,7 @@ export const OrgAdminDashboard: React.FC = () => {
             </Card>
           ))}
           {recruiters.length === 0 && (
-            <div className="col-span-full p-8 text-center text-slate-400 dark:text-neutral-500 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+            <div className="col-span-full p-8 text-center text-slate-400 dark:text-neutral-500 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700">
               No recruiters added yet. Click &quot;Add Recruiter&quot; to invite a team member.
             </div>
           )}

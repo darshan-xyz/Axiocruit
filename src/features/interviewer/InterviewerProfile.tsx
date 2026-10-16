@@ -68,7 +68,7 @@ export const InterviewerProfile: React.FC = () => {
                 <Card className="md:col-span-1 text-center p-6 h-fit">
                     <div className="relative w-32 h-32 mx-auto mb-4 group">
                         <img src={profilePicture || DEFAULT_AVATAR} className="w-full h-full rounded-full object-cover border-4 border-blue-600 dark:border-blue-500 shadow-md" alt="Profile" />
-                        <label className="absolute bottom-0 right-0 p-2 bg-white dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer">
+                        <label className="absolute bottom-0 right-0 p-2 bg-white dark:bg-slate-800 rounded-full border border-slate-300 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer">
                             <Upload size={16} />
                             <input type="file" className="hidden" accept="image/*" onChange={handleProfilePictureChange} />
                         </label>
@@ -80,7 +80,7 @@ export const InterviewerProfile: React.FC = () => {
 
                 <Card className="md:col-span-2 p-8 space-y-6">
                     <div>
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-neutral-800 pb-2">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-slate-300 dark:border-neutral-700 pb-2">
                             <User size={18} className="text-blue-600 dark:text-blue-400" /> Personal
                         </h3>
                         <div className="grid md:grid-cols-2 gap-4">
@@ -90,14 +90,14 @@ export const InterviewerProfile: React.FC = () => {
                     </div>
 
                     <div>
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-neutral-800 pb-2">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-slate-300 dark:border-neutral-700 pb-2">
                             <Briefcase size={18} className="text-blue-600 dark:text-blue-400" /> Expertise
                         </h3>
                         <div className="space-y-4">
                             <Input label="Professional Headline" placeholder="e.g. Senior System Design Interviewer" value={formData.headline} onChange={e => setFormData({ ...formData, headline: e.target.value })} />
                             <div>
                                 <label className="block text-sm font-medium text-neutral-400 mb-1.5">Bio / Expertise</label>
-                                <textarea className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm h-24 focus:border-blue-500 outline-none transition-colors"
+                                <textarea className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm h-24 focus:border-blue-500 outline-none transition-colors"
                                     placeholder="Describe your technical expertise..."
                                     value={formData.bio} onChange={e => setFormData({ ...formData, bio: e.target.value })}
                                 />
@@ -107,7 +107,7 @@ export const InterviewerProfile: React.FC = () => {
                     </div>
 
                     <div>
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-neutral-800 pb-2">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-slate-300 dark:border-neutral-700 pb-2">
                             <DollarSign size={18} className="text-blue-600 dark:text-blue-400" /> Rates & Availability
                         </h3>
                         <div className="grid md:grid-cols-3 gap-4">

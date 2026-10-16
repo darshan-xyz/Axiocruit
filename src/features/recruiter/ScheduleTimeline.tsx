@@ -32,8 +32,8 @@ export const ScheduleTimeline: React.FC<ScheduleTimelineProps> = ({
     <div
       className={`w-full rounded-2xl p-6 border shadow-sm transition-all duration-200 ${
         isDark
-          ? 'bg-[#111726] border-slate-800 text-white'
-          : 'bg-white border-neutral-200/80 text-[#111111]'
+          ? 'bg-[#111726] border-slate-700 text-white'
+          : 'bg-white border-slate-300 text-[#111111]'
       }`}
     >
       <div className="flex items-center justify-between mb-5">
@@ -74,7 +74,7 @@ export const ScheduleTimeline: React.FC<ScheduleTimelineProps> = ({
             return (
               <div
                 key={item.id}
-                className={`p-4 rounded-xl border border-neutral-200/70 dark:border-slate-800/80 ${borderClass} ${
+                className={`p-4 rounded-xl border border-slate-300 dark:border-slate-700 ${borderClass} ${
                   isDark ? 'bg-slate-900/50 hover:bg-slate-900' : 'bg-neutral-50/70 hover:bg-neutral-50'
                 } transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}
               >

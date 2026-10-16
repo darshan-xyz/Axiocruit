@@ -98,7 +98,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
   return (
     <div className="w-full bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm flex flex-col">
       {/* Top Filter Controls: Category Pills & Search */}
-      <div className="p-5 border-b border-slate-200 dark:border-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="p-5 border-b border-slate-300 dark:border-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         {/* Category filtering pills (Requirement R2 / F8) */}
         <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
           {categoryPills.map(cat => {
@@ -173,7 +173,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
         {/* Loading State */}
         {loading ? (
           <div className="py-16 text-center">
-            <div className="w-8 h-8 rounded-full border-2 border-slate-200 dark:border-slate-700 border-t-blue-600 animate-spin mx-auto mb-3" />
+            <div className="w-8 h-8 rounded-full border-2 border-slate-300 dark:border-slate-700 border-t-blue-600 animate-spin mx-auto mb-3" />
             <p className="text-xs font-bold text-slate-500">Loading candidates...</p>
           </div>
         ) : filteredList.length === 0 ? (
@@ -183,7 +183,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
             <p className="text-xs text-slate-400 mt-1">Try adjusting your search query or category filter.</p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-200 dark:divide-slate-700 min-w-[620px]">
+          <div className="divide-y divide-slate-300 dark:divide-slate-700 min-w-[620px]">
             {paginatedList.map((cand, pageIndex) => {
               const index = startIndex + pageIndex;
               const isSelected = selectedCandidateId === cand._id || selectedCandidateId === cand.candidate?._id;
@@ -293,7 +293,7 @@ export const CandidateTable: React.FC<CandidateTableProps> = ({
       </div>
 
       {/* Table Footer with Dynamic Pagination Pills */}
-      <div className="px-5 py-3.5 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 bg-slate-50/40 dark:bg-slate-900/30">
+      <div className="px-5 py-3.5 border-t border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 bg-slate-50/40 dark:bg-slate-900/30">
         <span>Showing {filteredList.length === 0 ? 0 : startIndex + 1} to {Math.min(startIndex + pageSize, filteredList.length)} of {displayTotal} candidates</span>
 
         <div className="flex items-center gap-1.5">

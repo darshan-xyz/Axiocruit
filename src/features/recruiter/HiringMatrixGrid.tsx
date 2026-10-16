@@ -151,7 +151,7 @@ export const HiringMatrixGrid: React.FC<HiringMatrixGridProps> = ({ jobs, applic
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <tr className="border-b border-slate-300 dark:border-slate-700 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               <th className="pb-3 pr-4 font-bold">Jobs</th>
               <th className="pb-3 px-3 text-center font-bold">New Applied</th>
               <th className="pb-3 px-3 text-center font-bold">Screening</th>
@@ -160,7 +160,7 @@ export const HiringMatrixGrid: React.FC<HiringMatrixGridProps> = ({ jobs, applic
               <th className="pb-3 pl-3 text-center font-bold">Hired</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200 dark:divide-slate-700 text-xs">
+          <tbody className="divide-y divide-slate-300 dark:divide-slate-700 text-xs">
             {rows.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-slate-400 dark:text-neutral-500 font-medium">

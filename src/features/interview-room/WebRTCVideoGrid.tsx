@@ -159,7 +159,7 @@ export const WebRTCVideoGrid: React.FC<WebRTCVideoGridProps> = ({
             isCodingTestVisible
                 ? 'w-[320px] min-w-[280px] max-w-[380px] border-l'
                 : 'flex-1'
-        } overflow-hidden relative transition-all duration-500 ${isDark ? 'bg-neutral-900 border-neutral-800' : 'bg-slate-100 border-slate-200'}`}>
+        } overflow-hidden relative transition-all duration-500 ${isDark ? 'bg-neutral-900 border-neutral-700' : 'bg-slate-100 border-slate-300'}`}>
             <style>{VIDEO_GRID_STYLES}</style>
 
             {/* "Start Coding Test" Button — Host only, shown in full video view */}

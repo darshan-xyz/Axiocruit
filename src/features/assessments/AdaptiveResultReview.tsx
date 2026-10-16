@@ -71,7 +71,7 @@ export const AdaptiveResultReview: React.FC = () => {
     return (
       <div className="flex items-center justify-center py-32">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-full border-4 border-slate-200 dark:border-neutral-800 border-t-blue-600 dark:border-t-blue-400 animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 rounded-full border-4 border-slate-300 dark:border-neutral-700 border-t-blue-600 dark:border-t-blue-400 animate-spin mx-auto mb-4" />
           <p className="text-neutral-400">Loading candidate performance...</p>
         </div>
       </div>

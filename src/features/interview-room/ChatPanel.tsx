@@ -80,7 +80,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
     return (
         <div className={`flex flex-col h-full ${isDark ? 'bg-neutral-900 text-white' : 'bg-white text-slate-900'}`}>
             {/* Header */}
-            <div className={`flex items-center justify-between px-4 py-3 border-b ${isDark ? 'border-neutral-800 bg-neutral-950' : 'border-slate-200 bg-slate-50'}`}>
+            <div className={`flex items-center justify-between px-4 py-3 border-b ${isDark ? 'border-neutral-700 bg-neutral-950' : 'border-slate-300 bg-slate-50'}`}>
                 <div className="flex items-center gap-2">
                     <MessageSquare size={16} className="text-blue-500" />
                     <span className="text-sm font-bold">Session Chat</span>
@@ -123,7 +123,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
             </div>
 
             {/* Input bar */}
-            <form onSubmit={sendMessage} className={`p-3 border-t flex gap-2 ${isDark ? 'border-neutral-800 bg-neutral-950' : 'border-slate-200 bg-slate-50'}`}>
+            <form onSubmit={sendMessage} className={`p-3 border-t flex gap-2 ${isDark ? 'border-neutral-700 bg-neutral-950' : 'border-slate-300 bg-slate-50'}`}>
                 <input
                     type="text"
                     value={inputText}

@@ -302,7 +302,7 @@ export const RecruiterDashboard: React.FC = () => {
 
                 {/* Recent Jobs with Quick Link to Ranked Candidates */}
                 {recentJobsList.length > 0 && (
-                    <div className="divide-y divide-slate-200 dark:divide-slate-700 pt-2">
+                    <div className="divide-y divide-slate-300 dark:divide-slate-700 pt-2">
                         {recentJobsList.map(job => {
                             const appCount = job.applicantCount || job.applicationCount || (rawApplications.filter((a: any) => (a.job?._id || a.job)?.toString() === job._id?.toString()).length) || 0;
                             return (

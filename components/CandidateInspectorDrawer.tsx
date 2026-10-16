@@ -153,7 +153,7 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
           <img
             src={cand.candidate?.profilePicture || DEFAULT_AVATAR}
             alt={cand.candidate?.name}
-            className="w-16 h-16 rounded-full object-cover border-2 border-slate-200 dark:border-slate-600 shadow-sm"
+            className="w-16 h-16 rounded-full object-cover border-2 border-slate-300 dark:border-slate-600 shadow-sm"
           />
           <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
         </div>
@@ -166,7 +166,7 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
         </p>
 
         {/* Subtitle Row: Left Department Icon / Right Circular Match Gauge (Requirement R2 / F12) */}
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 text-left">
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-300 dark:border-slate-700 text-left">
           {/* Left: Department Badge */}
           <div className="flex items-center gap-2">
             <div className={`w-8 h-8 rounded-xl flex items-center justify-center border ${dept.badgeClass}`}>
@@ -221,7 +221,7 @@ export const CandidateInspectorDrawer: React.FC<CandidateInspectorDrawerProps> =
       </div>
 
       {/* 5 Functional Sub-Navigation Tabs (Requirement R2 / F13) */}
-      <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-700 pb-2 mb-4 text-xs font-bold text-slate-400 overflow-x-auto">
+      <div className="flex items-center gap-3 border-b border-slate-300 dark:border-slate-700 pb-2 mb-4 text-xs font-bold text-slate-400 overflow-x-auto">
         {tabs.map(tab => (
           <button
             key={tab}

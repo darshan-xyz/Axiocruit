@@ -48,7 +48,7 @@ export const NewHirings: React.FC = () => {
             {loading ? (
                 <div className="grid md:grid-cols-2 gap-6">
                     {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="h-64 bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-sm animate-pulse" />
+                        <div key={i} className="h-64 bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl shadow-sm animate-pulse" />
                     ))}
                 </div>
             ) : hirings.length === 0 ? (
@@ -268,7 +268,7 @@ export const PastJobs: React.FC = () => {
             {loading ? (
                 <div className="space-y-3">
                     {[1, 2, 3, 4, 5].map(i => (
-                        <div key={i} className="h-20 bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-sm animate-pulse" />
+                        <div key={i} className="h-20 bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl shadow-sm animate-pulse" />
                     ))}
                 </div>
             ) : jobs.length === 0 ? (
@@ -303,7 +303,7 @@ export const PastJobs: React.FC = () => {
                     {jobs.map((job: any, idx: number) => (
                         <div
                             key={job._id}
-                            className="flex items-center gap-4 p-4 bg-white dark:bg-[#111726] border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-sm hover:border-neutral-700 transition-all duration-200 group"
+                            className="flex items-center gap-4 p-4 bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl shadow-sm hover:border-slate-400 dark:hover:border-slate-600 transition-all duration-200 group"
                         >
                             {/* Index */}
                             <div className="w-8 h-8 rounded-lg bg-neutral-800 flex items-center justify-center text-xs font-bold text-neutral-500 flex-shrink-0">

@@ -98,19 +98,19 @@ export const DelegatedProjects: React.FC = () => {
 
             {/* Stats Bar */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-xl text-center">
+                <div className="p-4 bg-neutral-900 border border-slate-300 dark:border-neutral-800 rounded-xl text-center">
                     <p className="text-2xl font-bold text-amber-400">{pendingCount}</p>
                     <p className="text-xs text-neutral-400 mt-1">Pending</p>
                 </div>
-                <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-xl text-center">
+                <div className="p-4 bg-neutral-900 border border-slate-300 dark:border-neutral-800 rounded-xl text-center">
                     <p className="text-2xl font-bold text-emerald-400">{activeCount}</p>
                     <p className="text-xs text-neutral-400 mt-1">Active</p>
                 </div>
-                <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-xl text-center">
+                <div className="p-4 bg-neutral-900 border border-slate-300 dark:border-neutral-800 rounded-xl text-center">
                     <p className="text-2xl font-bold text-purple-400">{reviewingCount}</p>
                     <p className="text-xs text-neutral-400 mt-1">Under Review</p>
                 </div>
-                <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-xl text-center">
+                <div className="p-4 bg-neutral-900 border border-slate-300 dark:border-neutral-800 rounded-xl text-center">
                     <p className="text-2xl font-bold text-blue-400">{completedCount}</p>
                     <p className="text-xs text-neutral-400 mt-1">Completed</p>
                 </div>
@@ -120,11 +120,11 @@ export const DelegatedProjects: React.FC = () => {
             {loading ? (
                 <div className="grid md:grid-cols-2 gap-6">
                     {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="h-56 bg-neutral-900 border border-neutral-800 rounded-xl animate-pulse" />
+                        <div key={i} className="h-56 bg-neutral-900 border border-slate-300 dark:border-neutral-800 rounded-xl animate-pulse" />
                     ))}
                 </div>
             ) : jobs.length === 0 ? (
-                <div className="text-center py-20 border border-neutral-800 rounded-xl">
+                <div className="text-center py-20 border border-slate-300 dark:border-neutral-800 rounded-xl">
                     <Briefcase size={48} className="text-neutral-700 mx-auto mb-4" />
                     <p className="text-neutral-500 text-lg font-medium">No delegated projects yet</p>
                     <p className="text-neutral-600 text-sm mt-1">

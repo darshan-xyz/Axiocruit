@@ -120,8 +120,8 @@ export const FreelancerServiceManager: React.FC = () => {
                     {services.map(svc => (
                         <div key={svc._id} className={`p-5 rounded-xl border transition-all ${
                             svc.isActive
-                                ? 'bg-white dark:bg-[#111726] border-slate-200/80 dark:border-slate-800 hover:border-blue-500/40 shadow-sm'
-                                : 'bg-neutral-950 border-neutral-800/50 opacity-60'
+                                ? 'bg-white dark:bg-[#111726] border-slate-300 dark:border-slate-700 hover:border-blue-500/40 shadow-sm'
+                                : 'bg-neutral-950 border-slate-300 dark:border-neutral-700 opacity-60'
                         }`}>
                             <div className="flex justify-between items-start gap-3">
                                 <div className="flex-1 min-w-0">
@@ -170,7 +170,7 @@ export const FreelancerServiceManager: React.FC = () => {
                     <div>
                         <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">Description *</label>
                         <textarea
-                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm h-24 outline-none focus:border-blue-500 resize-none transition-colors"
+                            className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm h-24 outline-none focus:border-blue-500 resize-none transition-colors"
                             placeholder="Describe what you'll evaluate and your approach..."
                             value={form.description}
                             onChange={e => setForm({ ...form, description: e.target.value })}
@@ -183,7 +183,7 @@ export const FreelancerServiceManager: React.FC = () => {
                             value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
                         <div>
                             <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">Duration</label>
-                            <select className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white text-sm outline-none focus:border-blue-500 transition-colors"
+                            <select className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white text-sm outline-none focus:border-blue-500 transition-colors"
                                 value={form.durationMinutes} onChange={e => setForm({ ...form, durationMinutes: e.target.value })}>
                                 <option value="30">30 minutes</option>
                                 <option value="45">45 minutes</option>
@@ -192,7 +192,7 @@ export const FreelancerServiceManager: React.FC = () => {
                             </select>
                         </div>
                     </div>
-                    <div className="flex justify-end gap-3 pt-2 border-t border-neutral-800">
+                    <div className="flex justify-end gap-3 pt-2 border-t border-slate-300 dark:border-neutral-700">
                         <Button variant="ghost" onClick={() => setFormOpen(false)}>Cancel</Button>
                         <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : editing ? 'Save Changes' : 'Publish Service'}</Button>
                     </div>

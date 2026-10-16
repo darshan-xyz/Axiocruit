@@ -137,7 +137,7 @@ const HiringMatrixGrid: React.FC = () => {
               <th className="pb-3 pl-3 text-center font-bold">Hired</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200 dark:divide-slate-700 text-xs">
+          <tbody className="divide-y divide-slate-300 dark:divide-slate-700 text-xs">
             {TALENT_PIPELINE_MATRIX_ROWS.map(row => (
               <tr key={row.jobTitle} className="hover:bg-slate-50/70 dark:hover:bg-slate-850/40 transition-colors">
                 <td className="py-3.5 pr-4 font-bold text-slate-900 dark:text-white min-w-[170px]">
@@ -1010,7 +1010,7 @@ export const RecruiterDashboard: React.FC = () => {
 
                 {/* Recent Jobs with Quick Link to Ranked Candidates */}
                 {recentJobsList.length > 0 && (
-                    <div className="divide-y divide-slate-200 dark:divide-slate-700 pt-2">
+                    <div className="divide-y divide-slate-300 dark:divide-slate-700 pt-2">
                         {recentJobsList.map(job => (
                             <div key={job._id} className="py-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:bg-slate-50/60 dark:hover:bg-slate-850/40 px-3 rounded-2xl transition-colors">
                                 <div>
@@ -1415,7 +1415,7 @@ export const Applicants: React.FC = () => {
                     <div>
                         <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Message</label>
                         <textarea
-                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm h-32 focus:border-blue-500 outline-none transition-colors"
+                            className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-sm h-32 focus:border-blue-500 outline-none transition-colors"
                             placeholder="Write your message here..."
                             value={messageData.content}
                             onChange={e => setMessageData({ ...messageData, content: e.target.value })}
@@ -1963,7 +1963,7 @@ export const ServiceMarketplace: React.FC = () => {
                             className="group flex flex-col bg-white dark:bg-[#111726] border border-slate-300 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden hover:border-blue-500/50 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/10"
                         >
                             {/* Freelancer header */}
-                            <div className="p-5 border-b border-slate-200 dark:border-neutral-700 flex items-center gap-3">
+                            <div className="p-5 border-b border-slate-300 dark:border-neutral-700 flex items-center gap-3">
                                 <img
                                     src={svc.freelancerId.profilePicture || DEFAULT_AVATAR}
                                     alt={svc.freelancerId.name}

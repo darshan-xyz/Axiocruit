@@ -39,7 +39,7 @@ export const InterviewerRequests: React.FC = () => {
             ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {pendingRequests.map(inv => (
-                        <Card key={inv._id} className="flex flex-col h-full border hover:border-blue-500/40 transition-all">
+                        <Card key={inv._id} className="flex flex-col h-full border border-slate-300 dark:border-neutral-700 hover:border-blue-500/40 transition-all">
                             <div className="flex-1 space-y-4">
                                 <div className="flex justify-between items-start">
                                     <Badge variant="warning">Pending Request</Badge>

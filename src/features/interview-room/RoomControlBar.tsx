@@ -32,8 +32,8 @@ export const RoomControlBar: React.FC<RoomControlBarProps> = ({
         <div
             className={`absolute bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center justify-center gap-3 px-6 py-3 border rounded-full backdrop-blur-xl ${
                 isDark
-                    ? 'bg-neutral-900/95 border-neutral-700/60 shadow-[0_8px_32px_rgba(0,0,0,0.6)]'
-                    : 'bg-white/95 border-slate-200 shadow-[0_8px_32px_rgba(37,99,235,0.15)]'
+                    ? 'bg-neutral-900/95 border-neutral-700 shadow-[0_8px_32px_rgba(0,0,0,0.6)]'
+                    : 'bg-white/95 border-slate-300 shadow-[0_8px_32px_rgba(37,99,235,0.15)]'
             }`}
         >
             {/* Mute */}

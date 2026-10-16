@@ -325,7 +325,7 @@ export const InterviewRoomContainer: React.FC = () => {
             <ToastContainer />
 
             {/* Top Bar */}
-            <header className={`relative z-[100] h-14 flex items-center justify-between px-4 flex-shrink-0 backdrop-blur-sm border-b ${isDark ? 'bg-neutral-900/80 border-neutral-800' : 'bg-white/80 border-slate-200'}`}>
+            <header className={`relative z-[100] h-14 flex items-center justify-between px-4 flex-shrink-0 backdrop-blur-sm border-b ${isDark ? 'bg-neutral-900/80 border-neutral-700' : 'bg-white/80 border-slate-300'}`}>
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-xs font-bold shadow-lg shadow-blue-500/20 text-white">
                         AI

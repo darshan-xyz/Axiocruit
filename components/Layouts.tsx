@@ -25,7 +25,7 @@ export const ThemeToggle: React.FC<{ className?: string }> = ({ className = '' }
       onClick={toggleTheme}
       aria-label="Toggle theme"
       className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40 ${
-        isDark ? 'bg-slate-800 border border-slate-700' : 'bg-slate-200 border border-slate-300/80'
+        isDark ? 'bg-slate-800 border border-slate-700' : 'bg-slate-200 border border-slate-300'
       } ${className}`}
     >
       <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full flex items-center justify-center transition-transform duration-200 shadow-sm ${
@@ -78,13 +78,13 @@ export const PublicLayout: React.FC = () => {
       <header className={`sticky top-0 z-40 w-full px-4 sm:px-6 lg:px-8 pt-3 pb-2 transition-colors duration-200 ${
         /* Matches Hero: isHomePage ? 'bg-[#D4F882]' */
         isHomePage ? (isDark ? 'bg-[#0A0E1A]' : 'bg-[#D4F882]') : (isDark ? 'bg-slate-900' : 'bg-white')
-      } ${isHomePage && isScrolled ? (isDark ? 'bg-[#0A0E1A]/90 backdrop-blur-md border-b border-slate-800/50' : 'bg-[#D4F882]/90 backdrop-blur-md border-b border-[#111111]/10') : ''}`}>
+      } ${isHomePage && isScrolled ? (isDark ? 'bg-[#0A0E1A]/90 backdrop-blur-md border-b border-slate-800' : 'bg-[#D4F882]/90 backdrop-blur-md border-b border-[#111111]/10') : ''}`}>
         <nav className={`max-w-6xl mx-auto rounded-full px-5 py-2.5 flex items-center justify-between border transition-all shadow-sm ${
           isDark
             ? (isHomePage && !isScrolled
-                ? 'bg-[#111726]/90 border-slate-800/90 backdrop-blur-xl'
-                : 'bg-[#111726]/85 border-slate-800/90 backdrop-blur-xl')
-            : 'bg-[#0A0A0A]/95 border-neutral-800/90 backdrop-blur-xl shadow-xl'
+                ? 'bg-[#111726]/90 border-slate-700 backdrop-blur-xl'
+                : 'bg-[#111726]/85 border-slate-700 backdrop-blur-xl')
+            : 'bg-[#0A0A0A]/95 border-neutral-700 backdrop-blur-xl shadow-xl'
         }`}>
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
             <BrandLogo className="w-8 h-8 text-sm" />
@@ -371,7 +371,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
       <div className="w-full flex-1 flex flex-col min-h-screen bg-white dark:bg-[#111726] border-0 rounded-none shadow-none overflow-hidden /* full-screen edge-to-edge layout: w-full max-w-[1540px] mx-auto rounded-[28px] rounded-[36px] shadow-2xl */">
         
         {/* macOS Window Top Chrome & Pill Navigation Bar */}
-        <header className="h-16 flex items-center justify-between px-5 md:px-7 border-b border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/60 backdrop-blur-md flex-shrink-0 z-20">
+        <header className="h-16 flex items-center justify-between px-5 md:px-7 border-b border-slate-300 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/60 backdrop-blur-md flex-shrink-0 z-20">
           <div className="flex items-center gap-4">
             {/* Window controls removed for full-screen UI: #FF5F56 #FFBD2E #27C93F */}
 
@@ -526,7 +526,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
             </div>
 
             {/* User Profile & Sign Out Footer */}
-            <div className="p-3.5 border-t border-slate-200 dark:border-slate-700">
+            <div className="p-3.5 border-t border-slate-300 dark:border-slate-700">
               <div className="flex items-center justify-between px-2 py-1.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-850 transition-colors">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
