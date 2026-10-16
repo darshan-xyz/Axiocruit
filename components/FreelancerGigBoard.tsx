@@ -100,7 +100,7 @@ export const FreelancerGigBoard: React.FC = () => {
                                     <img
                                         src={gig.recruiterId?.profilePicture || DEFAULT_AVATAR}
                                         alt="Company"
-                                        className="w-12 h-12 rounded-lg bg-neutral-800 object-cover border border-slate-300 dark:border-neutral-700"
+                                        className="w-12 h-12 rounded-lg bg-neutral-800 object-cover border border-slate-300 dark:border-slate-700"
                                     />
                                     <div>
                                         <h3 className="font-bold text-slate-900 dark:text-white text-lg leading-tight">{gig.jobId?.title || 'General Interview'}</h3>
@@ -118,7 +118,7 @@ export const FreelancerGigBoard: React.FC = () => {
                                 <Badge variant="info">Open</Badge>
                             </div>
 
-                            <div className="bg-slate-50 dark:bg-black/30 p-3 rounded-lg border border-slate-300 dark:border-neutral-700">
+                            <div className="bg-slate-50 dark:bg-black/30 p-3 rounded-lg border border-slate-300 dark:border-slate-700">
                                 <div className="flex items-center gap-2 text-slate-700 dark:text-neutral-300 text-sm mb-2">
                                     <Calendar size={14} className="text-blue-600 dark:text-blue-400" />
                                     <span>Proposed Time: <strong>{formatDate(gig.proposedDate)}</strong></span>
@@ -132,7 +132,7 @@ export const FreelancerGigBoard: React.FC = () => {
                                 <h4 className="text-xs font-semibold text-slate-500 dark:text-neutral-500 mb-2 uppercase tracking-wider">Required Technical Skills</h4>
                                 <div className="flex flex-wrap gap-2">
                                     {gig.requiredSkills?.length > 0 ? gig.requiredSkills.map((skill, idx) => (
-                                        <span key={idx} className="text-xs bg-slate-100 dark:bg-neutral-800/80 border border-slate-300 dark:border-neutral-700 px-2 py-1 rounded text-slate-700 dark:text-neutral-300">
+                                        <span key={idx} className="text-xs bg-slate-100 dark:bg-neutral-800/80 border border-slate-300 dark:border-slate-700 px-2 py-1 rounded text-slate-700 dark:text-neutral-300">
                                             {skill}
                                         </span>
                                     )) : (
@@ -141,7 +141,7 @@ export const FreelancerGigBoard: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="mt-auto pt-4 border-t border-slate-300 dark:border-neutral-700 flex gap-3">
+                            <div className="mt-auto pt-4 border-t border-slate-300 dark:border-slate-700 flex gap-3">
                                 <Button
                                     className="w-full flex-1 font-semibold"
                                     onClick={() => handleAcceptGig(gig._id)}
