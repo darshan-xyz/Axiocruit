@@ -83,7 +83,7 @@ export const FreelancerAvailability: React.FC = () => {
     };
 
     return (
-        <Card className="w-full border border-slate-300 dark:border-neutral-700 dark:bg-neutral-900 shadow-xl">
+        <Card className="w-full border border-slate-300 dark:border-slate-700 dark:bg-neutral-900 shadow-xl">
             <ToastContainer />
             <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -101,12 +101,12 @@ export const FreelancerAvailability: React.FC = () => {
             ) : (
                 <div className="space-y-6">
                     {/* Add Slot Control */}
-                    <div className="bg-gray-50 dark:bg-neutral-800/50 p-4 rounded-xl border border-slate-300 dark:border-neutral-700">
+                    <div className="bg-gray-50 dark:bg-neutral-800/50 p-4 rounded-xl border border-slate-300 dark:border-slate-700">
                         <div className="flex flex-col md:flex-row gap-4 items-end">
                             <div className="w-full md:w-1/3">
                                 <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">Day of Week</label>
                                 <select 
-                                    className="w-full rounded-lg py-2.5 px-4 transition-shadow outline-none border bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full rounded-lg py-2.5 px-4 transition-shadow outline-none border bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     value={selectedDay}
                                     onChange={(e) => setSelectedDay(Number(e.target.value))}
                                 >
@@ -119,7 +119,7 @@ export const FreelancerAvailability: React.FC = () => {
                                 <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">Start Time</label>
                                 <input 
                                     type="time" 
-                                    className="w-full rounded-lg py-2.5 px-4 transition-shadow outline-none border bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full rounded-lg py-2.5 px-4 transition-shadow outline-none border bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     value={startTime}
                                     onChange={(e) => setStartTime(e.target.value)}
                                 />
@@ -128,7 +128,7 @@ export const FreelancerAvailability: React.FC = () => {
                                 <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">End Time</label>
                                 <input 
                                     type="time" 
-                                    className="w-full rounded-lg py-2.5 px-4 transition-shadow outline-none border bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full rounded-lg py-2.5 px-4 transition-shadow outline-none border bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     value={endTime}
                                     onChange={(e) => setEndTime(e.target.value)}
                                 />
@@ -154,7 +154,7 @@ export const FreelancerAvailability: React.FC = () => {
                         ) : (
                             <div className="grid grid-cols-1 gap-3">
                                 {timeSlots.map((slot, idx) => (
-                                    <div key={idx} className="flex justify-between items-center bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 p-3 rounded-lg hover:border-blue-500 transition-colors">
+                                    <div key={idx} className="flex justify-between items-center bg-white dark:bg-neutral-800 border border-slate-300 dark:border-slate-700 p-3 rounded-lg hover:border-blue-500 transition-colors">
                                         <div className="flex items-center gap-3">
                                             <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-bold px-3 py-1 rounded w-24 text-center">
                                                 {DAYS_OF_WEEK[slot.dayOfWeek].substring(0, 3)}
@@ -176,7 +176,7 @@ export const FreelancerAvailability: React.FC = () => {
                         )}
                     </div>
 
-                    <div className="pt-6 border-t border-slate-300 dark:border-neutral-700 flex justify-end">
+                    <div className="pt-6 border-t border-slate-300 dark:border-slate-700 flex justify-end">
                         <Button 
                             className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
                             size="lg"
