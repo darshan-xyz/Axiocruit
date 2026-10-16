@@ -136,7 +136,7 @@ export const PublicLayout: React.FC = () => {
         {/* Mobile Dropdown */}
         {isMenuOpen && (
           <div className={`md:hidden mt-2 max-w-6xl mx-auto rounded-3xl p-4 border shadow-xl ${
-            isDark ? 'bg-[#111726] border-slate-800' : 'bg-[#0A0A0A] border-neutral-800 text-white'
+            isDark ? 'bg-[#111726] border-slate-700' : 'bg-[#0A0A0A] border-neutral-700 text-white'
           }`}>
             <div className="flex flex-col space-y-3">
               {['Platform', 'AI Proctoring', 'ATS Engine', 'Pricing'].map(item => {
@@ -152,7 +152,7 @@ export const PublicLayout: React.FC = () => {
                   </a>
                 );
               })}
-              <div className="pt-3 border-t border-neutral-800 dark:border-slate-800 flex flex-col gap-2">
+              <div className="pt-3 border-t border-neutral-700 dark:border-slate-700 flex flex-col gap-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -175,7 +175,7 @@ export const PublicLayout: React.FC = () => {
       </main>
 
       {/* Enterprise Footer */}
-      <footer className={`border-t py-12 ${isDark ? 'border-slate-800 bg-[#0A0E1A]' : 'border-neutral-900 bg-[#050505] text-white'}`}>
+      <footer className={`border-t py-12 ${isDark ? 'border-slate-700 bg-[#0A0E1A]' : 'border-neutral-800 bg-[#050505] text-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2.5 mb-4">
@@ -207,7 +207,7 @@ export const PublicLayout: React.FC = () => {
             </div>
           ))}
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 pt-6 border-t border-neutral-800 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-neutral-400 dark:text-slate-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 pt-6 border-t border-neutral-700 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-neutral-400 dark:text-slate-400">
           <span>(c) 2026 AXIOCRUIT Platform. Enterprise Recruitment System. All rights reserved.</span>
           <span className="flex items-center gap-1.5 font-medium text-neutral-400 dark:text-slate-400">
             <span className="w-2 h-2 rounded-full bg-emerald-500" /> All microservices operational
@@ -502,7 +502,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
 
             {/* Iridescent AI Assistant Card */}
             <div className="p-3.5">
-              <div className="rounded-3xl p-4 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white shadow-md relative overflow-hidden group">
+              <div className="rounded-3xl p-4 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white shadow-md relative overflow-hidden group border border-blue-400/30 dark:border-indigo-400/30">
                 <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 rounded-full blur-xl pointer-events-none" />
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-1.5">

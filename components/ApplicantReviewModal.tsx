@@ -42,10 +42,10 @@ export const ApplicantReviewModal: React.FC<ApplicantReviewModalProps> = ({
             <div className="flex flex-col h-full max-h-[80vh]">
 
                 {/* Header Section */}
-                <div className="flex items-start gap-6 border-b border-slate-300 dark:border-neutral-700 pb-6 mb-6">
+                <div className="flex items-start gap-6 border-b border-slate-300 dark:border-slate-700 pb-6 mb-6">
                     <img
                         src={data.profilePicture || DEFAULT_AVATAR}
-                        className="w-24 h-24 rounded-xl object-cover border-2 border-slate-300 dark:border-neutral-700"
+                        className="w-24 h-24 rounded-xl object-cover border-2 border-slate-300 dark:border-slate-700"
                         alt="profile"
                     />
                     <div className="flex-1">
@@ -79,7 +79,7 @@ export const ApplicantReviewModal: React.FC<ApplicantReviewModalProps> = ({
                                 )}
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-center border-slate-300 dark:border-neutral-600 text-neutral-300 hover:text-white"
+                                    className="w-full justify-center border-slate-300 dark:border-slate-600 text-neutral-300 hover:text-white"
                                     onClick={() => {
                                         const jobId = application?.job?._id || application?.job || '';
                                         const candidateId = application?.candidate?._id || application?.candidate || application?._id || '';
@@ -95,7 +95,7 @@ export const ApplicantReviewModal: React.FC<ApplicantReviewModalProps> = ({
                 </div>
 
                 {/* Tabs Navigation */}
-                <div className="flex border-b border-slate-300 dark:border-neutral-700 mb-6">
+                <div className="flex border-b border-slate-300 dark:border-slate-700 mb-6">
                     <button
                         className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'summary' ? 'border-blue-600 text-blue-600 dark:text-blue-400' : 'border-transparent text-neutral-400 hover:text-white'}`}
                         onClick={() => setActiveTab('summary')}
@@ -123,7 +123,7 @@ export const ApplicantReviewModal: React.FC<ApplicantReviewModalProps> = ({
                         <div className="space-y-6 animate-in fade-in duration-300">
                             <div>
                                 <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-white"><User size={18} className="text-blue-600 dark:text-blue-400" /> About</h3>
-                                <p className="text-neutral-300 leading-relaxed text-sm bg-neutral-900/50 p-4 rounded-lg border border-slate-300 dark:border-neutral-700">
+                                <p className="text-neutral-300 leading-relaxed text-sm bg-neutral-900/50 p-4 rounded-lg border border-slate-300 dark:border-slate-700">
                                     {data.bio || "No bio provided."}
                                 </p>
                             </div>
@@ -132,7 +132,7 @@ export const ApplicantReviewModal: React.FC<ApplicantReviewModalProps> = ({
                                 <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-white"><BarChart2 size={18} className="text-blue-600 dark:text-blue-400" /> Skills</h3>
                                 <div className="flex flex-wrap gap-2">
                                     {data.skills?.map((skill: string, idx: number) => (
-                                        <Badge key={idx} variant="neutral" className="bg-neutral-800 border-slate-300 dark:border-neutral-600 text-neutral-300">{skill}</Badge>
+                                        <Badge key={idx} variant="neutral" className="bg-neutral-800 border-slate-300 dark:border-slate-600 text-neutral-300">{skill}</Badge>
                                     )) || <p className="text-sm text-neutral-500">No skills listed.</p>}
                                 </div>
                             </div>
@@ -143,8 +143,8 @@ export const ApplicantReviewModal: React.FC<ApplicantReviewModalProps> = ({
                         <div className="space-y-6 animate-in fade-in duration-300">
                             <div className="space-y-4">
                                 {data.experience?.map((exp: any, idx: number) => (
-                                    <div key={idx} className="relative pl-6 border-l-2 border-slate-300 dark:border-neutral-700 hover:border-blue-500 transition-colors pb-6 last:pb-0">
-                                        <div className="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-black border-2 border-slate-400 dark:border-neutral-500 group-hover:border-blue-500 transition-colors"></div>
+                                    <div key={idx} className="relative pl-6 border-l-2 border-slate-300 dark:border-slate-700 hover:border-blue-500 transition-colors pb-6 last:pb-0">
+                                        <div className="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-black border-2 border-slate-400 dark:border-slate-600 group-hover:border-blue-500 transition-colors"></div>
                                         <h4 className="font-bold text-white text-lg">{exp.designation}</h4>
                                         <p className="text-blue-600 dark:text-blue-400 font-medium mb-1">{exp.company}</p>
                                         <p className="text-xs text-neutral-500 mb-2 flex items-center gap-1">
@@ -161,7 +161,7 @@ export const ApplicantReviewModal: React.FC<ApplicantReviewModalProps> = ({
                         <div className="space-y-6 animate-in fade-in duration-300">
                             <div className="grid gap-4">
                                 {data.education?.map((edu: any, idx: number) => (
-                                    <div key={idx} className="bg-neutral-900/30 border border-slate-300 dark:border-neutral-700 p-4 rounded-lg flex items-start gap-4">
+                                    <div key={idx} className="bg-neutral-900/30 border border-slate-300 dark:border-slate-700 p-4 rounded-lg flex items-start gap-4">
                                         <div className="p-3 bg-blue-500/10 rounded-lg text-blue-600 dark:text-blue-400">
                                             <GraduationCap size={24} />
                                         </div>
@@ -179,9 +179,9 @@ export const ApplicantReviewModal: React.FC<ApplicantReviewModalProps> = ({
                 </div>
 
                 {/* Footer / Actions */}
-                <div className="flex gap-3 pt-6 mt-2 border-t border-slate-300 dark:border-neutral-700">
+                <div className="flex gap-3 pt-6 mt-2 border-t border-slate-300 dark:border-slate-700">
                     <Button className="flex-1" icon={Video} onClick={onSchedule}>Schedule Interview</Button>
-                    <Button variant="outline" className="flex-1 border-slate-300 dark:border-neutral-600" icon={MessageSquare} onClick={onMessage}>Send Message</Button>
+                    <Button variant="outline" className="flex-1 border-slate-300 dark:border-slate-600" icon={MessageSquare} onClick={onMessage}>Send Message</Button>
                     {onProposeHire && (
                         <Button className="bg-[#FFD700]/20 text-[#FFD700] hover:bg-[#FFD700]/30 border border-[#FFD700]/50" onClick={onProposeHire}>
                             ⭐ Propose as Final Hire

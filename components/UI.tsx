@@ -257,10 +257,10 @@ export const MetricStatCard: React.FC<MetricStatCardProps> = ({
   onClick
 }) => {
   const colorMap = {
-    pink: "bg-[#FF5D8F] text-white",
-    emerald: "bg-[#10B981] text-white",
-    blue: "bg-[#2563EB] text-white",
-    coral: "bg-[#FF6B6B] text-white",
+    pink: "bg-[#FF5D8F] text-white border border-pink-400/40 dark:border-pink-400/30",
+    emerald: "bg-[#10B981] text-white border border-emerald-400/40 dark:border-emerald-400/30",
+    blue: "bg-[#2563EB] text-white border border-blue-400/40 dark:border-blue-400/30",
+    coral: "bg-[#FF6B6B] text-white border border-rose-400/40 dark:border-rose-400/30",
     dark: "bg-slate-900 text-white dark:bg-slate-850 border border-slate-700",
     white: "bg-white text-slate-900 dark:bg-[#111726] dark:text-white border border-slate-300 dark:border-slate-700 shadow-sm",
   };
@@ -324,7 +324,7 @@ export const DualToneProgressBar: React.FC<DualToneProgressBarProps> = ({
           <span>{score}%</span>
         </div>
       )}
-      <div className={`w-full bg-slate-100 dark:bg-slate-800 rounded-full ${heightClass} overflow-hidden`}>
+      <div className={`w-full bg-slate-100 dark:bg-slate-800 rounded-full ${heightClass} overflow-hidden border border-slate-300/80 dark:border-slate-700`}>
         <div
           className={`${heightClass} rounded-full transition-all duration-700 ease-out ${barColor}`}
           style={{ width: `${Math.min(100, Math.max(0, score))}%` }}
