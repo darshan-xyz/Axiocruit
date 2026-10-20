@@ -12,6 +12,7 @@ const { registerProctorHandlers } = require('./proctorHandler');
 const { registerInterviewSignalingHandlers } = require('./interviewSignaling');
 const { normalizeRole } = require('../schemas/roleTaxonomy');
 const { getJwtSecret } = require('../config/jwt');
+const metricsCollector = require('../utils/metricsCollector');
 
 // State tracking for Redis pub/sub clients
 let redisPubClient = null;
@@ -147,6 +148,11 @@ const createSocketServer = (httpServer, options = {}) => {
 
   io.on('connection', (socket) => {
     console.log(`[Socket.IO] User connected: ${socket.userName} (${socket.userId}, ${socket.userRole})`);
+    metricsCollector.incGauge('axiocruit_active_websocket_connections', { type: 'realtime' }, 1);
+
+    socket.on('disconnect', () => {
+      metricsCollector.decGauge('axiocruit_active_websocket_connections', { type: 'realtime' }, 1);
+    });
 
     // Register domain event handlers
     registerChatHandlers(io, socket, userSocketMap);

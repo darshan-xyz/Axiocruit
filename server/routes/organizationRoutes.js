@@ -9,6 +9,7 @@ const {
     getOrganizationDetails,
     updateOrganizationDetails
 } = require('../controllers/organizationController');
+const ssoController = require('../controllers/ssoController');
 
 // All routes require authentication + organization role
 router.use(protect, authorize('ORGANIZATION', 'ADMIN'));
@@ -19,5 +20,7 @@ router.get('/jobs', getOrgJobs);
 router.get('/recruiters', getRecruiters);
 router.post('/recruiters/invite', inviteRecruiter);
 router.delete('/recruiters/:id', removeRecruiter);
+router.get('/sso', ssoController.getOrgSsoSettings);
+router.put('/sso', ssoController.updateOrgSsoSettings);
 
 module.exports = router;

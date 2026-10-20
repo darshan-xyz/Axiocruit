@@ -33,12 +33,16 @@ const recruiterServiceRoutes = require('../routes/recruiterServiceRoutes');
 const messageRoutes = require('../routes/messageRoutes');
 const complianceRoutes = require('../routes/complianceRoutes');
 const webhookRoutes = require('../routes/webhookRoutes');
+const metricsRoutes = require('../routes/metricsRoutes');
+const ssoRoutes = require('../routes/ssoRoutes');
+const { metricsMiddleware } = require('../middleware/metricsMiddleware');
 
 const createApp = () => {
   const app = express();
 
   // Enterprise Security & Request Tracing Middleware
   app.use(correlationMiddleware);
+  app.use(metricsMiddleware);
   app.use(securityHeadersMiddleware);
   app.use(
     cors({
@@ -113,6 +117,7 @@ const createApp = () => {
   app.use('/api', apiRateLimiter);
 
   // Application Routes (guarded by requireDatabase to prevent unhandled buffering timeouts)
+  app.use('/api/auth/sso', requireDatabase, ssoRoutes);
   app.use('/api/auth', authRateLimiter, requireDatabase, authRoutes);
   app.use('/api/users', requireDatabase, userRoutes);
   app.use('/api/interviews', requireDatabase, interviewRoutes);
@@ -127,6 +132,8 @@ const createApp = () => {
   app.use('/api/recruiter', requireDatabase, recruiterServiceRoutes);
   app.use('/api/compliance', requireDatabase, complianceRoutes);
   app.use('/api/webhooks', requireDatabase, webhookRoutes);
+  app.use('/metrics', metricsRoutes);
+  app.use('/api/metrics', metricsRoutes);
 
   app.get('/', (req, res) => {
     res.send('Axiocruit Platform API is running...');

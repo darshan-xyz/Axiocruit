@@ -4,6 +4,7 @@
  */
 
 const PROCTOR_THROTTLE_MS = 3000;
+const metricsCollector = require('../utils/metricsCollector');
 
 const registerProctorHandlers = (io, socket, proctorThrottles) => {
   // Relay candidate proctor events to recruiters/interviewers
@@ -36,6 +37,7 @@ const registerProctorHandlers = (io, socket, proctorThrottles) => {
       return;
     }
     socketThrottles.set(evType, now);
+    metricsCollector.incCounter('axiocruit_proctoring_anomalies_total', { type: evType });
 
     console.log(`[Socket.IO][Proctor] Relaying ${evType} from ${socket.userName} to room ${interviewId}`);
     socket.to(interviewId).emit('proctor-event', {

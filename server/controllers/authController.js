@@ -442,6 +442,26 @@ exports.login = exports.loginUser = async (req, res) => {
 
         if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
+        // Enforce Corporate Single Sign-On (SSO) policy
+        if (email) {
+            const userDomain = email.split('@')[1];
+            if (userDomain) {
+                const ssoOrg = await Organization.findOne({
+                    'ssoConfig.enabled': true,
+                    'ssoConfig.enforceSso': true,
+                    'ssoConfig.domains': userDomain,
+                });
+                if (ssoOrg) {
+                    return res.status(403).json({
+                        message: `Corporate Single Sign-On (SSO) is enforced for @${userDomain}. Please sign in via your enterprise Identity Provider.`,
+                        ssoEnforced: true,
+                        organizationName: ssoOrg.name,
+                        provider: ssoOrg.ssoConfig?.provider || 'oidc',
+                    });
+                }
+            }
+        }
+
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 

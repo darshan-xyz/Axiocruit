@@ -9,6 +9,7 @@ const https = require('https');
 const { URL } = require('url');
 const WebhookSubscription = require('../models/WebhookSubscription');
 const WebhookDelivery = require('../models/WebhookDelivery');
+const metricsCollector = require('./metricsCollector');
 
 /**
  * Compute cryptographic HMAC-SHA256 signature for payload verification
@@ -118,6 +119,7 @@ const deliverSingleWebhook = async (subscription, event, data) => {
   const startTime = Date.now();
   const result = await postWebhookPayload(subscription.targetUrl, payloadString, headers);
   const durationMs = Date.now() - startTime;
+  metricsCollector.incCounter('axiocruit_webhooks_dispatched_total', { event, success: String(result.success) });
 
   let deliveryRecord = null;
   try {

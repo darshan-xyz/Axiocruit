@@ -106,4 +106,12 @@ router.get('/ready', async (req, res) => {
   });
 });
 
+const metricsController = require('../controllers/metricsController');
+
+/**
+ * Standard Kubernetes Liveness & Readiness Probes
+ */
+router.get('/health/live', metricsController.getLivenessProbe);
+router.get('/health/ready', metricsController.getReadinessProbe);
+
 module.exports = router;

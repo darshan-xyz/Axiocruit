@@ -1032,21 +1032,28 @@ const executeCpp = (code, input) => {
  * Polyglot execution router.
  * Dispatches code execution to the hardened sandbox of the requested language.
  */
-const executePolyglot = (code, input, language = 'python') => {
+const executePolyglot = async (code, input, language = 'python') => {
   const lang = String(language || 'python').toLowerCase().trim();
+  let result;
   if (lang === 'javascript' || lang === 'nodejs' || lang === 'js') {
-    return executeJavaScript(code, input);
+    result = await executeJavaScript(code, input);
+  } else if (lang === 'typescript' || lang === 'ts') {
+    result = await executeTypeScript(code, input);
+  } else if (lang === 'java') {
+    result = await executeJava(code, input);
+  } else if (lang === 'cpp' || lang === 'c++') {
+    result = await executeCpp(code, input);
+  } else {
+    result = await executePython(code, input);
   }
-  if (lang === 'typescript' || lang === 'ts') {
-    return executeTypeScript(code, input);
-  }
-  if (lang === 'java') {
-    return executeJava(code, input);
-  }
-  if (lang === 'cpp' || lang === 'c++') {
-    return executeCpp(code, input);
-  }
-  return executePython(code, input);
+
+  const status = result?.errorType ? 'fail' : 'pass';
+  try {
+    const metricsCollector = require('../utils/metricsCollector');
+    metricsCollector.incCounter('axiocruit_coding_assessments_total', { language: lang, status });
+  } catch (_) {}
+
+  return result;
 };
 
 /**
