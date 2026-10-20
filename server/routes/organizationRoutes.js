@@ -10,6 +10,7 @@ const {
     updateOrganizationDetails
 } = require('../controllers/organizationController');
 const ssoController = require('../controllers/ssoController');
+const roleController = require('../controllers/roleController');
 
 // All routes require authentication + organization role
 router.use(protect, authorize('ORGANIZATION', 'ADMIN'));
@@ -22,5 +23,13 @@ router.post('/recruiters/invite', inviteRecruiter);
 router.delete('/recruiters/:id', removeRecruiter);
 router.get('/sso', ssoController.getOrgSsoSettings);
 router.put('/sso', ssoController.updateOrgSsoSettings);
+
+// RBAC custom roles & permissions
+router.get('/permissions', roleController.listPermissions);
+router.get('/roles', roleController.listCustomRoles);
+router.post('/roles', roleController.createCustomRole);
+router.put('/roles/:id', roleController.updateCustomRole);
+router.delete('/roles/:id', roleController.deleteCustomRole);
+router.post('/members/:id/role', roleController.assignMemberRole);
 
 module.exports = router;

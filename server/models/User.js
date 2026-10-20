@@ -40,6 +40,7 @@ const userSchema = new mongoose.Schema({
 
   // Organization Link (For Org Admin & Recruiters)
   organization: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization' },
+  customRole: { type: mongoose.Schema.Types.ObjectId, ref: 'CustomRole', default: null },
 
   // Profile Link
   profile: { type: mongoose.Schema.Types.ObjectId, ref: 'Profile' },
