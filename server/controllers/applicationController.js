@@ -7,6 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const HttpClient = require('../utils/httpClient');
+const { dispatchWebhookEvent } = require('../utils/webhookDispatcher');
 
 // AI Service config (defaults to port 8002 for microservice isolation)
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8002';
@@ -307,6 +308,20 @@ exports.applyWithCV = async (req, res) => {
             job.applicants.push(req.user.id);
             await job.save();
 
+            if (job.organization) {
+                dispatchWebhookEvent({
+                    organizationId: job.organization,
+                    event: 'application.created',
+                    data: {
+                        applicationId: application._id,
+                        jobId: job._id,
+                        jobTitle: job.title,
+                        candidateId: req.user.id,
+                        aiScore: application.aiScore,
+                    },
+                });
+            }
+
             return res.status(201).json({
                 message: 'Application submitted successfully',
                 application: {
@@ -342,6 +357,19 @@ exports.applyWithCV = async (req, res) => {
 
         job.applicants.push(req.user.id);
         await job.save();
+
+        if (job.organization) {
+            dispatchWebhookEvent({
+                organizationId: job.organization,
+                event: 'application.created',
+                data: {
+                    applicationId: application._id,
+                    jobId: job._id,
+                    jobTitle: job.title,
+                    candidateId: req.user.id,
+                },
+            });
+        }
 
         // Immediately return HTTP 201 without blocking event loop
         res.status(201).json({

@@ -11,6 +11,7 @@ const Job = require('../models/Job');
 const Application = require('../models/Application');
 const User = require('../models/User');
 const HttpClient = require('../utils/httpClient');
+const { dispatchWebhookEvent } = require('../utils/webhookDispatcher');
 
 // AI Service URL from environment (defaults to port 8002 for microservice isolation)
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8002';
@@ -231,6 +232,24 @@ exports.scheduleInterview = async (req, res) => {
       .populate('recruiterId', 'name email profilePicture')
       .populate('interviewerId', 'name email profilePicture')
       .populate('jobId', 'title company');
+
+    if (newInterview.jobId) {
+      Job.findById(newInterview.jobId).then((j) => {
+        if (j && j.organization) {
+          dispatchWebhookEvent({
+            organizationId: j.organization,
+            event: 'interview.scheduled',
+            data: {
+              interviewId: newInterview._id,
+              meetingId: newInterview.meetingId,
+              scheduledTime: newInterview.scheduledTime,
+              candidateId: newInterview.candidateId,
+              recruiterId: newInterview.recruiterId,
+            },
+          });
+        }
+      }).catch(() => {});
+    }
 
     res.status(201).json(populated);
   } catch (error) {
@@ -773,6 +792,24 @@ exports.completeInterview = async (req, res) => {
       });
 
       console.log(`[Complete-BG] Evaluation saved for ${req.params.id}. aiGenerating=false`);
+
+      if (interview.jobId) {
+        Job.findById(interview.jobId).then((j) => {
+          if (j && j.organization) {
+            dispatchWebhookEvent({
+              organizationId: j.organization,
+              event: 'interview.completed',
+              data: {
+                interviewId: interview._id,
+                candidateId: interview.candidateId,
+                status: 'Completed',
+                suitabilityScore: aiResult.suitabilityScore,
+                codingScore: codingScore,
+              },
+            });
+          }
+        }).catch(() => {});
+      }
     })().catch(async (bgErr) => {
       console.error(`[Complete-BG] Critical unhandled error in AI evaluation for ${req.params.id}:`, bgErr.message);
       try {

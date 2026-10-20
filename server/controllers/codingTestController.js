@@ -10,8 +10,10 @@ const { spawn, exec, execFile } = require('child_process');
 
 const TestSession    = require('../models/TestSession');
 const CodingQuestion = require('../models/CodingQuestion');
+const Job            = require('../models/Job');
 const { getNextTarget, pickQuestion } = require('../utils/adaptiveEngine');
 const HttpClient     = require('../utils/httpClient');
+const { dispatchWebhookEvent } = require('../utils/webhookDispatcher');
 
 // Roles that can conduct/manage an interview session (mirrors codingTestRoutes.js)
 const HOST_ROLES = ['RECRUITER', 'ADMIN', 'ORGANIZATION', 'INTERVIEWER'];
@@ -1383,6 +1385,24 @@ const getNextQuestionAuto = async (req, res) => {
       session.status      = 'completed';
       session.completedAt = new Date();
       await session.save();
+
+    if (session.jobId && session.status === 'completed') {
+      Job.findById(session.jobId).then((j) => {
+        if (j && j.organization) {
+          dispatchWebhookEvent({
+            organizationId: j.organization,
+            event: 'assessment.completed',
+            data: {
+              sessionId: session._id,
+              jobId: session.jobId,
+              candidateId: session.candidateId,
+              finalScore: session.finalScore,
+              status: 'completed',
+            },
+          });
+        }
+      }).catch(() => {});
+    }
       return res.json({ done: true, finalScore: session.finalScore, sessionId: session._id });
     }
 
@@ -1396,11 +1416,47 @@ const getNextQuestionAuto = async (req, res) => {
       session.status      = 'completed';
       session.completedAt = new Date();
       await session.save();
+
+    if (session.jobId && session.status === 'completed') {
+      Job.findById(session.jobId).then((j) => {
+        if (j && j.organization) {
+          dispatchWebhookEvent({
+            organizationId: j.organization,
+            event: 'assessment.completed',
+            data: {
+              sessionId: session._id,
+              jobId: session.jobId,
+              candidateId: session.candidateId,
+              finalScore: session.finalScore,
+              status: 'completed',
+            },
+          });
+        }
+      }).catch(() => {});
+    }
       return res.json({ done: true, finalScore: session.finalScore, sessionId: session._id });
     }
 
     session.questionsAsked.push(question._id);
     await session.save();
+
+    if (session.jobId && session.status === 'completed') {
+      Job.findById(session.jobId).then((j) => {
+        if (j && j.organization) {
+          dispatchWebhookEvent({
+            organizationId: j.organization,
+            event: 'assessment.completed',
+            data: {
+              sessionId: session._id,
+              jobId: session.jobId,
+              candidateId: session.candidateId,
+              finalScore: session.finalScore,
+              status: 'completed',
+            },
+          });
+        }
+      }).catch(() => {});
+    }
 
     return res.json({
       sessionId: session._id,
@@ -1446,6 +1502,24 @@ const getNextQuestion = async (req, res) => {
       session.status      = 'completed';
       session.completedAt = new Date();
       await session.save();
+
+    if (session.jobId && session.status === 'completed') {
+      Job.findById(session.jobId).then((j) => {
+        if (j && j.organization) {
+          dispatchWebhookEvent({
+            organizationId: j.organization,
+            event: 'assessment.completed',
+            data: {
+              sessionId: session._id,
+              jobId: session.jobId,
+              candidateId: session.candidateId,
+              finalScore: session.finalScore,
+              status: 'completed',
+            },
+          });
+        }
+      }).catch(() => {});
+    }
       return res.json({ done: true, finalScore: session.finalScore, sessionId: session._id });
     }
 
@@ -1487,12 +1561,48 @@ const getNextQuestion = async (req, res) => {
       session.status      = 'completed';
       session.completedAt = new Date();
       await session.save();
+
+    if (session.jobId && session.status === 'completed') {
+      Job.findById(session.jobId).then((j) => {
+        if (j && j.organization) {
+          dispatchWebhookEvent({
+            organizationId: j.organization,
+            event: 'assessment.completed',
+            data: {
+              sessionId: session._id,
+              jobId: session.jobId,
+              candidateId: session.candidateId,
+              finalScore: session.finalScore,
+              status: 'completed',
+            },
+          });
+        }
+      }).catch(() => {});
+    }
       return res.json({ done: true, finalScore: session.finalScore, sessionId: session._id });
     }
 
     // Track this question so it is never repeated
     session.questionsAsked.push(question._id);
     await session.save();
+
+    if (session.jobId && session.status === 'completed') {
+      Job.findById(session.jobId).then((j) => {
+        if (j && j.organization) {
+          dispatchWebhookEvent({
+            organizationId: j.organization,
+            event: 'assessment.completed',
+            data: {
+              sessionId: session._id,
+              jobId: session.jobId,
+              candidateId: session.candidateId,
+              finalScore: session.finalScore,
+              status: 'completed',
+            },
+          });
+        }
+      }).catch(() => {});
+    }
 
     return res.json({
       questionNumber:    session.responses.length + 1,
@@ -1652,6 +1762,24 @@ const submitAnswer = async (req, res) => {
         finalScore = session.finalScore;
       }
       await session.save();
+
+    if (session.jobId && session.status === 'completed') {
+      Job.findById(session.jobId).then((j) => {
+        if (j && j.organization) {
+          dispatchWebhookEvent({
+            organizationId: j.organization,
+            event: 'assessment.completed',
+            data: {
+              sessionId: session._id,
+              jobId: session.jobId,
+              candidateId: session.candidateId,
+              finalScore: session.finalScore,
+              status: 'completed',
+            },
+          });
+        }
+      }).catch(() => {});
+    }
 
       return res.json({
         passed: false,
@@ -1881,6 +2009,24 @@ const submitAnswer = async (req, res) => {
 
     await session.save();
 
+    if (session.jobId && session.status === 'completed') {
+      Job.findById(session.jobId).then((j) => {
+        if (j && j.organization) {
+          dispatchWebhookEvent({
+            organizationId: j.organization,
+            event: 'assessment.completed',
+            data: {
+              sessionId: session._id,
+              jobId: session.jobId,
+              candidateId: session.candidateId,
+              finalScore: session.finalScore,
+              status: 'completed',
+            },
+          });
+        }
+      }).catch(() => {});
+    }
+
     // ── Build response ───────────────────────────────────────────────────
     return res.json({
       // Overall verdict
@@ -2004,6 +2150,24 @@ const endSession = async (req, res) => {
     session.status      = 'completed';
     session.completedAt = new Date();
     await session.save();
+
+    if (session.jobId && session.status === 'completed') {
+      Job.findById(session.jobId).then((j) => {
+        if (j && j.organization) {
+          dispatchWebhookEvent({
+            organizationId: j.organization,
+            event: 'assessment.completed',
+            data: {
+              sessionId: session._id,
+              jobId: session.jobId,
+              candidateId: session.candidateId,
+              finalScore: session.finalScore,
+              status: 'completed',
+            },
+          });
+        }
+      }).catch(() => {});
+    }
 
     console.log(`[CodingTest] Session ${session._id} ended by ${role}. ` +
       `Final score: ${session.finalScore}% (${session.responses.length} questions answered)`);

@@ -31,6 +31,8 @@ const codingTestRoutes = require('../routes/codingTestRoutes');
 const freelancerRoutes = require('../routes/freelancerRoutes');
 const recruiterServiceRoutes = require('../routes/recruiterServiceRoutes');
 const messageRoutes = require('../routes/messageRoutes');
+const complianceRoutes = require('../routes/complianceRoutes');
+const webhookRoutes = require('../routes/webhookRoutes');
 
 const createApp = () => {
   const app = express();
@@ -123,6 +125,8 @@ const createApp = () => {
   app.use('/api/coding-test', requireDatabase, codingTestRoutes);
   app.use('/api/freelancers', requireDatabase, freelancerRoutes);
   app.use('/api/recruiter', requireDatabase, recruiterServiceRoutes);
+  app.use('/api/compliance', requireDatabase, complianceRoutes);
+  app.use('/api/webhooks', requireDatabase, webhookRoutes);
 
   app.get('/', (req, res) => {
     res.send('Axiocruit Platform API is running...');

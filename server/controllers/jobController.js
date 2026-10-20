@@ -3,6 +3,7 @@ const Job = require('../models/Job');
 const Application = require('../models/Application');
 const User = require('../models/User');
 const { logAuditEvent } = require('../utils/auditLogger');
+const { dispatchWebhookEvent } = require('../utils/webhookDispatcher');
 
 const escapeRegex = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -630,6 +631,19 @@ exports.approveDelegatedHire = async (req, res) => {
                 delegatedFreelancerId: job.delegatedFreelancerId
             }
         });
+
+        if (job.organization || req.user.organization) {
+            dispatchWebhookEvent({
+                organizationId: job.organization || req.user.organization,
+                event: 'hire.approved',
+                data: {
+                    jobId: job._id,
+                    jobTitle: job.title,
+                    candidateId: job.proposedCandidateId,
+                    approvedBy: req.user._id,
+                },
+            });
+        }
 
         res.json({ message: 'Hire approved successfully. Job closed.', job });
     } catch (err) {

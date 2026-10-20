@@ -49,4 +49,6 @@ module.exports = {
   CanonicalRoles,
   normalizeRole,
   isHostRole,
+  isAdminRole: (role) => normalizeRole(role) === CanonicalRoles.ADMIN,
+  isOrgAdminRole: (role) => normalizeRole(role) === CanonicalRoles.ORGANIZATION || normalizeRole(role) === CanonicalRoles.ADMIN,
 };
