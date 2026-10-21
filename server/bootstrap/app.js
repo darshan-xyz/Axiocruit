@@ -36,6 +36,7 @@ const webhookRoutes = require('../routes/webhookRoutes');
 const metricsRoutes = require('../routes/metricsRoutes');
 const ssoRoutes = require('../routes/ssoRoutes');
 const storageRoutes = require('../routes/storageRoutes');
+const scorecardRoutes = require('../routes/scorecardRoutes');
 const { metricsMiddleware } = require('../middleware/metricsMiddleware');
 
 const createApp = () => {
@@ -134,6 +135,7 @@ const createApp = () => {
   app.use('/api/compliance', requireDatabase, complianceRoutes);
   app.use('/api/webhooks', requireDatabase, webhookRoutes);
   app.use('/api/storage', requireDatabase, storageRoutes);
+  app.use('/api/scorecards', requireDatabase, scorecardRoutes);
   app.use('/metrics', metricsRoutes);
   app.use('/api/metrics', metricsRoutes);
 

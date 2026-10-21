@@ -26,4 +26,7 @@ router.patch('/freelancers/:id/approve', adminController.approveFreelancer);
 // Audit Logging
 router.get('/audit-logs', adminController.getAuditLogs);
 
+// SIEM Real-time Security Stream
+router.use('/siem', require('./siemRoutes'));
+
 module.exports = router;

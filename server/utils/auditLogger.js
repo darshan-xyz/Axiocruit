@@ -50,6 +50,12 @@ const logAuditEvent = async ({ req, actor, action, resource, details = {} }) => 
     });
 
     await logEntry.save();
+
+    try {
+      const siemService = require('../services/siemService');
+      siemService.dispatch(logEntry);
+    } catch (_) {}
+
     return logEntry;
   } catch (err) {
     console.warn(`[AuditLogger] Non-fatal error persisting audit log for action ${action}:`, err.message);
