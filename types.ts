@@ -77,6 +77,7 @@ export interface User {
   // Freelancer Approval Status & Organization Link
   approvalStatus?: 'APPROVED' | 'PENDING' | 'REJECTED';
   organization?: string;
+  mfa?: { enabled: boolean };
 
   profile?: any;
   createdAt?: string;

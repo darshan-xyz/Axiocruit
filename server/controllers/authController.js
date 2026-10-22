@@ -465,6 +465,21 @@ exports.login = exports.loginUser = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
+        // Intercept 2FA challenge if MFA is enabled
+        if (user.mfa && user.mfa.enabled) {
+            const mfaToken = jwt.sign(
+                { id: user._id, email: user.email, role: user.role, type: 'mfa_challenge' },
+                getJwtSecret(),
+                { expiresIn: '5m' }
+            );
+            return res.status(200).json({
+                mfaRequired: true,
+                mfaToken,
+                userId: user._id,
+                email: user.email,
+            });
+        }
+
         const { accessToken, refreshToken } = await issueSessionTokens(user, req, res);
 
         // Tamper-evident audit log
@@ -689,3 +704,5 @@ exports.changePassword = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+exports.issueSessionTokens = issueSessionTokens;

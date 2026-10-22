@@ -29,4 +29,8 @@ router.get('/audit-logs', adminController.getAuditLogs);
 // SIEM Real-time Security Stream
 router.use('/siem', require('./siemRoutes'));
 
+// Background Job Queue & Dead-Letter Queue (DLQ)
+router.use('/queue', require('./queueRoutes'));
+router.use('/background-jobs', require('./queueRoutes'));
+
 module.exports = router;

@@ -57,6 +57,21 @@ const userSchema = new mongoose.Schema({
 
   profilePicture: { type: String, default: null },
   resumeUrl: { type: String }, // Store resume URL directly on User model
+
+  // Multi-Factor Authentication (MFA / 2FA)
+  mfa: {
+    enabled: { type: Boolean, default: false },
+    secret: { type: String, default: null },
+    tempSecret: { type: String, default: null },
+    recoveryCodes: [
+      {
+        codeHash: { type: String, required: true },
+        used: { type: Boolean, default: false },
+        usedAt: { type: Date, default: null },
+      },
+    ],
+  },
+
   createdAt: { type: Date, default: Date.now },
 });
 

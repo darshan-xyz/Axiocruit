@@ -29,4 +29,7 @@ router.post('/change-password', protect, require('../controllers/authController'
 router.post('/register-recruiter', protect, checkRole('ORGANIZATION'), addRecruiter);
 router.get('/recruiters', protect, checkRole('ORGANIZATION'), require('../controllers/authController').getRecruiters);
 
+// Multi-Factor Authentication (MFA / 2FA) Routes
+router.use('/mfa', require('./mfaRoutes'));
+
 module.exports = router;
